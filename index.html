@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
+  <meta name="theme-color" content="#0d0f0c" />
+  <meta name="description" content="THE LONG ROAD — a 2D road-trip survival tower defense. Drive, loot, build the rig, and hold the line." />
+  <title>THE LONG ROAD — Drive. Loot. Hold the line.</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%230d0f0c'/%3E%3Cpath d='M32 8l15 18-15 30-15-30z' fill='%23ff7a1a'/%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+<div id="app">
+  <canvas id="game" aria-label="The Long Road game canvas"></canvas>
+  <div class="fx-vignette"></div>
+  <div class="fx-scan"></div>
+
+  <!-- ═══════════════ HUD ═══════════════ -->
+  <div id="hud" class="hud hidden">
+    <div class="hud-top">
+      <div class="hud-loc">
+        <div class="eyebrow">
+          <span id="hudMile">MILE 000</span>
+          <span class="eyebrow-dot">·</span>
+          <span id="hudStop">STOP 1 / 12</span>
+        </div>
+        <div class="loc-name" id="hudLoc">OPEN ROAD</div>
+        <div class="route-track" aria-hidden="true">
+          <div class="route-fill" id="routeFill"></div>
+          <div class="route-nodes" id="routeNodes"></div>
+          <div class="route-marker" id="routeMarker"></div>
+        </div>
+      </div>
+      <div class="hud-right">
+        <div class="scrap-pill"><span class="scrap-diamond">◆</span><b id="hudScrap">0</b></div>
+        <button id="pauseBtn" class="icon-btn" aria-label="Pause game">Ⅱ</button>
+      </div>
+    </div>
+
+    <div id="baseHud" class="hud-base hidden">
+      <div class="base-top">
+        <span>RIG INTEGRITY</span>
+        <b id="baseText">120</b>
+      </div>
+      <div class="bar base-bar"><i id="baseFill"></i></div>
+      <div class="wave-label" id="waveLabel">WAVE 1 / 2</div>
+    </div>
+
+    <div class="hud-vitals">
+      <div class="vital">
+        <div class="vital-label"><span>HULL</span><b id="healthText">100</b></div>
+        <div class="bar health-bar"><i id="healthFill"></i></div>
+      </div>
+      <div class="vital">
+        <div class="vital-label"><span>ARMOR</span><b id="armorText">0</b></div>
+        <div class="bar armor-bar"><i id="armorFill"></i></div>
+      </div>
+      <div class="weapon-chip" id="weaponChip">
+        <span class="weapon-dot" id="weaponDot"></span>
+        <span id="weaponName">RUST PISTOL</span>
+        <span class="weapon-ammo" id="weaponAmmo">AUTO</span>
+      </div>
+    </div>
+
+    <button id="abilityBtn" class="ability-btn" aria-label="Use ability">
+      <span class="ability-ring"></span>
+      <span class="ability-icon" id="abilityIcon">⚡</span>
+      <span class="ability-label" id="abilityLabel">NOS</span>
+      <span class="ability-cd" id="abilityCd"></span>
+    </button>
+
+    <div id="hint" class="hint"></div>
+  </div>
+
+  <!-- ═══════════════ BUILD PANEL ═══════════════ -->
+  <div id="buildPanel" class="build-panel hidden">
+    <div class="build-head">
+      <div class="build-title-wrap">
+        <div class="eyebrow" id="buildEyebrow">HOLD THE LINE</div>
+        <h2 id="buildTitle">PREPARE THE RIG</h2>
+        <p id="buildSub">Place turrets, then call the wave.</p>
+      </div>
+      <div class="build-scrap"><span class="scrap-diamond">◆</span><b id="buildScrap">0</b></div>
+    </div>
+    <div id="turretCards" class="turret-cards"></div>
+    <div class="build-actions">
+      <button id="autoPlaceBtn" class="ghost-btn small">AUTO-PLACE</button>
+      <button id="startWaveBtn" class="primary-btn">START WAVE</button>
+    </div>
+  </div>
+
+  <!-- ═══════════════ TITLE ═══════════════ -->
+  <section id="titleScreen" class="screen title-screen">
+    <div class="title-shade"></div>
+    <div class="title-top">
+      <div class="brand-mark"><span class="brand-slash"></span>SURVIVAL DIVISION <span class="brand-sep">/</span> UNIT 66</div>
+      <div class="title-mile">388 MILES <span>·</span> 12 STOPS</div>
+    </div>
+
+    <div class="title-main">
+      <div class="title-kicker"><span class="kicker-line"></span> THE ROAD IS THE LAST PLACE LEFT <span class="kicker-line"></span></div>
+      <h1 class="logo">
+        <span class="logo-the">THE</span>
+        <span class="logo-long">LONG</span>
+        <span class="logo-road">ROAD</span>
+      </h1>
+      <p class="title-tagline">DRIVE · LOOT · HOLD THE LINE</p>
+      <p class="title-blurb">Twelve stops. One rig. A highway full of medium-weak zombies.<br>Build the car. Build the base. See Haven.</p>
+    </div>
+
+    <div class="title-menu">
+      <button id="startBtn" class="primary-btn big">START THE ENGINE</button>
+      <button id="continueBtn" class="ghost-btn hidden">CONTINUE RUN <span id="continueLabel">· STOP 1</span></button>
+      <div class="title-links">
+        <button id="howBtn" class="text-btn">HOW TO PLAY</button>
+        <span class="link-dot">/</span>
+        <button id="resetBtn" class="text-btn">ERASE SAVE</button>
+      </div>
+    </div>
+
+    <div class="title-foot">
+      <span><b>5</b> CARS</span>
+      <span><b>6</b> WEAPONS</span>
+      <span><b>12</b> PARTS</span>
+      <span><b>6</b> TURRETS</span>
+      <span class="foot-warn">NO HAPPY ENDINGS. ONLY HAVEN.</span>
+    </div>
+  </section>
+
+  <!-- ═══════════════ GARAGE ═══════════════ -->
+  <section id="garageScreen" class="screen garage-screen hidden">
+    <div class="garage-wrap">
+      <header class="garage-head">
+        <div class="garage-title-wrap">
+          <div class="eyebrow" id="garageEyebrow">STOP 1 CLEARED</div>
+          <h2 id="garageTitle">LAST CHANCE DINER</h2>
+          <p id="garageTagline">Coffee, pie, and the end of the world.</p>
+        </div>
+        <div class="garage-car-panel">
+          <canvas id="garageCar" width="300" height="150" aria-hidden="true"></canvas>
+          <div class="garage-car-meta">
+            <b id="garageCarName">INTERCEPTOR</b>
+            <span id="garageCarClass">MUSCLE</span>
+          </div>
+        </div>
+      </header>
+
+      <div class="garage-summary" id="garageSummary"></div>
+
+      <nav class="garage-tabs" id="garageTabs" aria-label="Garage categories">
+        <button data-tab="cars" class="active">CARS</button>
+        <button data-tab="weapons">WEAPONS</button>
+        <button data-tab="armor">ARMOR</button>
+        <button data-tab="parts">PARTS</button>
+        <button data-tab="base">BASE</button>
+      </nav>
+
+      <div class="garage-list" id="garageList"></div>
+
+      <footer class="garage-foot">
+        <div class="foot-scrap"><span class="scrap-diamond">◆</span><b id="garageScrap">0</b><span>SCRAP</span></div>
+        <button id="nextLegBtn" class="primary-btn">NEXT LEG <span>→</span></button>
+      </footer>
+    </div>
+  </section>
+
+  <!-- ═══════════════ PAUSE ═══════════════ -->
+  <section id="pauseScreen" class="screen modal-screen hidden">
+    <div class="modal-card pause-card">
+      <div class="eyebrow">ENGINE IDLING</div>
+      <h2>PAUSED</h2>
+      <div class="pause-stats" id="pauseStats"></div>
+      <button id="resumeBtn" class="primary-btn">RESUME</button>
+      <button id="muteBtn" class="ghost-btn">SOUND: ON</button>
+      <button id="abandonBtn" class="text-btn danger-text">QUIT TO TITLE</button>
+    </div>
+  </section>
+
+  <!-- ═══════════════ END SCREEN ═══════════════ -->
+  <section id="endScreen" class="screen modal-screen hidden">
+    <div class="modal-card end-card">
+      <div class="eyebrow" id="endKicker">RUN ENDED</div>
+      <h2 id="endTitle">THE ROAD WINS</h2>
+      <p id="endSub">The horde got the rig. The road remembers.</p>
+      <div class="end-stats" id="endStats"></div>
+      <button id="retryBtn" class="primary-btn">RETRY CHECKPOINT</button>
+      <button id="endTitleBtn" class="ghost-btn">QUIT TO TITLE</button>
+    </div>
+  </section>
+
+  <!-- ═══════════════ HOW TO PLAY ═══════════════ -->
+  <section id="howScreen" class="screen modal-screen hidden">
+    <div class="modal-card how-card">
+      <div class="eyebrow">FIELD MANUAL</div>
+      <h2>HOW TO SURVIVE</h2>
+      <div class="how-steps">
+        <div class="how-step">
+          <span class="how-num">01</span>
+          <div><b>DRIVE</b><p>Drag anywhere to steer. Your roof gun auto-fires at anything in range. Run over the weak ones. Grab scrap. Reach the next stop.</p></div>
+        </div>
+        <div class="how-step">
+          <span class="how-num">02</span>
+          <div><b>HOLD THE LINE</b><p>At every stop, the dead come for the rig. Place your turrets on hardpoints, aim the main gun by dragging, and survive every wave.</p></div>
+        </div>
+        <div class="how-step">
+          <span class="how-num">03</span>
+          <div><b>BUILD</b><p>Spend scrap in the garage on cars, weapons, armor, parts, turrets, and base modules. Then take the next leg toward Haven.</p></div>
+        </div>
+      </div>
+      <div class="how-keys">
+        <span><kbd>A</kbd><kbd>D</kbd> STEER</span>
+        <span><kbd>SPACE</kbd> NOS / PULSE</span>
+        <span><kbd>P</kbd> PAUSE</span>
+      </div>
+      <button id="howCloseBtn" class="primary-btn">GOT IT</button>
+    </div>
+  </section>
+
+  <div id="toast" class="toast"></div>
+  <div id="banner" class="banner">
+    <div class="banner-kicker" id="bannerKicker"></div>
+    <div class="banner-main" id="bannerMain"></div>
+    <div class="banner-sub" id="bannerSub"></div>
+  </div>
+  <div id="flash" class="screen-flash"></div>
+</div>
+<script type="module" src="js/game.js"></script>
+</body>
+</html>
