@@ -44,7 +44,8 @@ function spawnBall(p, charge, opts = {}) {
   const plan = throwPlan(p, charge);
   const weapon = weaponOf(p.char.id);
   const pow = 1 + 0.08 * upgradeBonus('power');
-  const dmg = Math.round((12 + 20 * charge) * pow * (roundMod.damage || 1) * weapon.damage * (opts.catchBonus ? 1.2 : 1));
+  const baseDmg = weapon.base || 12;
+  const dmg = Math.round((baseDmg + 12 * charge) * pow * (roundMod.damage || 1) * (opts.catchBonus ? 1.2 : 1));
   const r = (12 + 9 * charge) * S * (roundMod.ballSize || 1) * weapon.size;
   const b = {
     x: plan.hand.x, y: plan.hand.y,
@@ -230,23 +231,26 @@ function updateBalls(dt) {
 }
 
 function spawnSplit(b, out) {
-  for (let k = -1; k <= 1; k += 2) {
+  const n = 5;
+  for (let i = 0; i < n; i++) {
+    const ang = (i / (n - 1) - 0.5) * Math.PI * 0.9;
+    const sp = 180 * S;
     out.push({
       x: b.x, y: b.y,
-      vx: b.vx * 0.5 + k * 140 * S,
-      vy: b.vy * 0.5 - 60 * S,
-      r: Math.max(6 * S, b.r * 0.6),
-      owner: b.owner, charge: b.charge * 0.6,
-      damage: Math.max(4, Math.round(b.damage * 0.55)),
-      bounces: 0, bouncesLeft: 1, rest: 0.65,
-      rot: rand(0, TAU), spin: rand(-8, 8),
+      vx: Math.cos(ang) * sp * (b.vx >= 0 ? 1 : -1) * 0.6 + b.vx * 0.3,
+      vy: Math.sin(ang) * sp - 40 * S,
+      r: Math.max(5 * S, b.r * 0.35),
+      owner: b.owner, charge: b.charge * 0.4,
+      damage: 4,
+      bounces: 0, bouncesLeft: 2, rest: 0.75,
+      rot: rand(0, TAU), spin: rand(-10, 10),
       age: 0, dead: false, caught: false,
       weapon: b.weapon, wcolor: b.wcolor, wshape: b.wshape,
-      knock: (b.knock || 1) * 0.7, special: 'none',
+      knock: 0.6, special: 'none',
       pierceLeft: 0, splitDone: true,
     });
   }
-  burst(b.x, b.y, b.wcolor || '#fff4d8', 12, 0.9, 'star');
+  burst(b.x, b.y, b.wcolor || '#fff4d8', 16, 1.1, 'star');
 }
 
 function spawnStormBall() {
