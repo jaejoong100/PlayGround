@@ -42,19 +42,22 @@ function releaseThrow(p) {
 
 function spawnBall(p, charge, opts = {}) {
   const plan = throwPlan(p, charge);
+  const weapon = weaponOf(p.char.id);
   const pow = 1 + 0.08 * upgradeBonus('power');
-  const dmg = Math.round((12 + 20 * charge) * pow * (roundMod.damage || 1) * (opts.catchBonus ? 1.2 : 1));
-  const r = (12 + 9 * charge) * S * (roundMod.ballSize || 1);
+  const dmg = Math.round((12 + 20 * charge) * pow * (roundMod.damage || 1) * weapon.damage * (opts.catchBonus ? 1.2 : 1));
+  const r = (12 + 9 * charge) * S * (roundMod.ballSize || 1) * weapon.size;
   const b = {
     x: plan.hand.x, y: plan.hand.y,
-    vx: plan.vx, vy: plan.vy,
+    vx: plan.vx * weapon.speed, vy: plan.vy * weapon.speed,
     r, owner: p.idx, charge,
     damage: dmg,
     bounces: 0,
     bouncesLeft: roundMod.bounce ?? 2,
     rest: roundMod.rest ?? 0.78,
-    rot: rand(0, TAU), spin: rand(-8, 8),
+    rot: rand(0, TAU), spin: rand(-weapon.spin, weapon.spin),
     age: 0, dead: false, caught: !!opts.catchBonus,
+    weapon: p.char.id, wcolor: weapon.color, wshape: weapon.shape,
+    knock: weapon.knock || 1,
   };
   balls.push(b);
 
@@ -175,14 +178,6 @@ function updateBalls(dt) {
       }
       if (b.dead) break;
 
-      for (const pl of platforms) {
-        if (collideBallRect(b, pl)) {
-          offBounce(b, b.x, b.y);
-          if (b.dead) break;
-        }
-      }
-      if (b.dead) break;
-
       for (const p of players) {
         if (!p || p.ko || p.invuln > 0 || p.idx === b.owner) continue;
         const hx = p.x, hy = p.y - 40 * S;
@@ -230,7 +225,7 @@ function hitPlayer(p, dmg, dir, ball) {
   p.hitstun = 0.2;
   p.charging = false;
   p.charge = 0;
-  p.vx += dir * 320 * S;
+  p.vx += dir * 320 * S * (ball && ball.knock ? ball.knock : 1);
   p.vy = Math.min(p.vy, -250 * S);
   p.onGround = false;
   roundDamage[p.idx] += dmg;
@@ -297,8 +292,8 @@ function spawnPickup(type) {
       y = floorY - 28 * S;
     }
   } while (tries < 12 && players.some(p => dist(p.x, p.y - 40 * S, x, y) < 80 * S));
-  pickups.push({ type, x, y, ph: rand(0, TAU), life: 26 });
-  addParticle({ x, y, life: 0.45, size: 10 * S, color: type === 'coin' ? '#ffd23f' : '#ff5d5d', kind: 'ring', grav: 0 });
+  pickups.push({ type: 'heart', x, y, ph: rand(0, TAU), life: 26 });
+  addParticle({ x, y, life: 0.45, size: 10 * S, color: '#ff5d5d', kind: 'ring', grav: 0 });
 }
 
 function updatePickups(dt) {
@@ -309,20 +304,11 @@ function updatePickups(dt) {
       if (!p || p.ko) continue;
       if (dist(p.x, p.y - 40 * S, pk.x, pk.y) < 38 * S) {
         pk.dead = true;
-        if (pk.type === 'coin') {
-          awardGold(2, 'coins');
-          profile.stats.coins = (profile.stats.coins || 0) + 1;
-          if (profile.stats.coins >= 25) unlock('coin25');
-          addFloater('+2', pk.x, pk.y - 22 * S, '#ffd23f', 22);
-          burst(pk.x, pk.y, '#ffd23f', 10, 0.7, 'star');
-          sfx.coin();
-        } else {
-          p.hp = Math.min(p.maxHp, p.hp + 22);
-          addFloater('+22', pk.x, pk.y - 22 * S, '#ff6b8a', 22);
-          burst(pk.x, pk.y, '#ff5d5d', 10, 0.7, 'star');
-          sfx.heart();
-          updateHud();
-        }
+        p.hp = Math.min(p.maxHp, p.hp + 22);
+        addFloater('+22', pk.x, pk.y - 22 * S, '#ff6b8a', 22);
+        burst(pk.x, pk.y, '#ff5d5d', 10, 0.7, 'star');
+        sfx.heart();
+        updateHud();
         break;
       }
     }
