@@ -170,7 +170,7 @@ function startRound() {
   roundDamage = [0, 0];
   roundWinner = null;
   balls = []; particles = []; floaters = []; pickups = [];
-  stormTimer = 2.6; heartTimer = 9;
+  stormTimer = 2.6; heartTimer = 4.5;
   shake = 0; hitstop = 0;
   timeScale = 1; timeScaleTarget = 1; slowmoT = 0;
   generatePlatforms();
@@ -856,7 +856,7 @@ function update(dtRaw) {
     }
     heartTimer -= sdt;
     if (heartTimer <= 0) {
-      heartTimer = rand(10, 16);
+      heartTimer = rand(5, 8);
       if (players.some(p => p.hp < p.maxHp * 0.7) && !pickups.some(p => p.type === 'heart')) spawnPickup('heart');
     }
   }
