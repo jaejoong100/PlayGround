@@ -278,7 +278,7 @@ kbd{
 .joystick.active .stick-knob{background:#fff;transition:transform 0s,background .1s ease}
 .touch .actions{display:flex;flex-direction:column;gap:6px;height:var(--joy);pointer-events:none}
 .tbtn{
-  pointer-events:auto;touch-action:none;appearance:none;
+  pointer-events:auto;touch-action:none;appearance:none;cursor:pointer;
   border:2.5px solid var(--ink);border-radius:15px;background:rgba(255,244,216,.9);
   color:var(--ink);font-family:"Bungee",sans-serif;font-size:13px;line-height:1;
   box-shadow:0 4px 0 var(--ink),inset 0 -3px 0 rgba(0,0,0,.08);

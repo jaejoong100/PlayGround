@@ -104,7 +104,7 @@ function newMatch(mode = '2p', chars = null) {
     lastMod: null, hits: 0, catches: 0,
     chars: duo.slice(),
   };
-  matchEarnings = { coins: 0, hits: 0, rounds: 0, victory: 0, ach: 0 };
+  matchEarnings = { hits: 0, rounds: 0, victory: 0, ach: 0 };
   roundDamage = [0, 0];
   endShown = false;
   paused = false;
@@ -167,7 +167,7 @@ function startRound() {
   roundDamage = [0, 0];
   roundWinner = null;
   balls = []; particles = []; floaters = []; pickups = [];
-  stormTimer = 2.6; coinTimer = 2.2; heartTimer = 9;
+  stormTimer = 2.6; heartTimer = 9;
   shake = 0; hitstop = 0;
   timeScale = 1; timeScaleTarget = 1; slowmoT = 0;
   generatePlatforms();
@@ -271,10 +271,9 @@ function showEndScreen() {
     : quips[match.round % quips.length];
   renderPortrait(el.endPortrait, winner.char.id, color);
 
-  const e = matchEarnings || { coins: 0, hits: 0, rounds: 0, victory: 0, ach: 0 };
-  const total = e.coins + e.hits + e.rounds + e.victory + e.ach;
+  const e = matchEarnings || { hits: 0, rounds: 0, victory: 0, ach: 0 };
+  const total = e.hits + e.rounds + e.victory + e.ach;
   el.earnings.innerHTML = [
-    ['Coins grabbed', e.coins],
     ['Bonks landed', e.hits],
     ['Round wins', e.rounds],
     ['Match bonus', e.victory],
@@ -824,11 +823,6 @@ function update(dtRaw) {
     if (roundMod.storm) {
       stormTimer -= sdt;
       if (stormTimer <= 0) { stormTimer = rand(3.2, 5); spawnStormBall(); }
-    }
-    coinTimer -= sdt;
-    if (coinTimer <= 0) {
-      coinTimer = rand(3.6, 5.6);
-      if (pickups.filter(p => p.type === 'coin').length < 3) spawnPickup('coin');
     }
     heartTimer -= sdt;
     if (heartTimer <= 0) {

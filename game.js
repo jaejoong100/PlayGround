@@ -317,7 +317,7 @@ let hitstop = 0;
 let timeScale = 1, timeScaleTarget = 1, slowmoT = 0;
 let gameT = 0;
 let lastFrame = 0;
-let stormTimer = 0, coinTimer = 0, heartTimer = 0;
+let stormTimer = 0, heartTimer = 0;
 let countdownLabel = '';
 let lastTimerLabel = '';
 
@@ -478,17 +478,17 @@ function handPoint(p) {
 function aimTarget(p) {
   const opp = getOpponent(p);
   if (!opp) return { x: p.x + p.facing * 300 * S, y: p.y - 40 * S, vx: 0, vy: 0 };
-  return { x: opp.x, y: opp.y - 40 * S, vx: opp.vx, vy: opp.vy };
+  return { x: opp.x, y: opp.y - 40 * S, vx: 0, vy: 0 };
 }
 function throwPlan(p, charge) {
   const h = handPoint(p);
   const t = aimTarget(p);
   const dx = t.x - h.x, dy = t.y - h.y;
   let T = clamp(Math.hypot(dx, dy) / (1080 * S), 0.34, 0.76) * (1 - 0.16 * charge);
-  const tx = t.x + (t.vx || 0) * T * 0.26;
-  const ty = t.y + (t.vy || 0) * T * 0.12;
+  const tx = t.x;
+  const ty = t.y;
   const g = ballGravityFor();
-  const vx = (tx - h.x) / T + rand(-4, 4) * S;
+  const vx = (tx - h.x) / T;
   const vy = (ty - h.y - 0.5 * g * T * T) / T;
   return { vx, vy, T, g, hand: h, tx, ty };
 }

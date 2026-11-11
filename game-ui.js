@@ -10,7 +10,7 @@ const ICONS = {
   heart: `<svg viewBox="0 0 32 32" width="30" height="30" aria-hidden="true"><path d="M16 27C8 21 4 17 4 12a6 6 0 0 1 11-3 6 6 0 0 1 11 3c0 5-4 9-12 15z" fill="#fff4d8" stroke="#241335" stroke-width="2.4" stroke-linejoin="round"/><path d="M10 12c0-2 2-3 4-2" fill="none" stroke="#ff5d5d" stroke-width="2.2" stroke-linecap="round"/></svg>`,
 };
 
-let currentArcadeTab = 'upgrades';
+let currentArcadeTab = 'brawlers';
 let toastCount = 0;
 let howFromPause = false;
 
@@ -41,6 +41,7 @@ function toastAchievement(a) {
 function openArcade(tab) {
   ensureAudio();
   if (tab) currentArcadeTab = tab;
+  if (currentArcadeTab === 'upgrades') currentArcadeTab = 'brawlers';
   el.screenHow.classList.add('hidden');
   el.screenArcade.classList.remove('hidden');
   modalOpen = true;
@@ -73,28 +74,7 @@ function renderArcade() {
   el.arcadeSub.textContent = sub[currentArcadeTab] || '';
   updateGoldUI();
 
-  if (currentArcadeTab === 'upgrades') {
-    el.arcadeBody.innerHTML = `<div class="up-grid">${UPGRADE_IDS.map(id => {
-      const u = UPGRADES[id];
-      const lvl = upgradeBonus(id);
-      const maxed = lvl >= u.max;
-      const cost = maxed ? 0 : u.costs[lvl];
-      const afford = profile.gold >= cost;
-      return `<div class="up-card">
-        <div class="up-icon">${ICONS[u.icon] || ''}</div>
-        <div class="up-info">
-          <div class="up-name">${u.name}</div>
-          <div class="up-desc">${u.desc}</div>
-          <div class="up-levels">${Array.from({ length: u.max }, (_, i) => `<i class="${i < lvl ? 'on' : ''}"></i>`).join('')}</div>
-        </div>
-        <div class="up-buy">
-          <button class="buy-btn" data-buy="${id}" ${(maxed || !afford) ? 'disabled' : ''}>
-            ${maxed ? 'MAX' : 'BUY'}<span class="cost">${maxed ? 'FULL POWER' : cost + ' COINS'}</span>
-          </button>
-        </div>
-      </div>`;
-    }).join('')}</div>`;
-  } else if (currentArcadeTab === 'brawlers') {
+  if (currentArcadeTab === 'brawlers') {
     el.arcadeBody.innerHTML = `<div class="char-grid">${CHARS.map(c => {
       const owned = profile.unlocked.includes(c.id);
       const afford = profile.gold >= c.cost;

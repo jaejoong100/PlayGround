@@ -765,47 +765,18 @@ function drawPickups(t) {
   for (const pk of pickups) {
     const bob = Math.sin(t * 3 + pk.ph) * 4 * S;
     const y = pk.y + bob;
-    if (pk.type === 'coin') {
-      const spin = Math.cos(t * 4 + pk.ph);
-      ctx.save();
-      ctx.translate(pk.x, y);
-      ctx.beginPath(); ctx.ellipse(0, 24 * S, 10 * S, 3.5 * S, 0, 0, TAU);
-      ctx.fillStyle = 'rgba(14,6,26,.25)'; ctx.fill();
-      ctx.scale(Math.max(0.18, Math.abs(spin)), 1);
-      ctx.beginPath(); ctx.arc(0, 0, 13 * S, 0, TAU);
-      ctx.fillStyle = '#ffd23f'; ctx.fill();
-      ctx.lineWidth = 3 * S; ctx.strokeStyle = INK; ctx.stroke();
-      ctx.beginPath(); ctx.arc(0, 0, 8 * S, 0, TAU);
-      ctx.lineWidth = 2 * S; ctx.strokeStyle = '#e39a13'; ctx.stroke();
-      starPath(ctx, 5.2 * S, 2.2 * S, 5);
-      ctx.fillStyle = '#fff3a8'; ctx.fill();
-      ctx.lineWidth = 1.2 * S; ctx.strokeStyle = '#c27b08'; ctx.stroke();
-      if (Math.abs(spin) > 0.7) {
-        ctx.beginPath(); ctx.ellipse(-4.2 * S, -4.5 * S, 2.2 * S, 4 * S, -0.4, 0, TAU);
-        ctx.fillStyle = 'rgba(255,255,255,.7)'; ctx.fill();
-      }
-      ctx.restore();
-      // sparkle
-      if ((t + pk.ph) % 2.4 < 0.3) {
-        const a = (t + pk.ph) % 2.4 / 0.3;
-        ctx.save(); ctx.translate(pk.x + 12 * S, y - 8 * S); ctx.rotate(a * 2); ctx.globalAlpha = 1 - a;
-        starPath(ctx, 5 * S, 1.4 * S, 4); ctx.fillStyle = CREAM; ctx.fill();
-        ctx.restore();
-      }
-    } else {
-      ctx.save();
-      ctx.translate(pk.x, y);
-      ctx.beginPath(); ctx.ellipse(0, 24 * S, 10 * S, 3.5 * S, 0, 0, TAU);
-      ctx.fillStyle = 'rgba(14,6,26,.25)'; ctx.fill();
-      const pulse = 1 + Math.sin(t * 6 + pk.ph) * 0.06;
-      ctx.scale(pulse, pulse);
-      heartPath(ctx, 0, 0, 14 * S);
-      ctx.fillStyle = '#ff5d5d'; ctx.fill();
-      ctx.lineWidth = 3 * S; ctx.strokeStyle = INK; ctx.stroke();
-      ctx.beginPath(); ctx.ellipse(-5 * S, -5 * S, 3 * S, 5 * S, -0.6, 0, TAU);
-      ctx.fillStyle = 'rgba(255,255,255,.55)'; ctx.fill();
-      ctx.restore();
-    }
+    ctx.save();
+    ctx.translate(pk.x, y);
+    ctx.beginPath(); ctx.ellipse(0, 24 * S, 10 * S, 3.5 * S, 0, 0, TAU);
+    ctx.fillStyle = 'rgba(14,6,26,.25)'; ctx.fill();
+    const pulse = 1 + Math.sin(t * 6 + pk.ph) * 0.06;
+    ctx.scale(pulse, pulse);
+    heartPath(ctx, 0, 0, 14 * S);
+    ctx.fillStyle = '#ff5d5d'; ctx.fill();
+    ctx.lineWidth = 3 * S; ctx.strokeStyle = INK; ctx.stroke();
+    ctx.beginPath(); ctx.ellipse(-5 * S, -5 * S, 3 * S, 5 * S, -0.6, 0, TAU);
+    ctx.fillStyle = 'rgba(255,255,255,.55)'; ctx.fill();
+    ctx.restore();
   }
 }
 
