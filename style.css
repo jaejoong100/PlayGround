@@ -240,7 +240,7 @@ kbd{
 /* ---------------- touch pads ---------------- */
 .touch{position:absolute;left:0;right:0;bottom:0;height:130px;z-index:30;pointer-events:auto}
 .touch .pad{
-  --joy:clamp(86px,13vh,118px);
+  --joy:clamp(112px,16.9vh,153px);
   --btn:clamp(48px,7.2vh,62px);
   position:absolute;bottom:max(7px,env(safe-area-inset-bottom));
   display:flex;align-items:flex-end;gap:8px;pointer-events:auto;
