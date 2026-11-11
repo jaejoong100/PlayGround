@@ -57,7 +57,9 @@ function spawnBall(p, charge, opts = {}) {
     rot: rand(0, TAU), spin: rand(-weapon.spin, weapon.spin),
     age: 0, dead: false, caught: !!opts.catchBonus,
     weapon: p.char.id, wcolor: weapon.color, wshape: weapon.shape,
-    knock: weapon.knock || 1,
+    knock: weapon.knock || 1, special: weapon.special || 'none',
+    pierceLeft: weapon.special === 'pierce' ? 2 : 0,
+    splitDone: false,
   };
   balls.push(b);
 
@@ -143,6 +145,7 @@ function offBounce(b, x, y) {
 }
 
 function updateBalls(dt) {
+  const splitSpawns = [];
   for (const b of balls) {
     if (b.dead) continue;
     b.age += dt;
@@ -153,16 +156,37 @@ function updateBalls(dt) {
     const steps = clamp(Math.ceil(sp * dt / (11 * S)), 1, 4);
     for (let s = 0; s < steps && !b.dead; s++) {
       const step = dt / steps;
+
+      // homing
+      if (b.special === 'homing' && b.owner >= 0) {
+        const opp = players[1 - b.owner];
+        if (opp && !opp.ko) {
+          const tx = opp.x, ty = opp.y - 40 * S;
+          const dx = tx - b.x, dy = ty - b.y;
+          const d = Math.hypot(dx, dy) || 1;
+          const accel = 520 * S;
+          b.vx += (dx / d) * accel * step;
+          b.vy += (dy / d) * accel * step;
+          const sp2 = Math.hypot(b.vx, b.vy);
+          const maxSp = 1500 * S;
+          if (sp2 > maxSp) { b.vx = b.vx / sp2 * maxSp; b.vy = b.vy / sp2 * maxSp; }
+        }
+      }
+
       b.x += b.vx * step;
       b.y += b.vy * step;
 
       // arena walls
       if (b.x - b.r < arena.left) {
         b.x = arena.left + b.r;
-        if (b.vx < 0) { b.vx = -b.vx * b.rest; offBounce(b, arena.left, b.y); }
+        if (b.vx < 0) { b.vx = -b.vx * b.rest; offBounce(b, arena.left, b.y); 
+          if (b.special === 'split' && !b.splitDone) { b.splitDone = true; spawnSplit(b, splitSpawns); }
+        }
       } else if (b.x + b.r > arena.right) {
         b.x = arena.right - b.r;
-        if (b.vx > 0) { b.vx = -b.vx * b.rest; offBounce(b, arena.right, b.y); }
+        if (b.vx > 0) { b.vx = -b.vx * b.rest; offBounce(b, arena.right, b.y);
+          if (b.special === 'split' && !b.splitDone) { b.splitDone = true; spawnSplit(b, splitSpawns); }
+        }
       }
       if (b.y - b.r < arena.top) {
         b.y = arena.top + b.r;
@@ -182,8 +206,19 @@ function updateBalls(dt) {
         if (!p || p.ko || p.invuln > 0 || p.idx === b.owner) continue;
         const hx = p.x, hy = p.y - 40 * S;
         if (dist(b.x, b.y, hx, hy) < b.r + 26 * S) {
-          b.dead = true;
-          hitPlayer(p, b.damage, Math.sign(b.vx) || 1, b);
+          if (b.special === 'explosive') {
+            burst(b.x, b.y, '#ff8c42', 20, 1.5, 'star');
+            shakeIt(14);
+          }
+          if (b.special === 'pierce' && b.pierceLeft > 0) {
+            b.pierceLeft--;
+            hitPlayer(p, b.damage, Math.sign(b.vx) || 1, b);
+            b.vx *= 0.8; b.vy *= 0.8;
+            b.x += b.vx * 0.02; b.y += b.vy * 0.02;
+          } else {
+            b.dead = true;
+            hitPlayer(p, b.damage, Math.sign(b.vx) || 1, b);
+          }
           break;
         }
       }
@@ -191,6 +226,27 @@ function updateBalls(dt) {
     if (b.age > 6.5) b.dead = true;
   }
   balls = balls.filter(b => !b.dead && b.y < H + 200);
+  if (splitSpawns.length) balls.push(...splitSpawns);
+}
+
+function spawnSplit(b, out) {
+  for (let k = -1; k <= 1; k += 2) {
+    out.push({
+      x: b.x, y: b.y,
+      vx: b.vx * 0.5 + k * 140 * S,
+      vy: b.vy * 0.5 - 60 * S,
+      r: Math.max(6 * S, b.r * 0.6),
+      owner: b.owner, charge: b.charge * 0.6,
+      damage: Math.max(4, Math.round(b.damage * 0.55)),
+      bounces: 0, bouncesLeft: 1, rest: 0.65,
+      rot: rand(0, TAU), spin: rand(-8, 8),
+      age: 0, dead: false, caught: false,
+      weapon: b.weapon, wcolor: b.wcolor, wshape: b.wshape,
+      knock: (b.knock || 1) * 0.7, special: 'none',
+      pierceLeft: 0, splitDone: true,
+    });
+  }
+  burst(b.x, b.y, b.wcolor || '#fff4d8', 12, 0.9, 'star');
 }
 
 function spawnStormBall() {
