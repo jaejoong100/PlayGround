@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#101513" />
+  <title>Dustline — The Long Road</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800;900&family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main id="game-shell">
+    <canvas id="game" aria-label="Dustline game"></canvas>
+    <div class="vignette"></div>
+    <header class="topbar">
+      <div class="brand"><span class="brand-mark">D</span><div><b>DUSTLINE</b><small>THE LONG ROAD</small></div></div>
+      <div class="journey"><div class="journey-label"><span id="route-label">HIGHWAY 09</span><span id="stop-label">STOP 01 / 08</span></div><div class="route-track"><i id="route-fill"></i><span class="route-dot"></span><span class="route-dot"></span><span class="route-dot"></span><span class="route-dot"></span></div></div>
+      <button class="sound-button" id="sound-button" aria-label="Toggle sound">♫ <span>SOUND</span></button>
+    </header>
+    <section class="hud-left" aria-label="Vehicle status">
+      <div class="stat-card"><span class="stat-icon heart">✚</span><div class="stat-info"><small>ARMOR</small><div class="meter"><i id="armor-fill" class="armor-fill"></i></div></div><b id="armor-value">100</b></div>
+      <div class="stat-card"><span class="stat-icon fuel">◉</span><div class="stat-info"><small>FUEL</small><div class="meter"><i id="fuel-fill" class="fuel-fill"></i></div></div><b id="fuel-value">100</b></div>
+      <div class="resource-chip"><span>▣</span><b id="scrap-value">025</b><small>SCRAP</small></div>
+    </section>
+    <section class="hud-right"><div class="kill-counter"><span class="skull">☠</span><div><b id="kill-value">00</b><small>WASTED</small></div></div><div class="weapon-badge"><span id="weapon-icon">⌁</span><div><b id="weapon-name">SCRAP RIFLE</b><small id="weapon-detail">BURST • LV 1</small></div></div></section>
+    <div class="toast" id="toast"></div>
+    <div class="phase-banner" id="phase-banner"><span class="banner-line"></span><small>INCOMING</small><b>THE ROAD ISN'T SAFE</b><span class="banner-line"></span></div>
+    <div class="drive-hint" id="drive-hint"><span class="keycap">W</span><span class="keycap">↑</span> HOLD TO PUSH THE GAS</div>
+    <div class="controls" id="controls">
+      <div class="steer-group"><button class="control-btn steer" data-action="up" aria-label="Move up">▲</button><button class="control-btn steer" data-action="down" aria-label="Move down">▼</button></div>
+      <button class="control-btn boost" data-action="boost"><span class="boost-icon">➤</span><span>BOOST</span></button>
+      <button class="control-btn fire" data-action="fire"><span class="fire-icon">✦</span><span>FIRE</span><small id="ammo-label">∞</small></button>
+    </div>
+    <div class="overlay" id="overlay">
+      <section class="dialog intro-dialog" id="intro-dialog">
+        <div class="eyebrow"><i></i> A ROAD SURVIVAL GAME <i></i></div>
+        <h1>THE<br><em>LONG ROAD</em></h1>
+        <p class="intro-copy">The world ended. The road didn't.<br>Drive hard. Scavenge smart. Make it to <b>New Haven.</b></p>
+        <div class="intro-stats"><span><b>08</b><small>STOPS AHEAD</small></span><i></i><span><b>∞</b><small>UNDEAD</small></span><i></i><span><b>01</b><small>LAST CHANCE</small></span></div>
+        <button class="primary-button" id="start-button"><span>START YOUR ENGINE</span><b>→</b></button>
+        <div class="controls-note"><span>WASD / ARROWS</span> MOVE <i>•</i> <span>SPACE</span> FIRE <i>•</i> TOUCH CONTROLS ON MOBILE</div>
+      </section>
+      <section class="dialog stop-dialog hidden" id="stop-dialog">
+        <div class="eyebrow"><i></i> SAFE FOR NOW <i></i></div>
+        <h2 id="stop-title">DUSTY JUNCTION</h2>
+        <p class="dialog-sub" id="stop-sub">A roadside outpost. Pick your next move.</p>
+        <div class="loot-strip"><span>ROAD HAUL</span><b>+<i id="haul-value">18</i> SCRAP</b><small>THREAT LEVEL: <strong id="threat-value">LOW</strong></small></div>
+        <div class="choice-grid" id="choice-grid"></div>
+        <button class="primary-button compact" id="continue-button"><span>ROLL OUT</span><b>→</b></button>
+      </section>
+      <section class="dialog end-dialog hidden" id="end-dialog">
+        <div class="eyebrow"><i></i> RUN COMPLETE <i></i></div>
+        <h2 id="end-title">YOU MADE IT.</h2>
+        <p class="dialog-sub" id="end-copy">New Haven is still standing. For now.</p>
+        <div class="end-stats"><span><b id="end-kills">0</b><small>UNDEAD DROPPED</small></span><span><b id="end-stops">0</b><small>STOPS CLEARED</small></span><span><b id="end-scrap">0</b><small>SCRAP BANKED</small></span></div>
+        <button class="primary-button" id="restart-button"><span>DRIVE AGAIN</span><b>↻</b></button>
+      </section>
+    </div>
+    <div class="mobile-tip" id="mobile-tip">HOLD <b>FIRE</b> TO SHOOT • HOLD <b>BOOST</b> TO REACH THE NEXT STOP</div>
+    <div class="screen-flash" id="screen-flash"></div>
+  </main>
+  <script src="game.js"></script>
+</body>
+</html>
