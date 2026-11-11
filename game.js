@@ -341,7 +341,7 @@ function computeLayout() {
   el.canvas.style.width = W + 'px';
   el.canvas.style.height = H + 'px';
 
-  isTouch = window.matchMedia('(pointer: coarse)').matches;
+  isTouch = window.matchMedia('(pointer: coarse)').matches || (navigator.maxTouchPoints || 0) > 0;
   document.body.classList.toggle('touch', isTouch);
   S = clamp(Math.sqrt(W * H) / 860, 0.66, 1.3);
   apron = isTouch ? clamp(H * 0.27, 96, 134) : clamp(H * 0.075, 44, 66);

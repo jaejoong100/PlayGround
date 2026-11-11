@@ -14,7 +14,7 @@
 }
 
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{height:100%;margin:0;overflow:hidden;background:#1a0c2e;}
+html,body{height:100%;margin:0;overflow:hidden;background:#1a0c2e;touch-action:none;}
 body{
   font-family:"Fredoka","Trebuchet MS",Verdana,sans-serif;
   color:var(--ink);
