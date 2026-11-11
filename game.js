@@ -78,36 +78,121 @@ const CHARS = [
 const CHAR_BY_ID = Object.fromEntries(CHARS.map(c => [c.id, c]));
 const P_COLORS = [P1C, P2C];
 
+/* ------------------------------ weapons ------------------------------ */
+const WEAPONS = [
+  {
+    id: 'ball', name: 'DODGEBALL', short: 'BALL', icon: 'ball',
+    desc: 'The classic. Balanced arc, honest bonk.',
+    color: '#ff5d5d', accent: '#fff4d8',
+    speed: 1160, gravity: 1, drag: 0.9995,
+    radius: 10, chargeRadius: 8,
+    damage: 15, chargeDamage: 18,
+    knock: 1, spin: 7,
+  },
+  {
+    id: 'frisbee', name: 'FRISBEE', short: 'DISC', icon: 'frisbee',
+    desc: 'Fast and flat. Low damage, high style.',
+    color: '#2ec4b6', accent: '#fff4d8',
+    speed: 1580, gravity: 0.16, drag: 0.998,
+    radius: 8, chargeRadius: 5,
+    damage: 10, chargeDamage: 10,
+    knock: 0.7, spin: 16,
+  },
+  {
+    id: 'bomb', name: 'BOMB', short: 'BOMB', icon: 'bomb',
+    desc: 'Lob it. Everything nearby goes boom.',
+    color: '#3a2154', accent: '#ff5d5d',
+    speed: 940, gravity: 1.18, drag: 0.9995,
+    radius: 11, chargeRadius: 6,
+    damage: 0, chargeDamage: 0,
+    blastDamage: 24, blastRadius: 98,
+    knock: 1.1, spin: 3,
+  },
+  {
+    id: 'bowl', name: 'BOWLING BALL', short: 'BOWL', icon: 'bowl',
+    desc: 'Heavy, slow, and deeply rude.',
+    color: '#4b2d7f', accent: '#ffd23f',
+    speed: 1000, gravity: 1.45, drag: 0.9995,
+    radius: 13, chargeRadius: 9,
+    damage: 25, chargeDamage: 17,
+    knock: 1.5, spin: 4,
+  },
+];
+const WEAPON_BY_ID = Object.fromEntries(WEAPONS.map(w => [w.id, w]));
+
+/* ------------------------------ maps ------------------------------ */
+const MAPS = [
+  {
+    id: 'rooftop', name: 'SUNSET ROOFTOP', tag: 'HIGH-ALTITUDE BONKING',
+    sky: ['#3a1e66', '#8a3a8d', '#f56d73', '#ffb35e', '#ffe29a'],
+    sun: '#ffedb0', glow: 'rgba(255,199,110,.16)',
+    far: 'rgba(73,42,104,.72)', near: 'rgba(46,24,73,.9)',
+    window: 'rgba(255,218,130,.22)',
+    floor: '#1d1030', floor2: '#462669', platform: '#e2ab60', platformTop: '#ffe0a0',
+    accent: '#ffd23f', checker: ['#ff8a5c', '#ffe3a1'],
+    platformStyle: 'wood', decor: 'city',
+    layout: [
+      { fx: 0.05, fy: 1, fw: 0.32, motion: 'x' },
+      { fx: 0.42, fy: 2, fw: 0.28, motion: 'y' },
+      { fx: 0.70, fy: 3, fw: 0.24, motion: null },
+    ],
+  },
+  {
+    id: 'harbor', name: 'NEON HARBOR', tag: 'DOCKSIDE DODGEBALL',
+    sky: ['#06162e', '#0c3557', '#14707a', '#2ab39a', '#a8f0cf'],
+    sun: '#bfffe9', glow: 'rgba(80,255,220,.18)',
+    far: 'rgba(10,46,72,.8)', near: 'rgba(6,28,48,.94)',
+    window: 'rgba(120,255,230,.3)',
+    floor: '#061826', floor2: '#0d3b52', platform: '#2f8f9d', platformTop: '#8ff5e2',
+    accent: '#5fffe0', checker: ['#18a2a0', '#bfffe9'],
+    platformStyle: 'metal', decor: 'harbor',
+    layout: [
+      { fx: 0.06, fy: 1, fw: 0.36, motion: 'x' },
+      { fx: 0.50, fy: 1, fw: 0.26, motion: null },
+      { fx: 0.30, fy: 2, fw: 0.30, motion: 'y' },
+      { fx: 0.62, fy: 3, fw: 0.22, motion: 'x' },
+    ],
+  },
+  {
+    id: 'temple', name: 'JUNGLE TEMPLE', tag: 'ANCIENT BONK RUINS',
+    sky: ['#0d2417', '#1d4a2c', '#4c8738', '#b7c95a', '#ffe9a8'],
+    sun: '#fff0a8', glow: 'rgba(255,236,150,.18)',
+    far: 'rgba(24,62,36,.78)', near: 'rgba(12,38,22,.92)',
+    window: 'rgba(255,236,150,.24)',
+    floor: '#0c2414', floor2: '#1e4a2b', platform: '#a8894f', platformTop: '#e8d39a',
+    accent: '#ffe066', checker: ['#4f8b3a', '#e8d39a'],
+    platformStyle: 'stone', decor: 'temple',
+    layout: [
+      { fx: 0.04, fy: 1, fw: 0.28, motion: 'x' },
+      { fx: 0.38, fy: 1, fw: 0.28, motion: null },
+      { fx: 0.22, fy: 2, fw: 0.26, motion: 'y' },
+      { fx: 0.60, fy: 2, fw: 0.24, motion: 'x' },
+      { fx: 0.38, fy: 3, fw: 0.24, motion: null },
+    ],
+  },
+];
+const MAP_BY_ID = Object.fromEntries(MAPS.map(m => [m.id, m]));
+
 /* ------------------------------ round modifiers ------------------------------ */
 const MODS = [
   { id: 'classic', name: 'CLASSIC RULES', desc: 'No funny business. (Allegedly.)' },
-  { id: 'bouncy', name: 'SUPER BALL', desc: 'Dodgeballs bounce like caffeinated kangaroos.', bounce: 3, rest: 1.02 },
   { id: 'moon', name: 'MOON SHOES', desc: 'Low gravity. Maximum hang time.', grav: 0.56, jump: 0.78, ballGrav: 0.58 },
   { id: 'speedy', name: 'HYPER SOCKS', desc: 'Everyone moves extra fast. Good luck.', speed: 1.34 },
-  { id: 'big', name: 'BIG BALL ENERGY', desc: 'Giant dodgeballs. Giant bonks.', ballSize: 1.5, damage: 1.12 },
-  { id: 'storm', name: 'BALL STORM', desc: 'Bonus dodgeballs rain from the sky.', storm: true },
+  { id: 'big', name: 'BIG BALL ENERGY', desc: 'Giant projectiles. Giant bonks.', ballSize: 1.5, damage: 1.12 },
+  { id: 'storm', name: 'BALL STORM', desc: 'Bonus projectiles rain from the sky.', storm: true },
+  { id: 'glass', name: 'GLASS CANNON', desc: 'Everything hits much harder. Yikes.', damage: 1.55 },
 ];
-
-/* ------------------------------ upgrades ------------------------------ */
-const UPGRADES = {
-  speed: { name: 'SPEEDY SNEAKERS', desc: '+5% run speed per level.', max: 3, costs: [60, 130, 230], icon: 'shoe', color: '#ffd23f' },
-  jump: { name: 'SPRING HEELS', desc: '+5% jump per level.', max: 3, costs: [60, 130, 230], icon: 'spring', color: '#2ec4b6' },
-  power: { name: 'POWER GLOVES', desc: '+8% bonk damage per level.', max: 3, costs: [80, 160, 280], icon: 'fist', color: '#ff8fab' },
-  hp: { name: 'IRON BELLY', desc: '+10 max HP per level.', max: 3, costs: [80, 160, 280], icon: 'heart', color: '#25d9f2' },
-};
-const UPGRADE_IDS = Object.keys(UPGRADES);
 
 /* ------------------------------ achievements ------------------------------ */
 const ACHIEVEMENTS = [
   { id: 'random', name: 'RANDOM RUMBLE', desc: 'Start a match with random brawlers.', reward: 20, icon: '🎲' },
   { id: 'first', name: 'FIRST BONK', desc: 'Land your very first hit.', reward: 25, icon: '💥' },
-  { id: 'catcher', name: 'NICE CATCH', desc: 'Catch an incoming dodgeball.', reward: 40, icon: '🧤' },
-  { id: 'wall', name: 'OFF THE WALL', desc: 'Bonk someone with a bounced ball.', reward: 30, icon: '🪃' },
-  { id: 'trick', name: 'TRICK SHOT', desc: 'Hit after two or more bounces.', reward: 60, icon: '🎯' },
+  { id: 'catcher', name: 'NICE CATCH', desc: 'Catch an incoming projectile.', reward: 40, icon: '🧤' },
+  { id: 'demolition', name: 'DEMOLITION', desc: 'KO someone with a bomb.', reward: 80, icon: '💣' },
+  { id: 'heavy', name: 'HEAVY HITTER', desc: 'KO someone with a bowling ball.', reward: 80, icon: '🎳' },
+  { id: 'sniper', name: 'LONG SHOT', desc: 'Land a hit from across the arena.', reward: 60, icon: '🎯' },
   { id: 'untouchable', name: 'UNTOUCHABLE', desc: 'Win a round without getting hit.', reward: 75, icon: '🛡️' },
   { id: 'coin25', name: 'COIN PURSE', desc: 'Collect 25 coins total.', reward: 50, icon: '🪙' },
-  { id: 'shopper', name: 'BIG SPENDER', desc: 'Buy an upgrade.', reward: 50, icon: '🛒' },
-  { id: 'maxed', name: 'FULLY LOADED', desc: 'Max out any upgrade.', reward: 200, icon: '💪' },
   { id: 'regular', name: 'ARCADE REGULAR', desc: 'Play 5 matches.', reward: 80, icon: '🎟️' },
   { id: 'champion', name: 'CHAMPION', desc: 'Win a match.', reward: 100, icon: '👑' },
   { id: 'sweep', name: 'CLEAN SWEEP', desc: 'Win a match 3–0.', reward: 150, icon: '🧹' },
@@ -119,11 +204,12 @@ const SAVE_KEY = 'bonkball.profile.v1';
 function defaultProfile() {
   return {
     gold: 150,
-    upgrades: { speed: 0, jump: 0, power: 0, hp: 0 },
     unlocked: ['gloop', 'pickle'],
     ach: [],
-    stats: { matches: 0, wins: 0, hits: 0, catches: 0, coins: 0, ricochets: 0, rounds: 0, botWins: 0 },
+    stats: { matches: 0, wins: 0, hits: 0, catches: 0, coins: 0, rounds: 0, botWins: 0 },
     muted: false,
+    controls: 'buttons',
+    weapons: ['ball', 'ball'],
   };
 }
 function loadProfile() {
@@ -133,14 +219,18 @@ function loadProfile() {
     if (!raw) return base;
     const p = JSON.parse(raw);
     if (!p || typeof p !== 'object') return base;
+    const weapons = Array.isArray(p.weapons) && p.weapons.length === 2 && p.weapons.every(id => WEAPON_BY_ID[id])
+      ? p.weapons.slice()
+      : base.weapons.slice();
     return {
       ...base, ...p,
-      upgrades: { ...base.upgrades, ...(p.upgrades || {}) },
       stats: { ...base.stats, ...(p.stats || {}) },
       unlocked: Array.isArray(p.unlocked) && p.unlocked.length ? p.unlocked.filter(id => CHAR_BY_ID[id]) : base.unlocked,
       ach: Array.isArray(p.ach) ? p.ach.filter(id => ACH_BY_ID[id]) : [],
       gold: Number.isFinite(p.gold) ? Math.max(0, Math.floor(p.gold)) : base.gold,
       muted: !!p.muted,
+      controls: p.controls === 'sliders' ? 'sliders' : 'buttons',
+      weapons,
     };
   } catch { return base; }
 }
@@ -154,10 +244,7 @@ function saveSoon() {
   saveTimer = setTimeout(saveProfile, 160);
 }
 
-function upgradeBonus(key) {
-  return profile.upgrades[key] || 0;
-}
-function maxHpFor() { return 100 + upgradeBonus('hp') * 10; }
+function maxHpFor() { return 100; }
 
 /* ------------------------------ dom ------------------------------ */
 const $ = sel => document.querySelector(sel);
@@ -168,16 +255,21 @@ const el = {
   p1Hp: $('#p1Hp'), p2Hp: $('#p2Hp'),
   p1HpNum: $('#p1HpNum'), p2HpNum: $('#p2HpNum'),
   p1Pips: $('#p1Pips'), p2Pips: $('#p2Pips'),
+  p1Weapon: $('#p1Weapon'), p2Weapon: $('#p2Weapon'),
   roundTag: $('#roundTag'), timer: $('#timer'), modBadge: $('#modBadge'),
   deskHints: $('#deskHints'),
   screenTitle: $('#screenTitle'),
   titleP1Name: $('#titleP1Name'), titleP2Name: $('#titleP2Name'),
+  titleP1Weapon: $('#titleP1Weapon'), titleP2Weapon: $('#titleP2Weapon'),
+  weaponsP1: $('#weaponsP1'), weaponsP2: $('#weaponsP2'),
   titleP1Canvas: $('#titleP1 .portrait'), titleP2Canvas: $('#titleP2 .portrait'),
   btnPlay: $('#btnPlay'), btnSolo: $('#btnSolo'), btnArcade: $('#btnArcade'), btnHow: $('#btnHow'),
   btnReroll: $('#btnReroll'),
+  ctrlSeg: $('#ctrlSeg'), pauseCtrlSeg: $('#pauseCtrlSeg'),
+  mapTitle: $('#mapTitle'),
   goldTitle: $('#goldTitle'), goldArcade: $('#goldArcade'),
   roundCard: $('#roundCard'), rcRound: $('#rcRound'), rcVs: $('#rcVs'), rcMod: $('#rcMod'),
-  rcDesc: $('#rcDesc'), rcCount: $('#rcCount'),
+  rcDesc: $('#rcDesc'), rcCount: $('#rcCount'), rcMap: $('#rcMap'),
   announce: $('#announce'),
   touch: $('#touch'),
   btnPauseTouch: $('#btnPauseTouch'), btnMute: $('#btnMute'),
@@ -248,9 +340,40 @@ function noiseBurst(dur, vol = 0.18, freq = 1100, delay = 0, type = 'bandpass', 
 }
 const sfx = {
   ui() { blip(620, 0.06, 'triangle', 0.12, 120); },
-  throwBall(charge) {
-    noiseBurst(0.1, 0.09 + charge * 0.07, 700 + charge * 900, 0, 'bandpass', 2400);
-    blip(260 + charge * 120, 0.11, 'triangle', 0.12, -110);
+  throwBall(charge, weapon) {
+    const id = weapon && weapon.id;
+    if (id === 'frisbee') {
+      noiseBurst(0.16, 0.07 + charge * 0.04, 1900, 0, 'bandpass', 900);
+      blip(880 + charge * 160, 0.08, 'triangle', 0.07, 120);
+    } else if (id === 'bomb') {
+      blip(180 + charge * 80, 0.13, 'square', 0.09, -60);
+      noiseBurst(0.1, 0.05, 500, 0, 'lowpass', 260);
+    } else if (id === 'bowl') {
+      noiseBurst(0.14, 0.12, 280, 0, 'lowpass', 90);
+      blip(120, 0.12, 'triangle', 0.11, -50);
+    } else {
+      noiseBurst(0.1, 0.09 + charge * 0.07, 700 + charge * 900, 0, 'bandpass', 2400);
+      blip(260 + charge * 120, 0.11, 'triangle', 0.12, -110);
+    }
+  },
+  crush(weapon) {
+    const id = weapon && weapon.id;
+    if (id === 'frisbee') {
+      noiseBurst(0.08, 0.08, 2600, 0, 'highpass', 1400);
+      blip(1200, 0.06, 'square', 0.06, -300);
+    } else if (id === 'bowl') {
+      noiseBurst(0.18, 0.16, 220, 0, 'lowpass', 70);
+      blip(90, 0.16, 'square', 0.1, -40);
+    } else {
+      noiseBurst(0.12, 0.1, 600, 0, 'bandpass', 200);
+      blip(220, 0.09, 'triangle', 0.07, -100);
+    }
+  },
+  boom() {
+    noiseBurst(0.38, 0.24, 420, 0, 'lowpass', 60);
+    blip(90, 0.34, 'sawtooth', 0.16, -50);
+    blip(180, 0.18, 'square', 0.09, -80, 0.03);
+    for (let i = 0; i < 5; i++) noiseBurst(0.09, 0.05, 1200, 0.08 + i * 0.05, 'bandpass', 300);
   },
   jump() { blip(300, 0.14, 'sine', 0.13, 260); },
   land() { noiseBurst(0.06, 0.05, 320, 0, 'lowpass'); },
@@ -303,6 +426,8 @@ let floaters = [];
 let pickups = [];
 let confetti = [];
 let titleChars = [];
+let titleWeapons = (profile.weapons || ['ball', 'ball']).slice();
+let currentMap = MAPS[0];
 let roundMod = MODS[0];
 let roundTime = 0;
 let countdown = 0;
@@ -345,17 +470,7 @@ function computeLayout() {
   const margin = isTouch ? 14 : 24;
   arena = { left: margin, right: W - margin, top: arenaTop, bottom: floorY };
 
-  skyGrad = ctx.createLinearGradient(0, 0, 0, Math.max(200, floorY));
-  skyGrad.addColorStop(0, '#3a1e66');
-  skyGrad.addColorStop(0.38, '#8a3a8d');
-  skyGrad.addColorStop(0.64, '#f56d73');
-  skyGrad.addColorStop(0.85, '#ffb35e');
-  skyGrad.addColorStop(1, '#ffe29a');
-  vignetteGrad = ctx.createRadialGradient(W / 2, H * 0.45, Math.min(W, H) * 0.2, W / 2, H * 0.5, Math.max(W, H) * 0.78);
-  vignetteGrad.addColorStop(0, 'rgba(20,8,35,0)');
-  vignetteGrad.addColorStop(0.72, 'rgba(20,8,35,0.12)');
-  vignetteGrad.addColorStop(1, 'rgba(20,8,35,0.55)');
-
+  applyMapTheme();
   rebuildDecor();
   if (prevW && (prevW !== W || prevH !== H)) {
     const sx = W / prevW;
@@ -371,47 +486,76 @@ function computeLayout() {
   }
 }
 
+function applyMapTheme() {
+  const map = currentMap || MAPS[0];
+  skyGrad = ctx.createLinearGradient(0, 0, 0, Math.max(200, floorY));
+  const stops = [0, 0.38, 0.64, 0.85, 1];
+  map.sky.forEach((c, i) => skyGrad.addColorStop(stops[i] ?? i / (map.sky.length - 1), c));
+  vignetteGrad = ctx.createRadialGradient(W / 2, H * 0.45, Math.min(W, H) * 0.2, W / 2, H * 0.5, Math.max(W, H) * 0.78);
+  vignetteGrad.addColorStop(0, 'rgba(20,8,35,0)');
+  vignetteGrad.addColorStop(0.72, 'rgba(20,8,35,0.12)');
+  vignetteGrad.addColorStop(1, map.decor === 'temple' ? 'rgba(6,20,10,0.58)' : 'rgba(20,8,35,0.55)');
+}
+
+function useMap(id) {
+  currentMap = MAP_BY_ID[id] || MAPS[0];
+  applyMapTheme();
+  rebuildDecor();
+}
+
 function generatePlatforms() {
   const bw = arena.right - arena.left;
-  const mirror = Math.random() < 0.5;
-  const w = [
-    clamp(250 * S, bw * 0.22, bw * 0.34),
-    clamp(215 * S, bw * 0.20, bw * 0.30),
-    clamp(185 * S, bw * 0.17, bw * 0.26),
-  ];
-
-  // Keep the lowest ledge above a brawler's head (plus badge) and keep every
-  // step within a single jump. Short/landscape screens get fewer ledges rather
-  // than a cramped stack that clips through the fighters.
-  const step = 125 * S;
+  const step = 122 * S;
   const maxRise = Math.max(step, floorY - (arena.top + 54 * S));
   let levels = 1;
   if (maxRise >= step * 2) levels = 2;
   if (maxRise >= step * 3) levels = 3;
 
-  // Chain the platforms horizontally so each one overlaps the next.
-  const xs = [arena.left + bw * 0.05];
-  for (let i = 1; i < levels; i++) {
-    xs[i] = Math.min(xs[i - 1] + w[i - 1] - w[i] * 0.34, arena.right - w[i] - 10);
-  }
+  const specs = (currentMap.layout || MAPS[0].layout).filter(s => s.fy <= levels);
+  platforms = specs.map((spec, i) => {
+    const w = clamp(bw * spec.fw, 150 * S, bw * 0.42);
+    let x = arena.left + bw * spec.fx;
+    x = clamp(x, arena.left + 8, arena.right - w - 8);
+    let y = floorY - step * spec.fy;
+    y = Math.max(y, arena.top + 54 * S);
+    const pl = {
+      x, y, w, h: 12 * S, style: i % 3,
+      baseX: x, baseY: y, phase: rand(0, TAU),
+      motion: null, dx: 0, dy: 0,
+    };
+    if (spec.motion === 'x') {
+      const roomL = x - arena.left - 12;
+      const roomR = arena.right - (x + w) - 12;
+      const range = Math.min(62 * S, roomL, roomR);
+      if (range > 10 * S) pl.motion = { axis: 'x', range, speed: rand(0.7, 1.05) };
+    } else if (spec.motion === 'y') {
+      const roomUp = y - (arena.top + 68 * S);
+      const roomDown = (floorY - 74 * S) - y;
+      const range = Math.min(28 * S, Math.max(0, roomUp), Math.max(0, roomDown));
+      if (range > 8 * S) pl.motion = { axis: 'y', range, speed: rand(0.8, 1.2) };
+    }
+    return pl;
+  });
+}
 
-  platforms = [];
-  for (let i = 0; i < levels; i++) {
-    platforms.push({
-      x: xs[i],
-      y: floorY - step * (i + 1),
-      w: w[i],
-      h: 12 * S,
-      style: i,
-    });
-  }
-
-  if (mirror) {
-    for (const p of platforms) p.x = arena.left + (arena.right - p.x - p.w);
-  }
-  for (const p of platforms) {
-    p.x = clamp(p.x, arena.left + 8, arena.right - p.w - 8);
-    p.y = Math.max(p.y, arena.top + 54 * S);
+function updatePlatforms(dt) {
+  for (const pl of platforms) {
+    if (!pl.motion) { pl.dx = 0; pl.dy = 0; continue; }
+    pl.phase += pl.motion.speed * dt;
+    const off = Math.sin(pl.phase) * pl.motion.range;
+    const nx = pl.motion.axis === 'x' ? pl.baseX + off : pl.baseX;
+    const ny = pl.motion.axis === 'y' ? pl.baseY + off : pl.baseY;
+    pl.dx = nx - pl.x;
+    pl.dy = ny - pl.y;
+    pl.x = nx;
+    pl.y = ny;
+    for (const p of players) {
+      if (p && !p.ko && p.onGround && p.platform === pl) {
+        p.x += pl.dx;
+        p.y += pl.dy;
+        p.x = clamp(p.x, arena.left + 18 * S, arena.right - 18 * S);
+      }
+    }
   }
 }
 
@@ -452,46 +596,63 @@ function nameOf(p) { return p.char.name; }
 function playerColor(p) { return P_COLORS[p.idx]; }
 function getOpponent(p) { return players[1 - p.idx]; }
 function runSpeedFor() {
-  let v = 330 * S;
-  v *= 1 + 0.05 * upgradeBonus('speed');
-  v *= roundMod.speed || 1;
-  return v;
+  return 330 * S * (roundMod.speed || 1);
 }
 function gravityFor() {
   return 2100 * S * (roundMod.grav || 1);
 }
 function jumpSpeedFor() {
-  return 790 * S * (roundMod.jump || 1) * (1 + 0.05 * upgradeBonus('jump'));
+  return 790 * S * (roundMod.jump || 1);
 }
 function ballGravityFor() {
   return 1650 * S * (roundMod.ballGrav || 1);
 }
+function weaponOf(p) {
+  return WEAPON_BY_ID[p && p.weaponId] || WEAPONS[0];
+}
+function throwSpeedFor(weapon, charge) {
+  const w = weapon || WEAPONS[0];
+  return w.speed * S * (0.82 + 0.42 * clamp(charge || 0, 0, 1));
+}
 function handPoint(p) {
-  const opp = getOpponent(p);
-  const dir = opp ? (Math.sign(opp.x - p.x) || p.facing) : p.facing;
+  const dir = p.facing || 1;
   const charging = p.charging;
+  const lift = charging ? Math.sin(clamp(p.aimAngle ?? 0.55, 0, 1.35)) * 10 : 0;
   return {
-    x: p.x + dir * (charging ? 14 : 22) * S,
-    y: p.y - 48 * S,
+    x: p.x + dir * (charging ? 15 : 22) * S,
+    y: p.y - (48 + lift) * S,
     dir,
   };
 }
-function aimTarget(p) {
-  const opp = getOpponent(p);
-  if (!opp) return { x: p.x + p.facing * 300 * S, y: p.y - 40 * S, vx: 0, vy: 0 };
-  return { x: opp.x, y: opp.y - 40 * S, vx: opp.vx, vy: opp.vy };
-}
-function throwPlan(p, charge) {
+function throwPlan(p, charge, weapon) {
+  const w = weapon || weaponOf(p);
   const h = handPoint(p);
-  const t = aimTarget(p);
-  const dx = t.x - h.x, dy = t.y - h.y;
-  let T = clamp(Math.hypot(dx, dy) / (1080 * S), 0.34, 0.76) * (1 - 0.16 * charge);
-  const tx = t.x + (t.vx || 0) * T * 0.26;
-  const ty = t.y + (t.vy || 0) * T * 0.12;
-  const g = ballGravityFor();
-  const vx = (tx - h.x) / T + rand(-4, 4) * S;
-  const vy = (ty - h.y - 0.5 * g * T * T) / T;
-  return { vx, vy, T, g, hand: h, tx, ty };
+  const angle = clamp(p.aimAngle ?? 0.55, 0.04, 1.35);
+  const speed = throwSpeedFor(w, charge);
+  return {
+    hand: h,
+    weapon: w,
+    angle,
+    vx: Math.cos(angle) * speed * (p.facing || 1),
+    vy: -Math.sin(angle) * speed,
+    g: ballGravityFor() * w.gravity,
+  };
+}
+function solveAimAngle(p, target, charge, weapon) {
+  const w = weapon || weaponOf(p);
+  const h = handPoint(p);
+  const speed = throwSpeedFor(w, charge);
+  const g = ballGravityFor() * w.gravity;
+  const X = Math.max(24 * S, Math.abs((target.x || 0) - h.x));
+  const Y = -(((target.y || 0) - 40 * S) - h.y);
+  const v2 = speed * speed;
+  const disc = v2 * v2 - g * (g * X * X + 2 * Y * v2);
+  if (disc < 0) return 0.72;
+  const root = Math.sqrt(disc);
+  const low = Math.atan2(v2 - root, g * X);
+  const high = Math.atan2(v2 + root, g * X);
+  const a = clamp(Math.min(low, high), 0.1, 1.3);
+  return Number.isFinite(a) ? a : 0.72;
 }
 
 /* ------------------------------ drawing: primitives ------------------------------ */

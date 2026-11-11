@@ -21,6 +21,7 @@
       <div class="fc-top">
         <span class="p-tag">P1</span>
         <span class="fc-name" id="p1Name">GLOOP</span>
+        <span class="fc-weapon" id="p1Weapon">BALL</span>
         <span class="fc-hp" id="p1HpNum">100</span>
       </div>
       <div class="hp-track"><div class="hp-fill" id="p1Hp"></div><div class="hp-shine"></div></div>
@@ -34,6 +35,7 @@
     <div class="fighter-card p2">
       <div class="fc-top">
         <span class="fc-hp" id="p2HpNum">100</span>
+        <span class="fc-weapon" id="p2Weapon">BALL</span>
         <span class="fc-name" id="p2Name">PICKLE</span>
         <span class="p-tag">P2</span>
       </div>
@@ -62,6 +64,8 @@
         <div class="brawler-card p1" id="titleP1">
           <canvas class="portrait" width="120" height="120"></canvas>
           <div class="bc-meta"><span class="bc-p">PLAYER 1</span><strong id="titleP1Name">GLOOP</strong></div>
+          <div class="bc-weapon" id="titleP1Weapon">DODGEBALL</div>
+          <div class="weapon-picker" id="weaponsP1" role="group" aria-label="Player 1 weapon"></div>
         </div>
         <button class="btn dice" id="btnReroll" title="Roll new random brawlers" aria-label="Roll new random brawlers">
           <span class="dice-face">?</span>
@@ -69,6 +73,8 @@
         <div class="brawler-card p2" id="titleP2">
           <canvas class="portrait" width="120" height="120"></canvas>
           <div class="bc-meta"><span class="bc-p">PLAYER 2</span><strong id="titleP2Name">PICKLE</strong></div>
+          <div class="bc-weapon" id="titleP2Weapon">DODGEBALL</div>
+          <div class="weapon-picker" id="weaponsP2" role="group" aria-label="Player 2 weapon"></div>
         </div>
       </div>
 
@@ -78,7 +84,15 @@
         <button class="btn small" id="btnArcade">ARCADE</button>
         <button class="btn small" id="btnHow">HOW TO PLAY</button>
       </div>
+      <div class="ctrl-row">
+        <span class="ctrl-label">TOUCH CONTROLS</span>
+        <div class="seg" id="ctrlSeg" role="group" aria-label="Touch control style">
+          <button class="seg-btn active" data-ctrl="buttons" aria-pressed="true">BUTTONS</button>
+          <button class="seg-btn" data-ctrl="sliders" aria-pressed="false">SLIDERS</button>
+        </div>
+      </div>
       <div class="title-foot">
+        <span class="map-chip"><span class="map-dot"></span><span id="mapTitle">SUNSET ROOFTOP</span></span>
         <span class="gold-chip"><span class="coin-ico"></span><span class="gold-amount" id="goldTitle">0</span></span>
         <span class="tiny-note">FIRST TO 3 ROUNDS · RANDOM MAYHEM</span>
       </div>
@@ -93,6 +107,7 @@
       <div class="rc-kicker">THIS ROUND</div>
       <div class="rc-mod" id="rcMod">CLASSIC RULES</div>
       <div class="rc-desc" id="rcDesc">No funny business. (Allegedly.)</div>
+      <div class="rc-map" id="rcMap">SUNSET ROOFTOP · DODGEBALL VS DODGEBALL</div>
     </div>
     <div class="rc-count" id="rcCount">3</div>
   </div>
@@ -101,18 +116,49 @@
 
   <!-- ============ TOUCH CONTROLS ============ -->
   <div id="touch" class="touch hidden">
-    <div class="pad p1" data-player="0">
+    <!-- buttons layout -->
+    <div class="pad pad-buttons p1" data-player="0">
       <button class="tbtn move" data-act="left" aria-label="Player 1 move left">&#9664;</button>
       <button class="tbtn move" data-act="right" aria-label="Player 1 move right">&#9654;</button>
       <button class="tbtn jump" data-act="jump" aria-label="Player 1 jump">JUMP</button>
       <button class="tbtn throw" data-act="throw" aria-label="Player 1 throw">THROW</button>
     </div>
     <button class="tbtn pause-mini" id="btnPauseTouch" aria-label="Pause">II</button>
-    <div class="pad p2" data-player="1">
+    <div class="pad pad-buttons p2" data-player="1">
       <button class="tbtn move" data-act="left" aria-label="Player 2 move left">&#9664;</button>
       <button class="tbtn move" data-act="right" aria-label="Player 2 move right">&#9654;</button>
       <button class="tbtn jump" data-act="jump" aria-label="Player 2 jump">JUMP</button>
       <button class="tbtn throw" data-act="throw" aria-label="Player 2 throw">THROW</button>
+    </div>
+
+    <!-- sliders layout -->
+    <div class="pad pad-sliders p1" data-player="0">
+      <div class="slider aim" data-act="aim" role="slider" aria-label="Player 1 aim" aria-valuemin="0" aria-valuemax="100" aria-valuenow="55">
+        <div class="slider-track"><div class="slider-fill"></div></div>
+        <div class="slider-thumb"></div>
+        <span class="slider-cap">AIM</span>
+      </div>
+      <button class="tbtn jump" data-act="jump" aria-label="Player 1 jump">JUMP</button>
+      <button class="tbtn throw" data-act="throw" aria-label="Player 1 throw">THROW</button>
+      <div class="slider move" data-act="move" role="slider" aria-label="Player 1 move" aria-valuemin="-100" aria-valuemax="100" aria-valuenow="0">
+        <div class="slider-track"><div class="slider-fill"></div></div>
+        <div class="slider-thumb"></div>
+        <span class="slider-cap">MOVE</span>
+      </div>
+    </div>
+    <div class="pad pad-sliders p2" data-player="1">
+      <button class="tbtn throw" data-act="throw" aria-label="Player 2 throw">THROW</button>
+      <button class="tbtn jump" data-act="jump" aria-label="Player 2 jump">JUMP</button>
+      <div class="slider aim" data-act="aim" role="slider" aria-label="Player 2 aim" aria-valuemin="0" aria-valuemax="100" aria-valuenow="55">
+        <div class="slider-track"><div class="slider-fill"></div></div>
+        <div class="slider-thumb"></div>
+        <span class="slider-cap">AIM</span>
+      </div>
+      <div class="slider move" data-act="move" role="slider" aria-label="Player 2 move" aria-valuemin="-100" aria-valuemax="100" aria-valuenow="0">
+        <div class="slider-track"><div class="slider-fill"></div></div>
+        <div class="slider-thumb"></div>
+        <span class="slider-cap">MOVE</span>
+      </div>
     </div>
   </div>
 
@@ -147,7 +193,7 @@
     </div>
   </section>
 
-  <!-- ============ ARCADE / SHOP ============ -->
+  <!-- ============ ARCADE LOUNGE ============ -->
   <section id="screenArcade" class="screen overlay hidden">
     <div class="panel arcade-panel">
       <div class="arcade-head">
@@ -161,8 +207,7 @@
         </div>
       </div>
       <div class="tabs" role="tablist">
-        <button class="tab active" data-tab="upgrades" role="tab">UPGRADES</button>
-        <button class="tab" data-tab="brawlers" role="tab">BRAWLERS</button>
+        <button class="tab active" data-tab="brawlers" role="tab">BRAWLERS</button>
         <button class="tab" data-tab="trophies" role="tab">TROPHIES</button>
       </div>
       <div class="arcade-body" id="arcadeBody"></div>
@@ -191,13 +236,15 @@
         </div>
       </div>
       <ul class="how-list">
-        <li><b>Auto-aim.</b> Your dodgeball curves straight at your rival. Hold to charge for a bigger, faster, harder BONK.</li>
-        <li><b>Catch!</b> Tap throw just as an incoming ball gets close to catch it and hurl it right back, extra spicy.</li>
-        <li><b>Grab the loot.</b> Coins and hearts drop onto the court. Coins are saved to your arcade profile.</li>
+        <li><b>Pick your weapon.</b> Dodgeball, frisbee, bomb or bowling ball. Each one flies differently and hits differently. Choose per player on the title screen.</li>
+        <li><b>No aim assist.</b> Hold throw to charge. In BUTTONS mode your aim sweeps up and down automatically; in SLIDERS mode drag the vertical AIM slider to place your shot.</li>
+        <li><b>Everything breaks.</b> Projectiles crush on the first thing they touch — player, platform, wall or floor. Bombs explode instead. There is no bouncing back.</li>
+        <li><b>Catch!</b> Tap throw just as an incoming projectile gets close to catch it and hurl it right back, extra spicy.</li>
+        <li><b>Mind the platforms.</b> Some platforms slide and rise. Three maps — Sunset Rooftop, Neon Harbor and Jungle Temple — bring different layouts and moods.</li>
+        <li><b>Grab the loot.</b> Coins and hearts drop onto the court. Coins unlock new brawlers in the Arcade; there are no upgrades to buy.</li>
         <li><b>Win.</b> First to 3 round wins takes the match. Each round rolls a brand new modifier, so stay on your toes.</li>
-        <li><b>Upgrade.</b> Spend coins in the Arcade between matches. Upgrades apply to both brawlers — fair's fair.</li>
       </ul>
-      <div class="how-note">TABLET / PHONE: use the on-screen pads. Landscape recommended!</div>
+      <div class="how-note">TABLET / PHONE: choose BUTTONS or SLIDERS on the title screen. Landscape recommended!</div>
     </div>
   </section>
 
@@ -210,6 +257,13 @@
         <button class="btn" id="btnRestart">RESTART MATCH</button>
         <button class="btn" id="btnPauseHow">HOW TO PLAY</button>
         <button class="btn" id="btnPauseMenu">QUIT TO MENU</button>
+      </div>
+      <div class="ctrl-row pause-ctrl">
+        <span class="ctrl-label">TOUCH CONTROLS</span>
+        <div class="seg" id="pauseCtrlSeg" role="group" aria-label="Touch control style">
+          <button class="seg-btn active" data-ctrl="buttons" aria-pressed="true">BUTTONS</button>
+          <button class="seg-btn" data-ctrl="sliders" aria-pressed="false">SLIDERS</button>
+        </div>
       </div>
       <div class="pause-note"><span class="note-desk">Press <kbd>ESC</kbd> to resume · <kbd>M</kbd> to mute</span><span class="note-touch">Tap RESUME to continue</span></div>
     </div>

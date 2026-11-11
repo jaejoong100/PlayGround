@@ -23,6 +23,125 @@ function drawShoe(g, x, y, ang, color = CREAM) {
   g.lineWidth = 2.6; g.strokeStyle = INK; g.stroke();
   g.beginPath(); g.moveTo(-4, 1.8); g.lineTo(5, 1.8);
   g.lineWidth = 1.6; g.strokeStyle = 'rgba(36,19,53,.35)'; g.stroke();
+  // sole
+  rr(g, -7.5, 2.4, 16, 2.6, 1.3);
+  g.fillStyle = 'rgba(36,19,53,.7)'; g.fill();
+  g.restore();
+}
+
+/* ------------------------------ weapon art ------------------------------ */
+function drawWeaponShape(g, id, r, opts = {}) {
+  const w = WEAPON_BY_ID[id] || WEAPONS[0];
+  const color = opts.color || w.color;
+  const accent = w.accent || CREAM;
+  const t = opts.t ?? gameT;
+
+  if (id === 'frisbee') {
+    g.save();
+    g.rotate(opts.rot || -0.16);
+    g.beginPath(); g.ellipse(0, 0, r * 1.3, r * 0.46, 0, 0, TAU);
+    g.fillStyle = color; g.fill();
+    g.lineWidth = Math.max(1.6, r * 0.18); g.strokeStyle = INK; g.stroke();
+    g.beginPath(); g.ellipse(0, -r * 0.05, r * 0.86, r * 0.24, 0, 0, TAU);
+    g.fillStyle = withA(accent, 0.55); g.fill();
+    g.beginPath(); g.ellipse(0, -r * 0.12, r * 0.46, r * 0.12, 0, 0, TAU);
+    g.fillStyle = accent; g.fill();
+    g.lineWidth = Math.max(1, r * 0.08); g.strokeStyle = withA(INK, 0.45); g.stroke();
+    g.beginPath(); g.ellipse(-r * 0.6, -r * 0.18, r * 0.3, r * 0.06, -0.15, 0, TAU);
+    g.fillStyle = 'rgba(255,255,255,.5)'; g.fill();
+    g.restore();
+    return;
+  }
+
+  if (id === 'bomb') {
+    g.beginPath(); g.arc(0, r * 0.08, r, 0, TAU);
+    const bg = g.createRadialGradient(-r * 0.35, -r * 0.4, r * 0.1, 0, r * 0.1, r * 1.1);
+    bg.addColorStop(0, '#6b4a8f');
+    bg.addColorStop(0.55, '#33204f');
+    bg.addColorStop(1, '#160b26');
+    g.fillStyle = bg; g.fill();
+    g.lineWidth = Math.max(1.8, r * 0.18); g.strokeStyle = INK; g.stroke();
+    // team band
+    g.save();
+    g.beginPath(); g.arc(0, r * 0.08, r - 0.5, 0, TAU); g.clip();
+    g.fillStyle = withA(color, 0.9);
+    g.fillRect(-r, -r * 0.06, r * 2, r * 0.32);
+    g.fillStyle = withA(CREAM, 0.35);
+    g.fillRect(-r, -r * 0.06, r * 2, r * 0.08);
+    g.restore();
+    // fuse
+    g.strokeStyle = '#8a6a3f'; g.lineWidth = Math.max(1.4, r * 0.15); g.lineCap = 'round';
+    g.beginPath();
+    g.moveTo(r * 0.34, -r * 0.62);
+    g.quadraticCurveTo(r * 0.92, -r * 1.1, r * 0.72, -r * 1.55);
+    g.stroke();
+    // spark
+    const flick = 0.75 + 0.25 * Math.sin(t * 22 + (opts.seed || 0));
+    g.save();
+    g.translate(r * 0.72, -r * 1.55);
+    g.scale(flick, flick);
+    starPath(g, r * 0.42, r * 0.17, 5);
+    g.fillStyle = '#ffd23f'; g.fill();
+    g.lineWidth = Math.max(1, r * 0.08); g.strokeStyle = '#ff5d5d'; g.stroke();
+    g.restore();
+    g.beginPath(); g.ellipse(-r * 0.38, -r * 0.35, r * 0.22, r * 0.12, -0.6, 0, TAU);
+    g.fillStyle = 'rgba(255,255,255,.55)'; g.fill();
+    return;
+  }
+
+  if (id === 'bowl') {
+    g.beginPath(); g.arc(0, 0, r, 0, TAU);
+    const bg = g.createRadialGradient(-r * 0.38, -r * 0.42, r * 0.08, 0, 0, r * 1.15);
+    bg.addColorStop(0, '#7a56b5');
+    bg.addColorStop(0.55, color);
+    bg.addColorStop(1, '#241238');
+    g.fillStyle = bg; g.fill();
+    g.lineWidth = Math.max(1.8, r * 0.18); g.strokeStyle = INK; g.stroke();
+    const holeR = Math.max(1.1, r * 0.16);
+    [[-r * 0.36, -r * 0.28], [r * 0.1, -r * 0.38], [-r * 0.1, r * 0.16]].forEach(([hx, hy]) => {
+      g.beginPath(); g.arc(hx, hy, holeR, 0, TAU);
+      g.fillStyle = '#1c0d2b'; g.fill();
+      g.lineWidth = Math.max(0.8, r * 0.05); g.strokeStyle = withA(accent, 0.45); g.stroke();
+    });
+    g.beginPath(); g.ellipse(-r * 0.42, -r * 0.46, r * 0.2, r * 0.1, -0.7, 0, TAU);
+    g.fillStyle = 'rgba(255,255,255,.5)'; g.fill();
+    return;
+  }
+
+  // dodgeball
+  g.beginPath(); g.arc(0, 0, r, 0, TAU);
+  g.fillStyle = color; g.fill();
+  g.lineWidth = Math.max(1.8, r * 0.2); g.strokeStyle = INK; g.stroke();
+  g.save();
+  g.beginPath(); g.arc(0, 0, r - 0.6, 0, TAU); g.clip();
+  g.strokeStyle = withA(accent, 0.92);
+  g.lineWidth = r * 0.34;
+  g.beginPath(); g.arc(0, 0, r * 0.72, -1.02, 1.02); g.stroke();
+  g.beginPath(); g.arc(0, 0, r * 0.72, Math.PI - 1.02, Math.PI + 1.02); g.stroke();
+  g.fillStyle = withA('#ffffff', 0.2);
+  g.beginPath(); g.ellipse(-r * 0.25, -r * 0.35, r * 0.55, r * 0.35, -0.5, 0, TAU); g.fill();
+  g.restore();
+  g.beginPath(); g.ellipse(-r * 0.32, -r * 0.36, r * 0.2, r * 0.12, -0.6, 0, TAU);
+  g.fillStyle = 'rgba(255,255,255,.85)'; g.fill();
+}
+
+function drawHeldWeapon(g, weapon, x, y, r, color, charging, t) {
+  g.save();
+  g.translate(x, y);
+  const pulse = charging ? 1 + Math.sin((t || 0) * 14) * 0.07 : 1;
+  g.scale(pulse, pulse);
+  g.rotate(-0.2);
+  drawWeaponShape(g, weapon.id, r, { color, t, held: true, seed: x });
+  g.restore();
+}
+
+function drawWeaponIcon(canvas, id, color) {
+  const g = canvas.getContext('2d');
+  const w = canvas.width, h = canvas.height;
+  g.clearRect(0, 0, w, h);
+  g.save();
+  g.translate(w / 2, h / 2 + 1);
+  drawWeaponShape(g, id, Math.min(w, h) * 0.31, { color, t: performance.now() / 1000 });
   g.restore();
 }
 
@@ -34,11 +153,21 @@ function drawLegs(g, char, o) {
   const lift1 = o.onGround ? Math.max(0, Math.sin(pitch)) * 3.5 * run : 4;
   const lift2 = o.onGround ? Math.max(0, -Math.sin(pitch)) * 3.5 * run : 4;
   const bx = 7.5;
+  const sock = (x1, y1, x2, y2) => {
+    const k = 0.76;
+    const sx = lerp(x1, x2, k), sy = lerp(y1, y2, k);
+    g.strokeStyle = o.color; g.lineWidth = 4.6; g.lineCap = 'butt';
+    g.beginPath(); g.moveTo(sx, sy); g.lineTo(lerp(x1, x2, k + 0.12), lerp(y1, y2, k + 0.12)); g.stroke();
+    g.strokeStyle = withA(CREAM, 0.65); g.lineWidth = 1.4;
+    g.beginPath(); g.moveTo(sx, sy); g.lineTo(lerp(x1, x2, k + 0.12), lerp(y1, y2, k + 0.12)); g.stroke();
+  };
   // back leg
   limb(g, -bx, hip, -bx - swing, -6 - lift2, 5.2, char.skinDark, 2.2);
+  sock(-bx, hip, -bx - swing, -6 - lift2);
   drawShoe(g, -bx - swing, -5 - lift2, o.onGround ? -0.06 * Math.sin(pitch) * run : -0.22);
   // front leg
   limb(g, bx, hip, bx + swing, -6 - lift1, 5.2, char.skin, 2.2);
+  sock(bx, hip, bx + swing, -6 - lift1);
   drawShoe(g, bx + swing, -5 - lift1, o.onGround ? 0.06 * Math.sin(pitch) * run : 0.18);
 }
 
@@ -52,7 +181,7 @@ function drawArm(g, char, o, aim, front) {
     hy = lerp(-48, -62, k);
   } else if (front && o.charging) {
     hx = aim * 14;
-    hy = -48;
+    hy = -48 - Math.sin(clamp(o.aimAngle ?? 0.55, 0, 1.35)) * 10;
   } else if (front && (o.catchAnim || 0) > 0) {
     hx = aim * 30;
     hy = -54;
@@ -68,10 +197,21 @@ function drawArm(g, char, o, aim, front) {
   g.beginPath(); g.arc(shoulderX, shoulderY, 7.2, 0, TAU);
   g.fillStyle = char.color; g.fill();
   g.lineWidth = 2.8; g.strokeStyle = INK; g.stroke();
+  // sleeve stripe
+  g.beginPath(); g.arc(shoulderX, shoulderY, 5.2, -0.55, 0.55);
+  g.strokeStyle = withA(o.color, 0.95); g.lineWidth = 2; g.stroke();
   // team glove
   g.beginPath(); g.arc(hx, hy, 5.8, 0, TAU);
   g.fillStyle = o.color; g.fill();
   g.lineWidth = 2.4; g.strokeStyle = INK; g.stroke();
+  // glove cuff
+  const ga = Math.atan2(hy - shoulderY, hx - shoulderX);
+  g.save();
+  g.translate(hx, hy);
+  g.rotate(ga);
+  g.beginPath(); g.moveTo(-7.2, -4.2); g.lineTo(-7.2, 4.2);
+  g.strokeStyle = withA(CREAM, 0.8); g.lineWidth = 1.8; g.stroke();
+  g.restore();
   g.beginPath(); g.arc(hx - 1.6, hy - 1.8, 1.6, 0, TAU);
   g.fillStyle = 'rgba(255,255,255,.55)'; g.fill();
 
@@ -79,21 +219,10 @@ function drawArm(g, char, o, aim, front) {
     const br = o.ballRadius || 8;
     if (o.charging) {
       const pulse = 1 + Math.sin((o.t || 0) * 12) * 0.06;
-      g.beginPath(); g.arc(hx, hy, br * 1.7 * pulse, 0, TAU);
+      g.beginPath(); g.arc(hx, hy, br * 1.8 * pulse, 0, TAU);
       g.fillStyle = withA(o.color, 0.16); g.fill();
     }
-    g.beginPath(); g.arc(hx, hy, br, 0, TAU);
-    g.fillStyle = o.color; g.fill();
-    g.lineWidth = 3; g.strokeStyle = INK; g.stroke();
-    g.save();
-    g.beginPath(); g.arc(hx, hy, br - 1, 0, TAU); g.clip();
-    g.strokeStyle = withA(CREAM, 0.92);
-    g.lineWidth = br * 0.34;
-    g.beginPath(); g.arc(hx, hy, br * 0.74, -1.05, 1.05); g.stroke();
-    g.beginPath(); g.arc(hx, hy, br * 0.74, Math.PI - 1.05, Math.PI + 1.05); g.stroke();
-    g.restore();
-    g.beginPath(); g.arc(hx - br * 0.3, hy - br * 0.35, br * 0.22, 0, TAU);
-    g.fillStyle = 'rgba(255,255,255,.75)'; g.fill();
+    drawHeldWeapon(g, o.weapon || WEAPONS[0], hx, hy, br, o.color, o.charging, o.t);
   }
 }
 
@@ -111,6 +240,10 @@ function drawBody(g, char, o) {
   rr(g, -6, -70, 12, 12, 5);
   g.fillStyle = char.skin; g.fill();
   g.lineWidth = 3.4; g.strokeStyle = INK; g.stroke();
+  g.save();
+  g.beginPath(); g.rect(-6, -66, 12, 5); g.clip();
+  g.fillStyle = withA(char.skinDark, 0.55); g.fillRect(-6, -66, 12, 5);
+  g.restore();
 
   // jersey torso
   g.beginPath();
@@ -121,23 +254,53 @@ function drawBody(g, char, o) {
   g.quadraticCurveTo(9, -67, 0, -67);
   g.quadraticCurveTo(-9, -67, -18, -62);
   g.closePath();
-  paintBody(g, char.color);
+  const grad = g.createLinearGradient(-16, -64, 16, -40);
+  grad.addColorStop(0, char.color);
+  grad.addColorStop(0.58, char.color);
+  grad.addColorStop(1, char.dark);
+  paintBody(g, grad);
 
-  // team stripe across the chest
+  // fabric side panels + hem shading
   g.save();
   g.clip();
-  g.strokeStyle = o.color; g.lineWidth = 6; g.lineCap = 'round';
-  g.beginPath(); g.moveTo(-20, -56); g.lineTo(20, -49); g.stroke();
-  g.strokeStyle = withA(CREAM, 0.72); g.lineWidth = 2;
-  g.beginPath(); g.moveTo(-20, -59); g.lineTo(20, -52); g.stroke();
+  g.fillStyle = withA(char.dark, 0.55);
+  g.fillRect(-20, -66, 5.5, 28);
+  g.fillRect(15, -66, 5.5, 28);
+  g.fillStyle = 'rgba(255,255,255,.13)';
+  g.beginPath(); g.ellipse(-5, -56, 12, 7, -0.45, 0, TAU); g.fill();
+  g.fillStyle = 'rgba(36,19,53,.14)';
+  g.fillRect(-20, -43, 40, 5);
   g.restore();
 
-  // team star emblem
-  g.save();
-  g.translate(0, -45.5);
-  starPath(g, 6.4, 2.8, 5);
+  // collar
+  g.beginPath(); g.ellipse(0, -63.5, 7.6, 3.2, 0, 0, TAU);
   g.fillStyle = o.color; g.fill();
   g.lineWidth = 2; g.strokeStyle = INK; g.stroke();
+  g.beginPath(); g.ellipse(0, -64.6, 4.6, 1.5, 0, 0, TAU);
+  g.fillStyle = withA(CREAM, 0.55); g.fill();
+
+  // shoulder seams
+  g.strokeStyle = 'rgba(36,19,53,.22)'; g.lineWidth = 1.4;
+  g.beginPath(); g.moveTo(-14, -60); g.quadraticCurveTo(-8, -63, -3, -63); g.stroke();
+  g.beginPath(); g.moveTo(14, -60); g.quadraticCurveTo(8, -63, 3, -63); g.stroke();
+
+  // chest star emblem
+  g.save();
+  g.translate(-8.5, -51);
+  starPath(g, 4.6, 2, 5);
+  g.fillStyle = o.color; g.fill();
+  g.lineWidth = 1.6; g.strokeStyle = INK; g.stroke();
+  g.restore();
+
+  // jersey number
+  const num = String(o.number || 1);
+  g.save();
+  g.font = '9px Bungee, sans-serif';
+  g.textAlign = 'center'; g.textBaseline = 'middle';
+  g.lineWidth = 2.2; g.strokeStyle = INK;
+  g.strokeText(num, 8.5, -50.5);
+  g.fillStyle = CREAM;
+  g.fillText(num, 8.5, -50.5);
   g.restore();
 
   // shorts
@@ -146,10 +309,19 @@ function drawBody(g, char, o) {
   // waistband
   rr(g, -14, -40, 28, 3.4, 1.7);
   g.fillStyle = o.color; g.fill();
+  g.lineWidth = 1.2; g.strokeStyle = withA(INK, 0.5); g.stroke();
+  // side stripes
+  g.fillStyle = withA(o.color, 0.9);
+  g.fillRect(-15.5, -40, 3, 9);
+  g.fillRect(12.5, -40, 3, 9);
   // short hems
   g.strokeStyle = 'rgba(36,19,53,.4)'; g.lineWidth = 1.6;
   g.beginPath(); g.moveTo(-12, -29.5); g.lineTo(-5, -29.5); g.stroke();
   g.beginPath(); g.moveTo(5, -29.5); g.lineTo(12, -29.5); g.stroke();
+  // belt buckle
+  g.beginPath(); g.arc(0, -38.2, 1.9, 0, TAU);
+  g.fillStyle = '#ffd23f'; g.fill();
+  g.lineWidth = 1; g.strokeStyle = INK; g.stroke();
 }
 
 function drawEyes(g, char, o) {
@@ -347,6 +519,37 @@ function drawAnimalHead(g, char, o) {
     g.beginPath(); g.arc(9, -75.5, 0.8, 0, TAU); g.fill();
     drawEyes(g, char, o);
   }
+
+  drawHeadPolish(g, char, o);
+}
+
+function drawHeadPolish(g, char, o) {
+  const t = o.t || 0;
+  g.save();
+  // soft top-left rim light
+  g.beginPath(); g.ellipse(-4, -87, 12.5, 7.5, -0.5, 0, TAU);
+  g.fillStyle = 'rgba(255,255,255,.10)'; g.fill();
+  // cheek blush
+  g.fillStyle = 'rgba(255,93,93,.16)';
+  g.beginPath(); g.ellipse(-12.5, -76.5, 3.2, 2, 0, 0, TAU); g.fill();
+  g.beginPath(); g.ellipse(12.5, -76.5, 3.2, 2, 0, 0, TAU); g.fill();
+  // small forehead shine
+  g.beginPath(); g.ellipse(-6.5, -90.5, 4.2, 1.8, -0.55, 0, TAU);
+  g.fillStyle = 'rgba(255,255,255,.28)'; g.fill();
+  // neutral brows
+  if (!o.ko && !o.charging && !(o.hurt > 0)) {
+    const ey = char.eyeY, gap = char.eyeGap, r = char.eyeR;
+    g.strokeStyle = withA(INK, 0.5); g.lineWidth = 1.7; g.lineCap = 'round';
+    g.beginPath();
+    g.moveTo(-gap - r * 0.9, ey - r * 1.55);
+    g.quadraticCurveTo(-gap, ey - r * 1.85, -gap + r * 0.55, ey - r * 1.55);
+    g.stroke();
+    g.beginPath();
+    g.moveTo(gap + r * 0.9, ey - r * 1.55);
+    g.quadraticCurveTo(gap, ey - r * 1.85, gap - r * 0.55, ey - r * 1.55);
+    g.stroke();
+  }
+  g.restore();
 }
 
 function drawCharacter(g, char, o) {
@@ -360,6 +563,8 @@ function drawCharacter(g, char, o) {
     ? (run > 0.06 ? Math.abs(Math.sin(phase)) * 2.4 * run : Math.sin(t * 2.1 + (o.seed || 0)) * 1.4)
     : -1.5;
   g.translate(0, bob);
+  const sq = o.squash || 0;
+  if (sq) g.scale(1 + sq * 0.38, 1 - sq * 0.58);
   if ((o.hurt || 0) > 0) g.rotate(-0.09);
   if (o.charging) g.translate(rand(-0.9, 0.9), rand(-0.9, 0.9));
   g.scale(o.facing || 1, 1);
@@ -375,6 +580,7 @@ function drawCharacter(g, char, o) {
 function drawPlayer(p, t) {
   const opp = getOpponent(p);
   const color = playerColor(p);
+  const weapon = weaponOf(p);
   const lookX = opp ? clamp((opp.x - p.x) / (260 * S), -1, 1) * p.facing : 0;
   const lookY = opp ? clamp(((opp.y - 42 * S) - (p.y - 52 * S)) / (260 * S), -1, 1) : 0;
   const aimSign = opp ? (Math.sign(opp.x - p.x) || 1) : p.facing;
@@ -399,16 +605,46 @@ function drawPlayer(p, t) {
     t, phase: p.runPhase, run: p.onGround ? clamp(Math.abs(p.vx) / (runSpeedFor() || 1), 0, 1) : 0.4,
     onGround: p.onGround, vy: p.vy, seed: p.idx * 2.3,
     aiming: true, aim: aimSign * p.facing,
-    charging: p.charging, charge: p.charge,
+    charging: p.charging, charge: p.charge, aimAngle: p.aimAngle,
     throwAnim: p.throwAnim, catchAnim: p.catchAnim,
     hurt: p.hitstun, ko: p.ko,
     lookX, lookY,
     blink: p.blink > 0,
-    color,
+    color, number: p.idx + 1, squash: p.squash,
+    weapon,
     showBall: !p.ko && p.throwAnim <= 0 && p.throwCd <= 0,
-    ballRadius: 7.5 + p.charge * 7,
+    ballRadius: (weapon.radius + weapon.chargeRadius * p.charge) * 0.82 * S,
   });
   ctx.restore();
+
+  // low-HP sweat bead
+  if (!p.ko && p.hp / p.maxHp <= 0.34 && state === 'play') {
+    const k = 0.5 + 0.5 * Math.sin(t * 4 + p.idx * 2);
+    const sx = p.x + p.facing * 17 * S;
+    const sy = p.y - (84 + k * 3) * S;
+    ctx.save();
+    ctx.translate(sx, sy);
+    ctx.rotate(0.3);
+    ctx.beginPath();
+    ctx.moveTo(0, -6 * S);
+    ctx.quadraticCurveTo(4.5 * S, 1 * S, 0, 4 * S);
+    ctx.quadraticCurveTo(-4.5 * S, 1 * S, 0, -6 * S);
+    ctx.fillStyle = '#8fe6ff'; ctx.fill();
+    ctx.lineWidth = 1.5 * S; ctx.strokeStyle = INK; ctx.stroke();
+    ctx.restore();
+  }
+
+  // charge meter above the fighter
+  if (p.charging && !p.ko) {
+    const bw = 44 * S, bh = 7 * S;
+    const bx = p.x - bw / 2, by = p.y - 119 * S;
+    ctx.save();
+    rr(ctx, bx, by, bw, bh, bh / 2);
+    ctx.fillStyle = 'rgba(36,19,53,.62)'; ctx.fill();
+    rr(ctx, bx + 1.5 * S, by + 1.5 * S, (bw - 3 * S) * clamp(p.charge, 0, 1), bh - 3 * S, (bh - 3 * S) / 2);
+    ctx.fillStyle = p.charge > 0.82 ? '#ffd23f' : color; ctx.fill();
+    ctx.restore();
+  }
 
   // player ID badge above the head
   if (state !== 'title' && state !== 'matchEnd') {
@@ -473,15 +709,17 @@ function drawPlayer(p, t) {
 
 /* ------------------------------ scene ------------------------------ */
 function drawSky(t) {
+  const map = currentMap || MAPS[0];
   ctx.fillStyle = skyGrad;
   ctx.fillRect(0, 0, W, floorY);
 
-  const sunX = W * 0.74, sunY = arena.top + (floorY - arena.top) * 0.22;
-  const sunR = Math.min(W, H) * 0.072;
+  const sunX = W * (map.decor === 'temple' ? 0.67 : map.decor === 'harbor' ? 0.79 : 0.74);
+  const sunY = arena.top + (floorY - arena.top) * (map.decor === 'harbor' ? 0.17 : 0.22);
+  const sunR = Math.min(W, H) * (map.decor === 'harbor' ? 0.052 : 0.068);
   ctx.save();
   ctx.translate(sunX, sunY);
   ctx.rotate(t * 0.018);
-  ctx.fillStyle = 'rgba(255,236,168,.055)';
+  ctx.fillStyle = withA(map.sun, 0.05);
   for (let i = 0; i < 16; i++) {
     const a = i * TAU / 16;
     ctx.beginPath();
@@ -492,29 +730,30 @@ function drawSky(t) {
   }
   ctx.restore();
 
-  const glow = ctx.createRadialGradient(sunX, sunY, sunR * 0.2, sunX, sunY, sunR * 2.8);
-  glow.addColorStop(0, 'rgba(255,239,177,.55)');
-  glow.addColorStop(0.5, 'rgba(255,199,110,.16)');
+  const glow = ctx.createRadialGradient(sunX, sunY, sunR * 0.2, sunX, sunY, sunR * 2.9);
+  glow.addColorStop(0, withA(map.sun, 0.55));
+  glow.addColorStop(0.5, map.glow || 'rgba(255,199,110,.16)');
   glow.addColorStop(1, 'rgba(255,160,90,0)');
   ctx.fillStyle = glow;
-  ctx.beginPath(); ctx.arc(sunX, sunY, sunR * 2.8, 0, TAU); ctx.fill();
+  ctx.beginPath(); ctx.arc(sunX, sunY, sunR * 2.9, 0, TAU); ctx.fill();
   ctx.beginPath(); ctx.arc(sunX, sunY, sunR, 0, TAU);
-  ctx.fillStyle = '#ffedb0'; ctx.fill();
-  ctx.lineWidth = 3; ctx.strokeStyle = 'rgba(255,244,216,.55)'; ctx.stroke();
+  ctx.fillStyle = map.sun; ctx.fill();
+  ctx.lineWidth = 3; ctx.strokeStyle = withA(CREAM, 0.45); ctx.stroke();
 
   // stars
+  const starA = map.decor === 'harbor' ? 0.8 : map.decor === 'temple' ? 0.45 : 0.38;
   for (const st of stars) {
     const tw = 0.35 + 0.65 * (0.5 + 0.5 * Math.sin(t * st.sp + st.ph));
     ctx.beginPath(); ctx.arc(st.x, st.y, st.r, 0, TAU);
-    ctx.fillStyle = `rgba(255,244,216,${tw * 0.65})`; ctx.fill();
+    ctx.fillStyle = `rgba(255,244,216,${tw * starA})`; ctx.fill();
   }
 
   // clouds
-  ctx.fillStyle = 'rgba(255,220,190,.18)';
   for (const c of clouds) {
     const x = ((c.x + t * c.sp + 160) % (W + 320)) - 160;
     const y = c.y + Math.sin(t * 0.4 + c.ph) * 3;
-    ctx.globalAlpha = c.a;
+    ctx.globalAlpha = c.a * (map.decor === 'temple' ? 0.7 : 1);
+    ctx.fillStyle = withA(map.sun, 0.22);
     ctx.beginPath();
     ctx.ellipse(x, y, 46 * c.s, 15 * c.s, 0, 0, TAU);
     ctx.ellipse(x + 34 * c.s, y - 8 * c.s, 30 * c.s, 17 * c.s, 0, 0, TAU);

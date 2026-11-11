@@ -11,6 +11,7 @@ function makePlayer(idx, charId) {
     onGround: true, coyote: 0, jumpsLeft: 1, jumpBuffer: 0,
     hp: maxHpFor(), maxHp: maxHpFor(),
     charging: false, charge: 0, throwCd: 0, throwAnim: 0, catchAnim: 0,
+    weaponId: 'ball', aimAngle: 0.55, aimT: 0, aimManual: false, platform: null, squash: 0,
     invuln: 0, hitstun: 0, ko: false, koT: 0, koDir: 1,
     runPhase: rand(0, TAU), blink: 0, blinkTimer: rand(1.2, 3.4),
     ai: false, aiTimer: rand(0.5, 1.4), aiMove: 0, aiJumpCd: 0,
@@ -50,6 +51,8 @@ function resetDemoStage() {
   players.forEach((p, i) => {
     p.demo = true;
     p.ai = true;
+    p.weaponId = titleWeapons[i] || 'ball';
+    p.aimAngle = i === 0 ? 0.62 : 0.5;
     p.x = arena.left + (arena.right - arena.left) * (i === 0 ? 0.13 : 0.87);
     p.y = floorY;
     p.facing = i === 0 ? 1 : -1;
@@ -79,6 +82,8 @@ function showTitle() {
   el.screenEnd.classList.add('hidden');
   el.screenPause.classList.add('hidden');
   el.announce.classList.remove('show');
+  useMap(pick(MAPS).id);
+  if (el.mapTitle) el.mapTitle.textContent = currentMap.name;
   resetDemoStage();
   setTitleChars(titleChars, true);
   updateGoldUI();
@@ -96,12 +101,16 @@ function newMatch(mode = '2p', chars = null) {
   titleChars = duo;
   players = [makePlayer(0, duo[0]), makePlayer(1, duo[1])];
   players[1].ai = mode === 'bot';
-  players.forEach(p => { p.demo = false; });
+  players.forEach((p, i) => {
+    p.demo = false;
+    p.weaponId = titleWeapons[i] || 'ball';
+  });
 
   match = {
     mode, scores: [0, 0], round: 1, winner: null,
     lastMod: null, hits: 0, catches: 0,
-    chars: duo.slice(),
+    chars: duo.slice(), weapons: titleWeapons.slice(),
+    mapId: pick(MAPS.filter(m => m.id !== currentMap.id)).id,
   };
   matchEarnings = { coins: 0, hits: 0, rounds: 0, victory: 0, ach: 0 };
   roundDamage = [0, 0];
@@ -144,6 +153,7 @@ function resetPlayerForRound(p) {
   p.vx = 0; p.vy = 0;
   p.onGround = true; p.coyote = 0; p.jumpsLeft = 1; p.jumpBuffer = 0;
   p.charging = false; p.charge = 0; p.throwCd = 0; p.throwAnim = 0; p.catchAnim = 0;
+  p.aimAngle = 0.55; p.aimT = 0; p.aimManual = false; p.platform = null; p.squash = 0;
   p.invuln = 0; p.hitstun = 0; p.ko = false; p.koT = 0; p.koDir = 1;
   p.blink = 0; p.blinkTimer = rand(1.2, 3.4);
   p.aiTimer = rand(0.6, 1.6); p.aiMove = 0; p.aiJumpCd = 0;
@@ -169,6 +179,7 @@ function startRound() {
   stormTimer = 2.6; coinTimer = 2.2; heartTimer = 9;
   shake = 0; hitstop = 0;
   timeScale = 1; timeScaleTarget = 1; slowmoT = 0;
+  useMap(match.mapId || currentMap.id);
   generatePlatforms();
   players.forEach(resetPlayerForRound);
 
@@ -177,6 +188,7 @@ function startRound() {
   el.rcVs.innerHTML = `${players[0].char.name} <span>VS</span> ${players[1].char.name}`;
   el.rcMod.textContent = roundMod.name;
   el.rcDesc.textContent = roundMod.desc;
+  el.rcMap.textContent = `${currentMap.name} · ${weaponOf(players[0]).name} VS ${weaponOf(players[1]).name}`;
   el.rcCount.textContent = '3';
   el.modBadge.textContent = roundMod.name;
   el.announce.classList.remove('show');
@@ -306,8 +318,7 @@ function pauseGame(force) {
   if (paused) {
     players.forEach(p => { p.charging = false; p.charge = 0; });
     keys.clear();
-    touchDirs[0].clear(); touchDirs[1].clear();
-    document.querySelectorAll('.tbtn.pressed').forEach(b => b.classList.remove('pressed'));
+    clearTouchInput();
     saveSoon();
   }
 }
@@ -349,6 +360,8 @@ function updateHud() {
   const [p1, p2] = players;
   el.p1Name.textContent = p1.char.name;
   el.p2Name.textContent = p2.char.name;
+  if (el.p1Weapon) el.p1Weapon.textContent = weaponOf(p1).short;
+  if (el.p2Weapon) el.p2Weapon.textContent = weaponOf(p2).short;
   const p1pct = clamp(p1.hp / p1.maxHp, 0, 1) * 100;
   const p2pct = clamp(p2.hp / p2.maxHp, 0, 1) * 100;
   el.p1Hp.style.width = p1pct + '%';
@@ -383,6 +396,8 @@ function showAnnounce(text, sub = '') {
 /* ------------------------------ input ------------------------------ */
 const keys = new Set();
 const touchDirs = [new Set(), new Set()];
+const touchMove = [0, 0];
+const touchPointers = [new Map(), new Map()];
 const pointerOwners = new Map();
 const PLAYER_KEYS = [
   { left: ['KeyA'], right: ['KeyD'], jump: ['KeyW'], throw: ['Space'] },
@@ -401,7 +416,7 @@ function isModalOpen() {
 }
 function getInputDir(p) {
   if (p.ai) return p.aiMove;
-  let dir = 0;
+  let dir = touchMove[p.idx] || 0;
   if (p.idx === 0) {
     if (keys.has('KeyA')) dir--;
     if (keys.has('KeyD')) dir++;
@@ -414,10 +429,40 @@ function getInputDir(p) {
   if (ts.has('right')) dir++;
   return clamp(dir, -1, 1);
 }
+function touchActionActive(pIdx, act) {
+  for (const a of touchPointers[pIdx].values()) if (a === act) return true;
+  return false;
+}
+function clearTouchInput() {
+  touchDirs[0].clear(); touchDirs[1].clear();
+  touchMove[0] = 0; touchMove[1] = 0;
+  touchPointers[0].clear(); touchPointers[1].clear();
+  pointerOwners.clear();
+  document.querySelectorAll('.tbtn.pressed').forEach(b => b.classList.remove('pressed'));
+  document.querySelectorAll('.pad-sliders .slider.active').forEach(s => s.classList.remove('active'));
+}
+function setControlStyle(style, silent) {
+  profile.controls = style === 'sliders' ? 'sliders' : 'buttons';
+  document.body.classList.toggle('ctrl-sliders', profile.controls === 'sliders');
+  [el.ctrlSeg, el.pauseCtrlSeg].forEach(seg => {
+    if (!seg) return;
+    seg.querySelectorAll('[data-ctrl]').forEach(b => b.classList.toggle('active', b.dataset.ctrl === profile.controls));
+  });
+  clearTouchInput();
+  document.querySelectorAll('.pad-sliders .slider[data-act="move"]').forEach(track => {
+    track.style.setProperty('--v', '0.5');
+  });
+  document.querySelectorAll('.pad-sliders .slider[data-act="aim"]').forEach(track => {
+    track.style.setProperty('--v', '0.55');
+  });
+  if (!silent) { saveSoon(); sfx.ui(); }
+}
 function doJump(p, strength = 1) {
   if (!p || p.ko) return;
   p.vy = -jumpSpeedFor() * strength;
   p.onGround = false;
+  p.platform = null;
+  p.squash = -0.14;
   p.coyote = 0;
   p.jumpBuffer = 0;
   if (p.wasGround) { dust(p.x, p.y, 4); sfx.jump(); }
@@ -432,10 +477,10 @@ function queueJump(p) {
   if (state !== 'play' && state !== 'title') return;
   p.jumpBuffer = 0.13;
 }
-function requestThrow(p) {
+function requestThrow(p, manual) {
   if (!p || p.ko) return;
   if (state !== 'play' && state !== 'title') return;
-  beginThrow(p);
+  beginThrow(p, manual);
 }
 function releaseThrowInput(p) {
   if (!p) return;
@@ -490,7 +535,7 @@ function onKeyUp(e) {
 }
 
 function bindTouch() {
-  document.querySelectorAll('.tbtn[data-act]').forEach(btn => {
+  document.querySelectorAll('.pad-buttons .tbtn[data-act]').forEach(btn => {
     const pad = btn.closest('.pad');
     const pIdx = Number(pad.dataset.player);
     const act = btn.dataset.act;
@@ -499,33 +544,92 @@ function bindTouch() {
       ensureAudio();
       if (state !== 'play' && state !== 'title') return;
       if (paused) return;
+      if (touchPointers[pIdx].has(e.pointerId)) return;
+      const wasThrow = touchActionActive(pIdx, 'throw');
       btn.classList.add('pressed');
       pointerOwners.set(e.pointerId, { pIdx, act, btn });
+      touchPointers[pIdx].set(e.pointerId, act);
       try { btn.setPointerCapture?.(e.pointerId); } catch {}
       const p = players[pIdx];
       if (!p) return;
       if (act === 'left') touchDirs[pIdx].add('left');
       if (act === 'right') touchDirs[pIdx].add('right');
       if (act === 'jump') queueJump(p);
-      if (act === 'throw') requestThrow(p);
+      if (act === 'throw' && !wasThrow) requestThrow(p, profile.controls === 'sliders');
     };
     const up = e => {
       const own = pointerOwners.get(e.pointerId);
       if (!own || own.pIdx !== pIdx) return;
       pointerOwners.delete(e.pointerId);
-      btn.classList.remove('pressed');
-      const p = players[pIdx];
-      if (act === 'left') touchDirs[pIdx].delete('left');
-      if (act === 'right') touchDirs[pIdx].delete('right');
-      if (!p) return;
-      if (act === 'throw') releaseThrowInput(p);
-      if (act === 'jump' && p.vy < -60 * S) p.vy *= 0.8;
+      touchPointers[pIdx].delete(e.pointerId);
+      if (!touchActionActive(pIdx, act)) {
+        btn.classList.remove('pressed');
+        const p = players[pIdx];
+        if (act === 'left') touchDirs[pIdx].delete('left');
+        if (act === 'right') touchDirs[pIdx].delete('right');
+        if (!p) return;
+        if (act === 'throw') releaseThrowInput(p);
+        if (act === 'jump' && p.vy < -60 * S) p.vy *= 0.8;
+      }
     };
     btn.addEventListener('pointerdown', down);
     btn.addEventListener('pointerup', up);
     btn.addEventListener('pointercancel', up);
     btn.addEventListener('lostpointercapture', up);
     btn.addEventListener('contextmenu', e => e.preventDefault());
+  });
+
+  document.querySelectorAll('.pad-sliders .slider').forEach(track => {
+    const pad = track.closest('.pad');
+    const pIdx = Number(pad.dataset.player);
+    const act = track.dataset.act;
+    let activePointer = null;
+    const paint = e => {
+      const rect = track.getBoundingClientRect();
+      const t = act === 'move'
+        ? clamp((e.clientX - rect.left) / Math.max(1, rect.width), 0, 1)
+        : clamp((e.clientY - rect.top) / Math.max(1, rect.height), 0, 1);
+      track.style.setProperty('--v', String(t));
+      if (act === 'move') {
+        touchMove[pIdx] = t * 2 - 1;
+      } else {
+        const p = players[pIdx];
+        if (p) {
+          p.aimAngle = lerp(1.18, 0.08, t);
+          p.aimManual = true;
+        }
+      }
+    };
+    const down = e => {
+      e.preventDefault();
+      ensureAudio();
+      if (state !== 'play' && state !== 'title') return;
+      if (paused) return;
+      activePointer = e.pointerId;
+      track.classList.add('active');
+      try { track.setPointerCapture?.(e.pointerId); } catch {}
+      paint(e);
+    };
+    const move = e => {
+      if (activePointer !== e.pointerId) return;
+      e.preventDefault();
+      paint(e);
+    };
+    const up = e => {
+      if (activePointer !== e.pointerId) return;
+      activePointer = null;
+      track.classList.remove('active');
+      if (act === 'move') {
+        touchMove[pIdx] = 0;
+        track.style.setProperty('--v', '0.5');
+      }
+    };
+    track.addEventListener('pointerdown', down);
+    track.addEventListener('pointermove', move);
+    track.addEventListener('pointerup', up);
+    track.addEventListener('pointercancel', up);
+    track.addEventListener('lostpointercapture', up);
+    track.addEventListener('contextmenu', e => e.preventDefault());
   });
 }
 
@@ -539,6 +643,7 @@ function updatePlayer(p, dt) {
   p.invuln = Math.max(0, p.invuln - dt);
   p.hitstun = Math.max(0, p.hitstun - dt);
   p.jumpBuffer = Math.max(0, p.jumpBuffer - dt);
+  p.squash = Math.max(0, p.squash - dt * 3.4);
   p.blinkTimer -= dt;
   if (p.blinkTimer <= 0) { p.blink = 0.11; p.blinkTimer = rand(2.2, 4.8); }
   p.blink = Math.max(0, p.blink - dt);
@@ -577,7 +682,11 @@ function updatePlayer(p, dt) {
   }
 
   if (p.charging && canControl) {
-    p.charge = Math.min(1, p.charge + dt / 0.62);
+    p.charge = Math.min(1, p.charge + dt / 0.85);
+    if (!p.aimManual && !p.ai) {
+      p.aimT += dt;
+      p.aimAngle = 0.6 + 0.42 * Math.sin(p.aimT * 3.5 - Math.PI / 2);
+    }
     p.chargeFx = (p.chargeFx || 0) - dt;
     if (p.chargeFx <= 0) {
       p.chargeFx = 0.07;
@@ -603,6 +712,7 @@ function updatePlayer(p, dt) {
   p.x = clamp(p.x, arena.left + 18 * S, arena.right - 18 * S);
 
   p.onGround = false;
+  p.platform = null;
   if (p.vy >= 0) {
     for (const pl of platforms) {
       if (prevY <= pl.y + 2 && p.y >= pl.y && p.y <= pl.y + pl.h + 30 * S &&
@@ -610,6 +720,7 @@ function updatePlayer(p, dt) {
         p.y = pl.y;
         p.vy = 0;
         p.onGround = true;
+        p.platform = pl;
         p.jumpsLeft = 1;
         break;
       }
@@ -619,12 +730,14 @@ function updatePlayer(p, dt) {
     p.y = floorY;
     p.vy = 0;
     p.onGround = true;
+    p.platform = null;
     p.jumpsLeft = 1;
   }
   if (p.onGround) p.coyote = 0.1;
   else p.coyote = Math.max(0, p.coyote - dt);
 
   if (p.onGround && !p.wasGround && p.vy === 0) {
+    p.squash = 0.22;
     dust(p.x, p.y, 5);
     if (Math.abs(p.vx) > 40 * S || state === 'play') sfx.land();
   }
@@ -647,11 +760,13 @@ function updateAI(p, dt) {
     p.aiMove = clamp((tx - p.x) / (70 * S), -1, 1);
     if (p.charging) {
       p.aiCharge += dt;
+      p.aimAngle = solveAimAngle(p, opp, p.charge);
       if (p.aiCharge > p.aiHold) releaseThrow(p);
     } else if (p.demoThrow <= 0 && p.throwCd <= 0 && balls.length < 3) {
-      beginThrow(p);
+      beginThrow(p, true);
       p.aiHold = rand(0.35, 0.85);
       p.aiCharge = 0;
+      p.aimAngle = solveAimAngle(p, opp, 0.35);
       p.demoThrow = rand(2.4, 4.4);
     }
     if (p.onGround && Math.random() < dt * 0.18) p.jumpBuffer = 0.1;
@@ -685,6 +800,8 @@ function updateAI(p, dt) {
 
   if (p.charging) {
     p.aiCharge += dt;
+    p.facing = Math.sign(opp.x - p.x) || p.facing;
+    p.aimAngle = solveAimAngle(p, opp, p.charge);
     if (p.aiCharge >= p.aiHold || p.charge >= 1) releaseThrow(p);
   } else if (p.throwCd <= 0 && p.aiTimer <= 0) {
     const catchable = nearbyCatchable(p);
@@ -692,9 +809,10 @@ function updateAI(p, dt) {
       doCatch(p, catchable);
       p.aiTimer = rand(0.7, 1.5);
     } else {
-      beginThrow(p);
+      beginThrow(p, true);
       p.aiHold = rand(0.28, 0.95);
       p.aiCharge = 0;
+      p.aimAngle = solveAimAngle(p, opp, 0.35);
       p.aiTimer = rand(0.55, 1.35);
     }
   }
@@ -711,6 +829,7 @@ function update(dtRaw) {
   }
   if (hitstop > 0) hitstop -= dtRaw;
   const sdt = hitstop > 0 ? 0 : dtRaw * timeScale;
+  updatePlatforms(sdt);
 
   shake = Math.max(0, shake - dtRaw * 46);
   const sh = shake;
@@ -801,7 +920,7 @@ window.addEventListener('keydown', onKeyDown);
 window.addEventListener('keyup', onKeyUp);
 window.addEventListener('blur', () => {
   keys.clear();
-  touchDirs[0].clear(); touchDirs[1].clear();
+  clearTouchInput();
   players.forEach(p => { if (p && !p.ai) { p.charging = false; p.charge = 0; } });
   if (state === 'play' && !paused) pauseGame(true);
 });
