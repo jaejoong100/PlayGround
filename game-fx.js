@@ -225,7 +225,7 @@ function updateBalls(dt) {
         }
       }
     }
-    if (b.age > 1.6) b.dead = true;
+    if (b.age > 1.0) b.dead = true;
   }
   balls = balls.filter(b => !b.dead && b.y < H + 200);
   if (splitSpawns.length) balls.push(...splitSpawns);
