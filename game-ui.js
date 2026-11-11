@@ -88,22 +88,6 @@ function renderArcade() {
   }
 }
 
-function buyUpgrade(id) {
-  const u = UPGRADES[id];
-  if (!u) return;
-  const lvl = upgradeBonus(id);
-  if (lvl >= u.max) return;
-  const cost = u.costs[lvl];
-  if (profile.gold < cost) { sfx.ui(); return; }
-  profile.gold -= cost;
-  profile.upgrades[id] = lvl + 1;
-  sfx.buy();
-  toast('UPGRADE GET', `${u.name} · LV ${lvl + 1}`, '🛠️', cost, true);
-  unlock('shopper');
-  if (lvl + 1 >= u.max) unlock('maxed');
-  saveProfile();
-  renderArcade();
-}
 
 function unlockCharacter(id) {
   const c = CHAR_BY_ID[id];
@@ -163,8 +147,6 @@ function bindUI() {
   el.btnHowClose.addEventListener('click', closeHow);
   el.tabs.forEach(t => t.addEventListener('click', () => switchArcadeTab(t.dataset.tab)));
   el.arcadeBody.addEventListener('click', e => {
-    const up = e.target.closest('[data-buy]');
-    if (up) { buyUpgrade(up.dataset.buy); return; }
     const ch = e.target.closest('[data-char-buy]');
     if (ch) unlockCharacter(ch.dataset.charBuy);
   });
@@ -269,7 +251,7 @@ window.__bonk = {
   info: () => ({
     state, paused, round: match?.round, scores: match?.scores, mod: roundMod.id,
     players: players.map(p => ({ name: p.char.name, x: Math.round(p.x), y: Math.round(p.y), hp: Math.round(p.hp), charging: p.charging })),
-    balls: balls.length, particles: particles.length, gold: profile.gold,
+    balls: balls.length, particles: particles.length, 
     ballList: balls.filter(b => !b.dead).map(b => ({ x: Math.round(b.x), y: Math.round(b.y), owner: b.owner, age: +b.age.toFixed(2) })),
     platforms: platforms.map(p => ({ x: Math.round(p.x), y: Math.round(p.y), w: Math.round(p.w) })),
   }),
