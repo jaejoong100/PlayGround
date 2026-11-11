@@ -74,6 +74,8 @@ function showTitle() {
   el.screenTitle.classList.remove('hidden');
   el.hud.classList.add('hidden');
   el.touch.classList.add('hidden');
+  el.btnPauseTouch.classList.add('hidden');
+  el.btnPauseTouch.classList.add('hidden');
   resetJoysticks();
   el.deskHints.classList.add('hidden');
   el.roundCard.classList.add('hidden');
@@ -120,6 +122,7 @@ function newMatch(mode = '2p', chars = null) {
   el.screenTitle.classList.add('hidden');
   el.hud.classList.remove('hidden');
   el.touch.classList.toggle('hidden', !isTouch);
+  el.btnPauseTouch.classList.toggle('hidden', !isTouch);
   el.deskHints.classList.toggle('hidden', isTouch);
   el.screenEnd.classList.add('hidden');
   el.screenPause.classList.add('hidden');
@@ -241,6 +244,7 @@ function endMatch(winner) {
   confettiBurst(W / 2, arena.top + 60 * S, 70);
   sfx.win();
   el.touch.classList.add('hidden');
+  el.btnPauseTouch.classList.add('hidden');
   el.deskHints.classList.add('hidden');
   saveProfile();
 }
