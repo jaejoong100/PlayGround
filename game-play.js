@@ -16,7 +16,7 @@ function makePlayer(idx, charId) {
     ai: false, aiTimer: rand(0.5, 1.4), aiMove: 0, aiJumpCd: 0,
     aiStrafe: pick([-1, 0, 1]), aiStrafeTimer: rand(0.6, 1.5),
     aiHold: 0.5, aiCharge: 0, demo: false, demoT: rand(0, 10), demoThrow: rand(1.4, 3.2),
-    chargeFx: 0, wasGround: true, needsMove: false, dropThrough: 0,
+    chargeFx: 0, wasGround: true, needsMove: false, dropThrough: 0, platform: null,
   };
   return p;
 }
@@ -151,7 +151,7 @@ function resetPlayerForRound(p) {
   p.blink = 0; p.blinkTimer = rand(1.2, 3.4);
   p.aiTimer = rand(0.6, 1.6); p.aiMove = 0; p.aiJumpCd = 0;
   p.aiStrafe = pick([-1, 0, 1]); p.aiStrafeTimer = rand(0.6, 1.5);
-  p.chargeFx = 0; p.needsMove = false; p.dropThrough = 0;
+  p.chargeFx = 0; p.needsMove = false; p.dropThrough = 0; p.platform = null;
   const bw = arena.right - arena.left;
   p.x = arena.left + bw * (p.idx === 0 ? 0.22 : 0.78);
   p.y = floorY;
@@ -692,6 +692,7 @@ function updatePlayer(p, dt) {
   p.x = clamp(p.x, arena.left + 18 * S, arena.right - 18 * S);
 
   p.onGround = false;
+  p.platform = null;
   if (p.vy >= 0 && (p.dropThrough || 0) <= 0) {
     for (const pl of platforms) {
       if (prevY <= pl.y + 2 && p.y >= pl.y && p.y <= pl.y + pl.h + 30 * S &&
@@ -700,6 +701,7 @@ function updatePlayer(p, dt) {
         p.vy = 0;
         p.onGround = true;
         p.jumpsLeft = 1;
+        p.platform = pl;
         break;
       }
     }
@@ -709,9 +711,16 @@ function updatePlayer(p, dt) {
     p.vy = 0;
     p.onGround = true;
     p.jumpsLeft = 1;
+    p.platform = null;
   }
   if (p.onGround) p.coyote = 0.1;
   else p.coyote = Math.max(0, p.coyote - dt);
+
+  // carry on moving platforms
+  if (p.onGround && p.platform) {
+    p.x += (p.platform.vx || 0) * dt;
+    p.x = clamp(p.x, arena.left + 18 * S, arena.right - 18 * S);
+  }
 
   if (p.onGround && !p.wasGround && p.vy === 0) {
     dust(p.x, p.y, 5);
@@ -805,6 +814,14 @@ function update(dtRaw) {
   const sh = shake;
   shakeX = sh > 0.1 ? rand(-sh, sh) : 0;
   shakeY = sh > 0.1 ? rand(-sh, sh) : 0;
+
+  // moving platforms
+  for (const pl of platforms) {
+    if (!pl.vx) pl.vx = (Math.random() < 0.5 ? -1 : 1) * 60 * S;
+    pl.x += pl.vx * (hitstop > 0 ? 0 : dtRaw * timeScale);
+    if (pl.x < arena.left) { pl.x = arena.left; pl.vx = Math.abs(pl.vx); }
+    if (pl.x + pl.w > arena.right) { pl.x = arena.right - pl.w; pl.vx = -Math.abs(pl.vx); }
+  }
 
   if (state === 'title') {
     for (const p of players) updatePlayer(p, sdt);
