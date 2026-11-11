@@ -408,6 +408,7 @@ function generatePlatforms() {
       w: w[i],
       h: 18 * S,
       style: i,
+      vx: (i % 2 === 0 ? 1 : -1) * rand(40, 110) * S,
     });
   }
 
