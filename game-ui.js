@@ -87,18 +87,6 @@ function renderArcade() {
     }).join('')}</div>`;
     // paint portraits
     el.arcadeBody.querySelectorAll('canvas[data-char]').forEach(c => renderPortrait(c, c.dataset.char, '#ffd23f'));
-  } else {
-    el.arcadeBody.innerHTML = `<div class="trophy-grid">${ACHIEVEMENTS.map(a => {
-      const got = profile.ach.includes(a.id);
-      return `<div class="trophy-card ${got ? 'got' : ''}">
-        <div class="tr-icon">${got ? a.icon : '🔒'}</div>
-        <div class="tr-info">
-          <div class="tr-name">${a.name}</div>
-          <div class="tr-desc">${a.desc}</div>
-        </div>
-        <div class="tr-reward">${got ? 'GOT IT' : '+' + a.reward}</div>
-      </div>`;
-    }).join('')}</div>`;
   }
 }
 
