@@ -337,7 +337,8 @@ function computeLayout() {
 
   isTouch = window.matchMedia('(pointer: coarse)').matches;
   document.body.classList.toggle('touch', isTouch);
-  S = clamp(Math.sqrt(W * H) / 860, 0.66, 1.3);
+  const portraitBoost = H > W * 1.15 ? 1.26 : 1;
+  S = clamp((Math.sqrt(W * H) / 860) * portraitBoost, 0.66, 1.35);
   apron = isTouch ? clamp(H * 0.27, 96, 134) : clamp(H * 0.075, 44, 66);
   arenaTop = isTouch ? 78 : 96;
   floorY = H - apron;
@@ -358,7 +359,7 @@ function computeLayout() {
   rebuildDecor();
   if (prevW && (prevW !== W || prevH !== H)) {
     const sx = W / prevW;
-    const sy = H / prevFloor;
+    const sy = prevFloor ? floorY / prevFloor : 1;
     for (const p of players) {
       p.x *= sx;
       p.y = prevFloor ? p.y * sy : floorY;
@@ -400,7 +401,7 @@ function generatePlatforms() {
       x: xs[i],
       y: floorY - step * (i + 1),
       w: w[i],
-      h: 18 * S,
+      h: 12 * S,
       style: i,
     });
   }
@@ -470,8 +471,8 @@ function handPoint(p) {
   const dir = opp ? (Math.sign(opp.x - p.x) || p.facing) : p.facing;
   const charging = p.charging;
   return {
-    x: p.x + dir * (charging ? 14 : 23) * S,
-    y: p.y - (charging ? 36 : 34) * S,
+    x: p.x + dir * (charging ? 14 : 22) * S,
+    y: p.y - 48 * S,
     dir,
   };
 }

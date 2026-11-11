@@ -412,7 +412,7 @@ function drawPlayer(p, t) {
 
   // player ID badge above the head
   if (state !== 'title' && state !== 'matchEnd') {
-    const bw = Math.max(15, 18 * S), bh = Math.max(11, 13 * S);
+    const bw = Math.max(15, 18 * S), bh = Math.max(9, 11 * S);
     const by = p.y - 104 * S;
     ctx.save();
     ctx.translate(p.x, by);

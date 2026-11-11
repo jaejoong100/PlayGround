@@ -401,6 +401,15 @@ body:not(.touch) .corner-btn{top:calc(max(10px,env(safe-area-inset-top)) + 84px)
 .pause-panel{width:min(340px,90vw);text-align:center}
 .pause-buttons{display:flex;flex-direction:column;gap:7px;margin:14px 0 10px}
 .pause-note{font-size:10.5px;color:#7a668f;font-weight:600}
+.note-touch{display:none}
+body.touch .note-desk{display:none}
+body.touch .note-touch{display:inline}
+
+/* Overlays take over the screen: tuck away the in-game chrome. */
+#touch,.desk-hints,.corner-btn{transition:opacity .18s ease,visibility .18s ease}
+body.overlay-open #touch,body.overlay-open .desk-hints,body.overlay-open .corner-btn{
+  opacity:0;visibility:hidden;pointer-events:none;
+}
 
 /* ---------------- toasts ---------------- */
 .toasts{
