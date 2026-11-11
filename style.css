@@ -243,14 +243,14 @@ kbd{
   --joy:clamp(86px,13vh,118px);
   --btn:clamp(48px,7.2vh,62px);
   position:absolute;bottom:max(7px,env(safe-area-inset-bottom));
-  display:flex;align-items:flex-end;gap:8px;pointer-events:none;
+  display:flex;align-items:flex-end;gap:8px;pointer-events:auto;
 }
 .touch .pad.p1{left:max(9px,env(safe-area-inset-left))}
 .touch .pad.p2{right:max(9px,env(safe-area-inset-right));flex-direction:row-reverse}
 .joystick{
   position:relative;width:var(--joy);height:var(--joy);flex:0 0 auto;
   border-radius:50%;pointer-events:auto;touch-action:none;
-  -webkit-tap-highlight-color:transparent;user-select:none;
+  -webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none;
 }
 .stick-base{
   position:absolute;inset:0;border-radius:50%;
@@ -276,7 +276,7 @@ kbd{
 .pad.p2 .stick-knob{box-shadow:0 3px 0 var(--ink),inset 0 0 0 4px rgba(255,62,165,.6)}
 .joystick.active .stick-base{background:rgba(255,255,255,.62);box-shadow:0 2px 0 rgba(36,19,53,.6),inset 0 0 0 5px rgba(36,19,53,.18)}
 .joystick.active .stick-knob{background:#fff;transition:transform 0s,background .1s ease}
-.touch .actions{display:flex;flex-direction:column;gap:6px;height:var(--joy);pointer-events:none}
+.touch .actions{display:flex;flex-direction:column;gap:6px;height:var(--joy);pointer-events:auto}
 .tbtn{
   pointer-events:auto;touch-action:none;appearance:none;cursor:pointer;
   border:2.5px solid var(--ink);border-radius:15px;background:rgba(255,244,216,.9);
