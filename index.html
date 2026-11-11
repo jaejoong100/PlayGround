@@ -102,17 +102,25 @@
   <!-- ============ TOUCH CONTROLS ============ -->
   <div id="touch" class="touch hidden">
     <div class="pad p1" data-player="0">
-      <button class="tbtn move" data-act="left" aria-label="Player 1 move left">&#9664;</button>
-      <button class="tbtn move" data-act="right" aria-label="Player 1 move right">&#9654;</button>
-      <button class="tbtn jump" data-act="jump" aria-label="Player 1 jump">JUMP</button>
-      <button class="tbtn throw" data-act="throw" aria-label="Player 1 throw">THROW</button>
+      <div class="joystick" role="application" aria-label="Player 1 movement joystick">
+        <div class="stick-base"></div>
+        <div class="stick-knob"></div>
+      </div>
+      <div class="actions">
+        <button class="tbtn jump" data-act="jump" aria-label="Player 1 jump">JUMP</button>
+        <button class="tbtn throw" data-act="throw" aria-label="Player 1 throw">THROW</button>
+      </div>
     </div>
     <button class="tbtn pause-mini" id="btnPauseTouch" aria-label="Pause">II</button>
     <div class="pad p2" data-player="1">
-      <button class="tbtn move" data-act="left" aria-label="Player 2 move left">&#9664;</button>
-      <button class="tbtn move" data-act="right" aria-label="Player 2 move right">&#9654;</button>
-      <button class="tbtn jump" data-act="jump" aria-label="Player 2 jump">JUMP</button>
-      <button class="tbtn throw" data-act="throw" aria-label="Player 2 throw">THROW</button>
+      <div class="joystick" role="application" aria-label="Player 2 movement joystick">
+        <div class="stick-base"></div>
+        <div class="stick-knob"></div>
+      </div>
+      <div class="actions">
+        <button class="tbtn jump" data-act="jump" aria-label="Player 2 jump">JUMP</button>
+        <button class="tbtn throw" data-act="throw" aria-label="Player 2 throw">THROW</button>
+      </div>
     </div>
   </div>
 
@@ -197,7 +205,7 @@
         <li><b>Win.</b> First to 3 round wins takes the match. Each round rolls a brand new modifier, so stay on your toes.</li>
         <li><b>Upgrade.</b> Spend coins in the Arcade between matches. Upgrades apply to both brawlers — fair's fair.</li>
       </ul>
-      <div class="how-note">TABLET / PHONE: use the on-screen pads. Landscape recommended!</div>
+      <div class="how-note">TABLET / PHONE: drag the joystick to move, tap JUMP / THROW. Landscape recommended!</div>
     </div>
   </section>
 

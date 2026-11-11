@@ -74,6 +74,7 @@ function showTitle() {
   el.screenTitle.classList.remove('hidden');
   el.hud.classList.add('hidden');
   el.touch.classList.add('hidden');
+  resetJoysticks();
   el.deskHints.classList.add('hidden');
   el.roundCard.classList.add('hidden');
   el.screenEnd.classList.add('hidden');
@@ -171,6 +172,7 @@ function startRound() {
   timeScale = 1; timeScaleTarget = 1; slowmoT = 0;
   generatePlatforms();
   players.forEach(resetPlayerForRound);
+  resetJoysticks();
 
   el.roundCard.classList.remove('hidden');
   el.rcRound.textContent = 'ROUND ' + match.round;
@@ -306,8 +308,7 @@ function pauseGame(force) {
   if (paused) {
     players.forEach(p => { p.charging = false; p.charge = 0; });
     keys.clear();
-    touchDirs[0].clear(); touchDirs[1].clear();
-    document.querySelectorAll('.tbtn.pressed').forEach(b => b.classList.remove('pressed'));
+    resetJoysticks();
     saveSoon();
   }
 }
@@ -382,7 +383,8 @@ function showAnnounce(text, sub = '') {
 
 /* ------------------------------ input ------------------------------ */
 const keys = new Set();
-const touchDirs = [new Set(), new Set()];
+const touchAxes = [0, 0];          // analog joystick output, -1..1
+const joysticks = [];
 const pointerOwners = new Map();
 const PLAYER_KEYS = [
   { left: ['KeyA'], right: ['KeyD'], jump: ['KeyW'], throw: ['Space'] },
@@ -409,9 +411,8 @@ function getInputDir(p) {
     if (keys.has('ArrowLeft')) dir--;
     if (keys.has('ArrowRight')) dir++;
   }
-  const ts = touchDirs[p.idx];
-  if (ts.has('left')) dir--;
-  if (ts.has('right')) dir++;
+  const axis = touchAxes[p.idx];
+  if (axis) dir += axis;
   return clamp(dir, -1, 1);
 }
 function doJump(p, strength = 1) {
@@ -504,8 +505,6 @@ function bindTouch() {
       try { btn.setPointerCapture?.(e.pointerId); } catch {}
       const p = players[pIdx];
       if (!p) return;
-      if (act === 'left') touchDirs[pIdx].add('left');
-      if (act === 'right') touchDirs[pIdx].add('right');
       if (act === 'jump') queueJump(p);
       if (act === 'throw') requestThrow(p);
     };
@@ -515,8 +514,6 @@ function bindTouch() {
       pointerOwners.delete(e.pointerId);
       btn.classList.remove('pressed');
       const p = players[pIdx];
-      if (act === 'left') touchDirs[pIdx].delete('left');
-      if (act === 'right') touchDirs[pIdx].delete('right');
       if (!p) return;
       if (act === 'throw') releaseThrowInput(p);
       if (act === 'jump' && p.vy < -60 * S) p.vy *= 0.8;
@@ -527,6 +524,76 @@ function bindTouch() {
     btn.addEventListener('lostpointercapture', up);
     btn.addEventListener('contextmenu', e => e.preventDefault());
   });
+}
+
+/* ------------------------------ virtual joysticks ------------------------------ */
+function bindJoysticks() {
+  joysticks.length = 0;
+  document.querySelectorAll('#touch .joystick').forEach(joyEl => {
+    const pad = joyEl.closest('.pad');
+    const pIdx = Number(pad.dataset.player);
+    const base = joyEl.querySelector('.stick-base');
+    const knob = joyEl.querySelector('.stick-knob');
+    const j = { el: joyEl, knob, pIdx, pointerId: null, max: 1 };
+    joysticks.push(j);
+
+    const centerOf = () => {
+      const r = base.getBoundingClientRect();
+      j.max = Math.max(1, r.width * 0.3);
+      return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+    };
+    const setAxis = (dx, dy) => {
+      const raw = Math.hypot(dx, dy);
+      const scale = raw > j.max ? j.max / raw : 1;
+      const kx = dx * scale, ky = dy * scale;
+      knob.style.transform = `translate(-50%, -50%) translate(${kx}px, ${ky}px)`;
+      const x = clamp(kx / j.max, -1, 1);
+      const dead = 0.16;
+      touchAxes[pIdx] = Math.sign(x) * clamp((Math.abs(x) - dead) / (1 - dead), 0, 1);
+    };
+    const release = e => {
+      if (j.pointerId === null) return;
+      if (e && e.pointerId !== undefined && e.pointerId !== j.pointerId) return;
+      j.pointerId = null;
+      touchAxes[pIdx] = 0;
+      joyEl.classList.remove('active');
+      knob.style.transform = 'translate(-50%, -50%)';
+    };
+    const canUse = () => (state === 'play' || state === 'title') && !paused;
+
+    joyEl.addEventListener('pointerdown', e => {
+      e.preventDefault();
+      ensureAudio();
+      if (!canUse() || j.pointerId !== null) return;
+      j.pointerId = e.pointerId;
+      joyEl.classList.add('active');
+      try { joyEl.setPointerCapture(e.pointerId); } catch {}
+      const c = centerOf();
+      setAxis(e.clientX - c.x, e.clientY - c.y);
+    });
+    joyEl.addEventListener('pointermove', e => {
+      if (j.pointerId !== e.pointerId) return;
+      e.preventDefault();
+      const c = centerOf();
+      setAxis(e.clientX - c.x, e.clientY - c.y);
+    });
+    joyEl.addEventListener('pointerup', release);
+    joyEl.addEventListener('pointercancel', release);
+    joyEl.addEventListener('lostpointercapture', release);
+    joyEl.addEventListener('contextmenu', e => e.preventDefault());
+  });
+}
+
+function resetJoysticks() {
+  touchAxes[0] = 0;
+  touchAxes[1] = 0;
+  for (const j of joysticks) {
+    j.pointerId = null;
+    j.el.classList.remove('active');
+    j.knob.style.transform = 'translate(-50%, -50%)';
+  }
+  pointerOwners.clear();
+  document.querySelectorAll('.tbtn.pressed').forEach(b => b.classList.remove('pressed'));
 }
 
 /* ------------------------------ player update ------------------------------ */
@@ -568,7 +635,7 @@ function updatePlayer(p, dt) {
 
   const maxSp = runSpeedFor() * (p.charging ? 0.58 : 1) * (p.hitstun > 0 ? 0.5 : 1);
   if (dir !== 0) {
-    p.facing = dir;
+    p.facing = Math.sign(dir) || p.facing;
     p.vx += dir * 2900 * S * dt;
     p.vx = clamp(p.vx, -maxSp, maxSp);
   } else {
@@ -801,7 +868,7 @@ window.addEventListener('keydown', onKeyDown);
 window.addEventListener('keyup', onKeyUp);
 window.addEventListener('blur', () => {
   keys.clear();
-  touchDirs[0].clear(); touchDirs[1].clear();
+  resetJoysticks();
   players.forEach(p => { if (p && !p.ai) { p.charging = false; p.charge = 0; } });
   if (state === 'play' && !paused) pauseGame(true);
 });

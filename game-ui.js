@@ -264,6 +264,7 @@ function boot() {
   showTitle();
   setMuted(profile.muted, true);
   bindTouch();
+  bindJoysticks();
   bindUI();
   [el.screenEnd, el.screenArcade, el.screenHow, el.screenPause].forEach(s => {
     if (s) new MutationObserver(syncOverlayClass).observe(s, { attributes: true, attributeFilter: ['class'] });

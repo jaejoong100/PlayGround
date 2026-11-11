@@ -240,13 +240,43 @@ kbd{
 /* ---------------- touch pads ---------------- */
 .touch{position:absolute;inset:0;z-index:30;pointer-events:none}
 .touch .pad{
-  --btn:clamp(44px,5.6vh,56px);
+  --joy:clamp(86px,13vh,118px);
+  --btn:clamp(48px,7.2vh,62px);
   position:absolute;bottom:max(7px,env(safe-area-inset-bottom));
-  display:grid;grid-template-columns:var(--btn) var(--btn) var(--btn);
-  grid-template-rows:var(--btn) var(--btn);gap:6px;pointer-events:none;
+  display:flex;align-items:flex-end;gap:8px;pointer-events:none;
 }
 .touch .pad.p1{left:max(9px,env(safe-area-inset-left))}
-.touch .pad.p2{right:max(9px,env(safe-area-inset-right))}
+.touch .pad.p2{right:max(9px,env(safe-area-inset-right));flex-direction:row-reverse}
+.joystick{
+  position:relative;width:var(--joy);height:var(--joy);flex:0 0 auto;
+  border-radius:50%;pointer-events:auto;touch-action:none;
+  -webkit-tap-highlight-color:transparent;user-select:none;
+}
+.stick-base{
+  position:absolute;inset:0;border-radius:50%;
+  border:3px solid var(--ink);
+  background:rgba(206,250,255,.42);
+  box-shadow:0 4px 0 rgba(36,19,53,.6),inset 0 0 0 5px rgba(36,19,53,.12);
+  transition:background .12s ease,box-shadow .12s ease;
+}
+.pad.p2 .stick-base{background:rgba(255,220,239,.42)}
+.stick-base::after{
+  content:"";position:absolute;inset:17%;border-radius:50%;
+  border:2px dashed rgba(36,19,53,.22);
+}
+.stick-knob{
+  position:absolute;left:50%;top:50%;width:47%;height:47%;border-radius:50%;
+  transform:translate(-50%,-50%);
+  background:#fff4d8;border:3px solid var(--ink);
+  box-shadow:0 3px 0 var(--ink),inset 0 -3px 0 rgba(0,0,0,.1);
+  transition:transform .09s ease-out,background .1s ease;
+  will-change:transform;
+}
+.pad.p1 .stick-knob{box-shadow:0 3px 0 var(--ink),inset 0 0 0 4px rgba(37,217,242,.6)}
+.pad.p2 .stick-knob{box-shadow:0 3px 0 var(--ink),inset 0 0 0 4px rgba(255,62,165,.6)}
+.joystick.active .stick-base{background:rgba(255,255,255,.62);box-shadow:0 2px 0 rgba(36,19,53,.6),inset 0 0 0 5px rgba(36,19,53,.18)}
+.joystick.active .stick-knob{background:#fff;transition:transform 0s,background .1s ease}
+.touch .actions{display:flex;flex-direction:column;gap:6px;height:var(--joy);pointer-events:none}
 .tbtn{
   pointer-events:auto;touch-action:none;appearance:none;
   border:2.5px solid var(--ink);border-radius:15px;background:rgba(255,244,216,.9);
@@ -255,17 +285,16 @@ kbd{
   display:flex;align-items:center;justify-content:center;
   transition:transform .06s,background .06s;
 }
+.touch .actions .tbtn{width:var(--btn);flex:1 1 0;min-height:0}
 .tbtn:active,.tbtn.pressed{transform:translateY(3px);box-shadow:0 1px 0 var(--ink);background:#fff}
 .touch .pad.p1 .tbtn{background:rgba(206,250,255,.92)}
 .touch .pad.p2 .tbtn{background:rgba(255,220,239,.92)}
-.tbtn.move{font-size:16px;grid-row:2}
-.tbtn.move[data-act="left"]{grid-column:1}
-.tbtn.move[data-act="right"]{grid-column:2}
-.tbtn.jump{grid-column:3;grid-row:1;background:var(--yellow)!important;font-size:11px}
-.tbtn.throw{grid-column:3;grid-row:2;background:var(--coral)!important;color:var(--cream);font-size:10.5px;letter-spacing:.06em;text-shadow:0 2px 0 rgba(36,19,53,.35)}
+.tbtn.jump{background:var(--yellow)!important;font-size:11px}
+.tbtn.throw{background:var(--coral)!important;color:var(--cream);font-size:10.5px;letter-spacing:.06em;text-shadow:0 2px 0 rgba(36,19,53,.35)}
 .pause-mini{
-  position:absolute;left:50%;bottom:max(8px,env(safe-area-inset-bottom));transform:translateX(-50%);
-  width:36px;height:31px;padding:0;border-radius:9px;font-size:11px;letter-spacing:.05em;
+  position:absolute;right:max(13px,env(safe-area-inset-right));
+  top:calc(max(10px,env(safe-area-inset-top)) + 122px);
+  width:34px;height:30px;padding:0;border-radius:9px;font-size:11px;letter-spacing:.05em;
   pointer-events:auto;background:rgba(255,244,216,.9);z-index:31;
 }
 .corner-btn{
@@ -473,6 +502,7 @@ body.overlay-open .toasts{
   .gold-chip .coin-ico{width:14px;height:14px}
   .fighter-card{width:min(270px,30vw);padding:4px 8px 5px}
   .corner-btn{top:calc(max(6px,env(safe-area-inset-top)) + 66px);width:28px;height:28px}
+  .pause-mini{top:calc(max(6px,env(safe-area-inset-top)) + 100px);width:30px;height:27px}
   .fc-name{font-size:11px}
   .fc-hp{font-size:11px}
   .hp-track{height:11px}
