@@ -568,7 +568,13 @@ function bindJoysticks() {
     const release = e => {
       if (j.pointerId === null) return;
       if (e && e.pointerId !== undefined && e.pointerId !== j.pointerId) return;
+      const p = players[pIdx];
+      if (p && p.charging) {
+        releaseThrow(p);
+        p.needsMove = true;
+      }
       j.pointerId = null;
+      j.jumpLatch = false;
       touchAxes[pIdx] = 0;
       joyEl.classList.remove('active');
       knob.style.transform = 'translate(-50%, -50%)';
@@ -645,11 +651,8 @@ function updatePlayer(p, dt) {
   if (state === 'play' && canControl && !p.ai && !p.ko && p.hitstun <= 0) {
     const moving = Math.abs(dir) > 0.15;
     if (moving) {
-      p.needsMove = false;
-      if (!p.charging && p.throwCd <= 0) beginThrow(p);
-    } else if (p.charging && p.onGround) {
-      releaseThrow(p);
-      p.needsMove = true;
+      if (p.needsMove) p.needsMove = false;
+      if (!p.charging && p.throwCd <= 0 && !p.needsMove) beginThrow(p);
     }
   }
 
