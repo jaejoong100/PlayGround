@@ -81,24 +81,11 @@ function renderArcade() {
         <div class="cc-name">${c.name}</div>
         <div class="cc-tag">${c.tag}</div>
         <div class="cc-weapon">${(weaponOf(c.id).name)}</div>
-        <div class="cc-status ${owned ? 'ready' : ''}">${owned ? 'READY TO RUMBLE' : 'LOCKED'}</div>
-        ${owned ? '' : `<button class="buy-btn" data-char-buy="${c.id}">UNLOCK</button>`}
+        <div class="cc-status ready">READY TO RUMBLE</div>
       </div>`;
     }).join('')}</div>`;
     // paint portraits
     el.arcadeBody.querySelectorAll('canvas[data-char]').forEach(c => renderPortrait(c, c.dataset.char, '#ffd23f'));
-  } else {
-    el.arcadeBody.innerHTML = `<div class="trophy-grid">${ACHIEVEMENTS.map(a => {
-      const got = profile.ach.includes(a.id);
-      return `<div class="trophy-card ${got ? 'got' : ''}">
-        <div class="tr-icon">${got ? a.icon : '🔒'}</div>
-        <div class="tr-info">
-          <div class="tr-name">${a.name}</div>
-          <div class="tr-desc">${a.desc}</div>
-        </div>
-        <div class="tr-reward">${got ? 'GOT IT' : '+' + a.reward}</div>
-      </div>`;
-    }).join('')}</div>`;
   }
 }
 

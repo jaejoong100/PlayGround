@@ -318,15 +318,7 @@ function elsPause(on) {
 
 /* ------------------------------ HUD / gold / achievements ------------------------------ */
 let goldUiDirty = false;
-function unlock(id) {
-  const a = ACH_BY_ID[id];
-  if (!a || profile.ach.includes(id)) return;
-  profile.ach.push(id);
-  toastAchievement(a);
-  sfx.ach();
-  saveProfile();
-  if (typeof refreshArcadeIfOpen === 'function') refreshArcadeIfOpen();
-}
+function unlock(id) { return; }
 function fmtTime(sec) {
   const s = Math.max(0, Math.ceil(sec));
   return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
