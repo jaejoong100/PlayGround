@@ -94,6 +94,26 @@ const CHARS = [
     color: '#a06cff', dark: '#6a3fb0', skin: '#c9b3e8', skinDark: '#9a82c4',
     animal: 'frog', headW: 36, eyeY: -88.5, eyeGap: 9.5, eyeR: 5.2, cost: 900,
   },
+  {
+    id: 'coco', name: 'COCO', tag: 'Nutty by nature.',
+    color: '#b07a4a', dark: '#7a4f2a', skin: '#d4a87a', skinDark: '#a87a52',
+    animal: 'lion', headW: 34, eyeY: -82.5, eyeGap: 7, eyeR: 4.8, cost: 0,
+  },
+  {
+    id: 'finn', name: 'FINN', tag: 'Jaws of steel.',
+    color: '#3a9fd9', dark: '#1f6fa3', skin: '#9fd4f0', skinDark: '#6fb0d9',
+    animal: 'croc', headW: 34, eyeY: -88.5, eyeGap: 7.5, eyeR: 4.8, cost: 0,
+  },
+  {
+    id: 'pepper', name: 'PEPPER', tag: 'Spicy little devil.',
+    color: '#e8434f', dark: '#a82028', skin: '#f0a0a0', skinDark: '#c87070',
+    animal: 'chicken', headW: 31, eyeY: -84, eyeGap: 6.5, eyeR: 4.4, cost: 0,
+  },
+  {
+    id: 'momo', name: 'MOMO', tag: 'Goes bananas.',
+    color: '#f0a030', dark: '#b07010', skin: '#f0c890', skinDark: '#c89860',
+    animal: 'frog', headW: 36, eyeY: -88.5, eyeGap: 9.5, eyeR: 5.2, cost: 0,
+  },
 ];
 const CHAR_BY_ID = Object.fromEntries(CHARS.map(c => [c.id, c]));
 const WEAPONS = {
@@ -107,6 +127,10 @@ const WEAPONS = {
   bolt: { name: 'SPARK', color: '#6fe3ff', size: 0.8, speed: 1.35, damage: 0.9, spin: 16, shape: 'diamond', knock: 0.8 },
   rex: { name: 'BOULDER', color: '#8a6a3a', size: 1.4, speed: 0.78, damage: 1.25, spin: 4, shape: 'egg', knock: 1.35 },
   squid: { name: 'INKBALL', color: '#a06cff', size: 1.05, speed: 1.05, damage: 1.0, spin: 9, shape: 'ring', knock: 1.0 },
+  coco: { name: 'COCONUT', color: '#b07a4a', size: 1.3, speed: 0.85, damage: 1.2, spin: 5, shape: 'egg', knock: 1.25 },
+  finn: { name: 'TRIDENT', color: '#3a9fd9', size: 0.9, speed: 1.2, damage: 1.0, spin: 11, shape: 'diamond', knock: 0.95 },
+  pepper: { name: 'PEPPER', color: '#e8434f', size: 0.85, speed: 1.3, damage: 0.95, spin: 15, shape: 'star', knock: 0.85 },
+  momo: { name: 'BANANA', color: '#f0a030', size: 1.1, speed: 1.0, damage: 1.05, spin: 7, shape: 'blob', knock: 1.0 },
 };
 function weaponOf(charId) { return WEAPONS[charId] || WEAPONS.gloop; }
 const P_COLORS = [P1C, P2C];
