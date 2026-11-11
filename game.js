@@ -152,7 +152,7 @@ const SAVE_KEY = 'bonkball.profile.v1';
 function defaultProfile() {
   return {
     upgrades: { speed: 0, jump: 0, power: 0, hp: 0 },
-    unlocked: ['gloop', 'pickle'],
+    unlocked: CHARS.map(c => c.id),
     ach: [],
     stats: { matches: 0, wins: 0, hits: 0, catches: 0, coins: 0, ricochets: 0, rounds: 0, botWins: 0 },
     muted: false,
@@ -169,7 +169,7 @@ function loadProfile() {
       ...base, ...p,
       upgrades: { ...base.upgrades, ...(p.upgrades || {}) },
       stats: { ...base.stats, ...(p.stats || {}) },
-      unlocked: Array.isArray(p.unlocked) && p.unlocked.length ? p.unlocked.filter(id => CHAR_BY_ID[id]) : base.unlocked,
+      unlocked: CHARS.map(c => c.id),
       ach: Array.isArray(p.ach) ? p.ach.filter(id => ACH_BY_ID[id]) : [],
       muted: !!p.muted,
     };
