@@ -304,8 +304,8 @@ function updatePickups(dt) {
       if (!p || p.ko) continue;
       if (dist(p.x, p.y - 40 * S, pk.x, pk.y) < 38 * S) {
         pk.dead = true;
-        p.hp = Math.min(p.maxHp, p.hp + 22);
-        addFloater('+22', pk.x, pk.y - 22 * S, '#ff6b8a', 22);
+        p.hp = Math.min(p.maxHp, p.hp + 50);
+        addFloater('+50', pk.x, pk.y - 22 * S, '#ff6b8a', 22);
         burst(pk.x, pk.y, '#ff5d5d', 10, 0.7, 'star');
         sfx.heart();
         updateHud();
