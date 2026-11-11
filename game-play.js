@@ -509,7 +509,11 @@ function bindTouch() {
       const p = players[pIdx];
       if (!p) return;
       if (act === 'jump') queueJump(p);
-      if (act === 'throw') requestThrow(p);
+      if (act === 'throw') {
+        const moving = Math.abs(getInputDir(p)) > 0.15;
+        requestThrow(p);
+        if (!moving) setTimeout(() => releaseThrowInput(p), 90);
+      }
     };
     const up = e => {
       const own = pointerOwners.get(e.pointerId);
@@ -537,7 +541,7 @@ function bindJoysticks() {
     const pIdx = Number(pad.dataset.player);
     const base = joyEl.querySelector('.stick-base');
     const knob = joyEl.querySelector('.stick-knob');
-    const j = { el: joyEl, knob, pIdx, pointerId: null, max: 1 };
+    const j = { el: joyEl, knob, pIdx, pointerId: null, max: 1, jumpLatch: false };
     joysticks.push(j);
 
     const centerOf = () => {
@@ -553,6 +557,13 @@ function bindJoysticks() {
       const x = clamp(kx / j.max, -1, 1);
       const dead = 0.16;
       touchAxes[pIdx] = Math.sign(x) * clamp((Math.abs(x) - dead) / (1 - dead), 0, 1);
+      // jump on upward flick
+      if (ky < -j.max * 0.5 && !j.jumpLatch) {
+        j.jumpLatch = true;
+        const p = players[pIdx];
+        if (p) queueJump(p);
+      }
+      if (ky > -j.max * 0.25) j.jumpLatch = false;
     };
     const release = e => {
       if (j.pointerId === null) return;
@@ -592,7 +603,7 @@ function resetJoysticks() {
   touchAxes[1] = 0;
   for (const j of joysticks) {
     j.pointerId = null;
-    j.el.classList.remove('active');
+    j.jumpLatch = false;
     j.knob.style.transform = 'translate(-50%, -50%)';
   }
   pointerOwners.clear();
