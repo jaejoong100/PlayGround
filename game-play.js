@@ -16,7 +16,7 @@ function makePlayer(idx, charId) {
     ai: false, aiTimer: rand(0.5, 1.4), aiMove: 0, aiJumpCd: 0,
     aiStrafe: pick([-1, 0, 1]), aiStrafeTimer: rand(0.6, 1.5),
     aiHold: 0.5, aiCharge: 0, demo: false, demoT: rand(0, 10), demoThrow: rand(1.4, 3.2),
-    chargeFx: 0, wasGround: true, needsMove: false,
+    chargeFx: 0, wasGround: true, needsMove: false, dropThrough: 0,
   };
   return p;
 }
@@ -152,7 +152,7 @@ function resetPlayerForRound(p) {
   p.blink = 0; p.blinkTimer = rand(1.2, 3.4);
   p.aiTimer = rand(0.6, 1.6); p.aiMove = 0; p.aiJumpCd = 0;
   p.aiStrafe = pick([-1, 0, 1]); p.aiStrafeTimer = rand(0.6, 1.5);
-  p.chargeFx = 0; p.needsMove = false;
+  p.chargeFx = 0; p.needsMove = false; p.dropThrough = 0;
   const bw = arena.right - arena.left;
   p.x = arena.left + bw * (p.idx === 0 ? 0.22 : 0.78);
   p.y = floorY;
@@ -557,6 +557,11 @@ function bindJoysticks() {
       const x = clamp(kx / j.max, -1, 1);
       const dead = 0.16;
       touchAxes[pIdx] = Math.sign(x) * clamp((Math.abs(x) - dead) / (1 - dead), 0, 1);
+      // drop through platforms on downward flick
+      if (ky > j.max * 0.5) {
+        const pp = players[pIdx];
+        if (pp) pp.dropThrough = 0.25;
+      }
       // jump on upward flick
       if (ky < -j.max * 0.5 && !j.jumpLatch) {
         j.jumpLatch = true;
@@ -626,6 +631,7 @@ function updatePlayer(p, dt) {
   p.invuln = Math.max(0, p.invuln - dt);
   p.hitstun = Math.max(0, p.hitstun - dt);
   p.jumpBuffer = Math.max(0, p.jumpBuffer - dt);
+  p.dropThrough = Math.max(0, (p.dropThrough || 0) - dt);
   p.blinkTimer -= dt;
   if (p.blinkTimer <= 0) { p.blink = 0.11; p.blinkTimer = rand(2.2, 4.8); }
   p.blink = Math.max(0, p.blink - dt);
@@ -646,6 +652,12 @@ function updatePlayer(p, dt) {
   const canControl = state === 'play' && !paused;
   let dir = canControl ? getInputDir(p) : 0;
   if (p.hitstun > 0) dir = 0;
+
+  // drop through platforms on down input
+  if (state === 'play' && canControl && !p.ai) {
+    const downHeld = (p.idx === 0 && keys.has('KeyS')) || (p.idx === 1 && keys.has('ArrowDown'));
+    if (downHeld) p.dropThrough = 0.2;
+  }
 
   // auto-charge / auto-fire for human players
   if (state === 'play' && canControl && !p.ai && !p.ko && p.hitstun <= 0) {
@@ -699,7 +711,7 @@ function updatePlayer(p, dt) {
   p.x = clamp(p.x, arena.left + 18 * S, arena.right - 18 * S);
 
   p.onGround = false;
-  if (p.vy >= 0) {
+  if (p.vy >= 0 && (p.dropThrough || 0) <= 0) {
     for (const pl of platforms) {
       if (prevY <= pl.y + 2 && p.y >= pl.y && p.y <= pl.y + pl.h + 30 * S &&
           p.x + 14 * S > pl.x + 3 && p.x - 14 * S < pl.x + pl.w - 3) {
