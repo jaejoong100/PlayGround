@@ -84,7 +84,6 @@ function showTitle() {
   el.announce.classList.remove('show');
   resetDemoStage();
   setTitleChars(titleChars, true);
-  updateGoldUI();
 }
 
 function hideAllScreens() {
@@ -213,7 +212,6 @@ function finishRound(winner, reason) {
 
   if (winner !== null) {
     match.scores[winner]++;
-    awardGold(15, 'rounds');
     profile.stats.rounds = (profile.stats.rounds || 0) + 1;
     if (roundDamage[winner] === 0) unlock('untouchable');
     updatePips();
@@ -236,8 +234,6 @@ function endMatch(winner) {
   endShown = false;
   timeScaleTarget = 0.55;
   slowmoT = 1.2;
-  awardGold(60, 'victory');
-  awardGold(20, 'victory');
   profile.stats.wins = (profile.stats.wins || 0) + 1;
   unlock('champion');
   if (match.scores[winner] === 3 && match.scores[1 - winner] === 0) unlock('sweep');
@@ -284,7 +280,6 @@ function showEndScreen() {
     ['Achievements', e.ach],
   ].map(([label, val]) => `<div class="earn-row"><span>${label}</span><span>+${val}</span></div>`).join('') +
     `<div class="earn-row total"><span>TOTAL EARNED</span><span>+${total}</span></div>`;
-  updateGoldUI();
   el.hud.classList.add('hidden');
 }
 
@@ -323,22 +318,10 @@ function elsPause(on) {
 
 /* ------------------------------ HUD / gold / achievements ------------------------------ */
 let goldUiDirty = false;
-function updateGoldUI() {
-  el.goldTitle.textContent = profile.gold;
-  el.goldArcade.textContent = profile.gold;
-}
-function awardGold(n, kind) {
-  if (!n) return;
-  profile.gold = Math.max(0, profile.gold + n);
-  if (matchEarnings && kind) matchEarnings[kind] = (matchEarnings[kind] || 0) + n;
-  updateGoldUI();
-  saveSoon();
-}
 function unlock(id) {
   const a = ACH_BY_ID[id];
   if (!a || profile.ach.includes(id)) return;
   profile.ach.push(id);
-  awardGold(a.reward, 'ach');
   toastAchievement(a);
   sfx.ach();
   saveProfile();

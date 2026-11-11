@@ -241,7 +241,6 @@ function hitPlayer(p, dmg, dir, ball) {
   if (ball && ball.owner >= 0 && ball.owner !== p.idx) {
     profile.stats.hits = (profile.stats.hits || 0) + 1;
     if (match) match.hits++;
-    awardGold(1, 'hits');
     unlock('first');
     if (ball.bounces >= 2) { unlock('trick'); profile.stats.ricochets = (profile.stats.ricochets || 0) + 1; }
     else if (ball.bounces >= 1) unlock('wall');

@@ -151,7 +151,6 @@ const ACH_BY_ID = Object.fromEntries(ACHIEVEMENTS.map(a => [a.id, a]));
 const SAVE_KEY = 'bonkball.profile.v1';
 function defaultProfile() {
   return {
-    gold: 150,
     upgrades: { speed: 0, jump: 0, power: 0, hp: 0 },
     unlocked: ['gloop', 'pickle'],
     ach: [],
@@ -172,7 +171,6 @@ function loadProfile() {
       stats: { ...base.stats, ...(p.stats || {}) },
       unlocked: Array.isArray(p.unlocked) && p.unlocked.length ? p.unlocked.filter(id => CHAR_BY_ID[id]) : base.unlocked,
       ach: Array.isArray(p.ach) ? p.ach.filter(id => ACH_BY_ID[id]) : [],
-      gold: Number.isFinite(p.gold) ? Math.max(0, Math.floor(p.gold)) : base.gold,
       muted: !!p.muted,
     };
   } catch { return base; }
@@ -208,7 +206,6 @@ const el = {
   titleP1Canvas: $('#titleP1 .portrait'), titleP2Canvas: $('#titleP2 .portrait'),
   btnPlay: $('#btnPlay'), btnSolo: $('#btnSolo'), btnArcade: $('#btnArcade'), btnHow: $('#btnHow'),
   btnReroll: $('#btnReroll'),
-  goldTitle: $('#goldTitle'), goldArcade: $('#goldArcade'),
   roundCard: $('#roundCard'), rcRound: $('#rcRound'), rcVs: $('#rcVs'), rcMod: $('#rcMod'),
   rcDesc: $('#rcDesc'), rcCount: $('#rcCount'),
   announce: $('#announce'),
