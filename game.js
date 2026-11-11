@@ -128,7 +128,7 @@ const SAVE_KEY = 'bonkball.profile.v1';
 function defaultProfile() {
   return {
     upgrades: { speed: 0, jump: 0, power: 0, hp: 0 },
-    unlocked: CHARS.map(c => c.id),
+    unlocked: CHARS.filter(c => c.cost === 0).map(c => c.id),
     ach: [],
     stats: { matches: 0, wins: 0, hits: 0, catches: 0, coins: 0, ricochets: 0, rounds: 0, botWins: 0 },
     muted: false,
@@ -145,8 +145,11 @@ function loadProfile() {
       ...base, ...p,
       upgrades: { ...base.upgrades, ...(p.upgrades || {}) },
       stats: { ...base.stats, ...(p.stats || {}) },
-      unlocked: CHARS.map(c => c.id),
-      ach: Array.isArray(p.ach) ? p.ach.filter(id => ACH_BY_ID[id]) : [],
+      unlocked: [...new Set([
+        ...base.unlocked,
+        ...(Array.isArray(p.unlocked) ? p.unlocked.filter(id => CHAR_BY_ID[id]) : []),
+      ])],
+      ach: Array.isArray(p.ach) ? [...new Set(p.ach.filter(id => ACH_BY_ID[id]))] : [],
       muted: !!p.muted,
     };
   } catch { return base; }
@@ -192,7 +195,7 @@ const el = {
   earnings: $('#earnings'),
   btnRematch: $('#btnRematch'), btnEndArcade: $('#btnEndArcade'), btnEndMenu: $('#btnEndMenu'),
   screenArcade: $('#screenArcade'), arcadeBody: $('#arcadeBody'), arcadeSub: $('#arcadeSub'),
-  btnArcadeClose: $('#btnArcadeClose'),
+  btnArcadeClose: $('#btnArcadeClose'), gold: $('#arcadeGold'),
   screenHow: $('#screenHow'), btnHowClose: $('#btnHowClose'),
   screenPause: $('#screenPause'), btnResume: $('#btnResume'), btnRestart: $('#btnRestart'),
   btnPauseHow: $('#btnPauseHow'), btnPauseMenu: $('#btnPauseMenu'),

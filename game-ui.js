@@ -41,7 +41,6 @@ function toastAchievement(a) {
 function openArcade(tab) {
   ensureAudio();
   if (tab) currentArcadeTab = tab;
-  if (currentArcadeTab === 'upgrades') currentArcadeTab = 'brawlers';
   el.screenHow.classList.add('hidden');
   el.screenArcade.classList.remove('hidden');
   modalOpen = true;
@@ -64,7 +63,12 @@ function switchArcadeTab(tab) {
 }
 function renderArcade() {
   if (!el.arcadeBody) return;
-  el.tabs.forEach(t => t.classList.toggle('active', t.dataset.tab === currentArcadeTab));
+  el.tabs.forEach(t => {
+    const active = t.dataset.tab === currentArcadeTab;
+    t.classList.toggle('active', active);
+    t.setAttribute('aria-selected', String(active));
+  });
+  if (el.gold) el.gold.textContent = String(profile.stats.coins || 0);
   const sub = {
     upgrades: 'Upgrades apply to BOTH brawlers — fair’s fair.',
     brawlers: 'Unlock the weirdos. Collect the whole fridge.',
@@ -75,26 +79,62 @@ function renderArcade() {
   if (currentArcadeTab === 'brawlers') {
     el.arcadeBody.innerHTML = `<div class="char-grid">${CHARS.map(c => {
       const owned = profile.unlocked.includes(c.id);
-      const afford = true;
+      const affordable = (profile.stats.coins || 0) >= c.cost;
+      const action = owned ? 'OWNED' : c.cost === 0 ? 'UNLOCK' : `BUY <span class="cost">🪙 ${c.cost}</span>`;
       return `<div class="char-card ${owned ? '' : 'locked'}">
         <canvas width="96" height="96" data-char="${c.id}"></canvas>
         <div class="cc-name">${c.name}</div>
         <div class="cc-tag">${c.tag}</div>
-        <div class="cc-weapon">${(weaponOf(c.id).name)}</div>
+        <div class="cc-weapon">${weaponOf(c.id).name}</div>
+        <button class="buy-btn cc-buy" data-char-buy="${c.id}" ${owned || !affordable ? 'disabled' : ''}>${action}</button>
       </div>`;
     }).join('')}</div>`;
-    // paint portraits
     el.arcadeBody.querySelectorAll('canvas[data-char]').forEach(c => renderPortrait(c, c.dataset.char, '#ffd23f'));
+  } else if (currentArcadeTab === 'upgrades') {
+    el.arcadeBody.innerHTML = `<div class="up-grid">${UPGRADE_IDS.map(id => {
+      const u = UPGRADES[id], level = Math.min(u.max, profile.upgrades[id] || 0);
+      const cost = u.costs[level], affordable = level >= u.max || (profile.stats.coins || 0) >= cost;
+      return `<div class="up-card">
+        <div class="up-icon">${ICONS[u.icon]}</div>
+        <div class="up-info"><div class="up-name">${u.name}</div><div class="up-desc">${u.desc}</div>
+          <div class="up-levels" aria-label="Level ${level} of ${u.max}">${Array.from({ length: u.max }, (_, i) => `<i class="${i < level ? 'on' : ''}"></i>`).join('')}</div>
+        </div><div class="up-buy"><button class="buy-btn" data-upgrade-buy="${id}" ${level >= u.max || !affordable ? 'disabled' : ''}>${level >= u.max ? 'MAX' : `BUY<span class="cost">🪙 ${cost}</span>`}</button></div>
+      </div>`;
+    }).join('')}</div>`;
+  } else if (currentArcadeTab === 'trophies') {
+    el.arcadeBody.innerHTML = `<div class="trophy-grid">${ACHIEVEMENTS.map(a => {
+      const got = profile.ach.includes(a.id);
+      return `<div class="trophy-card ${got ? 'got' : ''}">
+        <div class="tr-icon">${a.icon}</div><div class="tr-info"><div class="tr-name">${a.name}</div><div class="tr-desc">${a.desc}</div></div>
+        <div class="tr-reward">${got ? 'EARNED' : `🪙 ${a.reward}`}</div>
+      </div>`;
+    }).join('')}</div>`;
   }
 }
 
-
 function unlockCharacter(id) {
   const c = CHAR_BY_ID[id];
-  if (!c || profile.unlocked.includes(id)) return;
+  if (!c || profile.unlocked.includes(id) || (profile.stats.coins || 0) < c.cost) return;
+  profile.stats.coins -= c.cost;
   profile.unlocked.push(id);
   sfx.buy();
-  toast('NEW BRAWLER', c.name, '🎉', 0, true);
+  toast('NEW BRAWLER', c.name, '🎉', c.cost, true);
+  saveProfile();
+  renderArcade();
+}
+
+function buyUpgrade(id) {
+  const u = UPGRADES[id];
+  const level = profile.upgrades[id] || 0;
+  if (!u || level >= u.max) return;
+  const cost = u.costs[level];
+  if ((profile.stats.coins || 0) < cost) return;
+  profile.stats.coins -= cost;
+  profile.upgrades[id] = level + 1;
+  sfx.buy();
+  toast('UPGRADE BOUGHT', u.name, '⬆️', cost, true);
+  unlock('shopper');
+  if (profile.upgrades[id] >= u.max) unlock('maxed');
   saveProfile();
   renderArcade();
 }
@@ -148,7 +188,9 @@ function bindUI() {
   el.tabs.forEach(t => t.addEventListener('click', () => switchArcadeTab(t.dataset.tab)));
   el.arcadeBody.addEventListener('click', e => {
     const ch = e.target.closest('[data-char-buy]');
-    if (ch) unlockCharacter(ch.dataset.charBuy);
+    if (ch) { unlockCharacter(ch.dataset.charBuy); return; }
+    const upgrade = e.target.closest('[data-upgrade-buy]');
+    if (upgrade) buyUpgrade(upgrade.dataset.upgradeBuy);
   });
 
   el.btnMute.addEventListener('click', () => { setMuted(!profile.muted); if (!profile.muted) sfx.ui(); });

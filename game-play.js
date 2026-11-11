@@ -213,6 +213,7 @@ function finishRound(winner, reason) {
   if (winner !== null) {
     match.scores[winner]++;
     profile.stats.rounds = (profile.stats.rounds || 0) + 1;
+    awardMatchCoins('rounds', 20);
     if (roundDamage[winner] === 0) unlock('untouchable');
     updatePips();
     const wname = players[winner].char.name;
@@ -235,6 +236,7 @@ function endMatch(winner) {
   timeScaleTarget = 0.55;
   slowmoT = 1.2;
   profile.stats.wins = (profile.stats.wins || 0) + 1;
+  awardMatchCoins('victory', 50);
   unlock('champion');
   if (match.scores[winner] === 3 && match.scores[1 - winner] === 0) unlock('sweep');
   confettiBurst(W / 2, arena.top + 60 * S, 70);
@@ -318,7 +320,27 @@ function elsPause(on) {
 
 /* ------------------------------ HUD / gold / achievements ------------------------------ */
 let goldUiDirty = false;
-function unlock(id) { return; }
+function awardMatchCoins(category, amount) {
+  if (!matchEarnings || !Object.hasOwn(matchEarnings, category) || amount <= 0) return;
+  matchEarnings[category] += amount;
+  profile.stats.coins = (profile.stats.coins || 0) + amount;
+  saveProfile();
+  refreshArcadeIfOpen();
+  if (profile.stats.coins >= 25) unlock('coin25');
+}
+function unlock(id) {
+  const achievement = ACH_BY_ID[id];
+  if (!achievement || profile.ach.includes(id)) return false;
+  profile.ach.push(id);
+  profile.stats.coins = (profile.stats.coins || 0) + achievement.reward;
+  if (matchEarnings && !['title', 'matchEnd'].includes(state)) {
+    matchEarnings.ach += achievement.reward;
+  }
+  saveProfile();
+  toastAchievement(achievement);
+  refreshArcadeIfOpen();
+  return true;
+}
 function fmtTime(sec) {
   const s = Math.max(0, Math.ceil(sec));
   return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;

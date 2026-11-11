@@ -156,11 +156,14 @@
           <div class="arcade-sub" id="arcadeSub">Unlock brawlers and chase trophies.</div>
         </div>
         <div class="arcade-head-right">
+          <div class="gold-chip" aria-label="Coins"><i class="coin-ico"></i><span id="arcadeGold">0</span></div>
           <button class="btn close-btn" id="btnArcadeClose" aria-label="Close arcade">&#10005;</button>
         </div>
       </div>
-      <div class="tabs" role="tablist">
-        <button class="tab active" data-tab="brawlers" role="tab">BRAWLERS</button>
+      <div class="tabs" role="tablist" aria-label="Arcade sections">
+        <button class="tab active" data-tab="brawlers" role="tab" aria-selected="true">BRAWLERS</button>
+        <button class="tab" data-tab="upgrades" role="tab" aria-selected="false">UPGRADES</button>
+        <button class="tab" data-tab="trophies" role="tab" aria-selected="false">TROPHIES</button>
       </div>
       <div class="arcade-body" id="arcadeBody"></div>
     </div>
