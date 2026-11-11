@@ -560,7 +560,10 @@ function bindJoysticks() {
       // drop through platforms on downward flick
       if (ky > j.max * 0.5) {
         const pp = players[pIdx];
-        if (pp) pp.dropThrough = 0.25;
+        if (pp) {
+          pp.dropThrough = 0.25;
+          if (pp.onGround && pp.y < floorY - 1) { pp.vy = 120 * S; pp.onGround = false; }
+        }
       }
       // jump on upward flick
       if (ky < -j.max * 0.5 && !j.jumpLatch) {
@@ -656,7 +659,10 @@ function updatePlayer(p, dt) {
   // drop through platforms on down input
   if (state === 'play' && canControl && !p.ai) {
     const downHeld = (p.idx === 0 && keys.has('KeyS')) || (p.idx === 1 && keys.has('ArrowDown'));
-    if (downHeld) p.dropThrough = 0.2;
+    if (downHeld) {
+      p.dropThrough = 0.2;
+      if (p.onGround && p.y < floorY - 1) { p.vy = 120 * S; p.onGround = false; }
+    }
   }
 
   // auto-charge / auto-fire for human players
