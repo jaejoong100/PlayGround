@@ -42,19 +42,22 @@ function releaseThrow(p) {
 
 function spawnBall(p, charge, opts = {}) {
   const plan = throwPlan(p, charge);
+  const weapon = weaponOf(p.char.id);
   const pow = 1 + 0.08 * upgradeBonus('power');
-  const dmg = Math.round((12 + 20 * charge) * pow * (roundMod.damage || 1) * (opts.catchBonus ? 1.2 : 1));
-  const r = (12 + 9 * charge) * S * (roundMod.ballSize || 1);
+  const dmg = Math.round((12 + 20 * charge) * pow * (roundMod.damage || 1) * weapon.damage * (opts.catchBonus ? 1.2 : 1));
+  const r = (12 + 9 * charge) * S * (roundMod.ballSize || 1) * weapon.size;
   const b = {
     x: plan.hand.x, y: plan.hand.y,
-    vx: plan.vx, vy: plan.vy,
+    vx: plan.vx * weapon.speed, vy: plan.vy * weapon.speed,
     r, owner: p.idx, charge,
     damage: dmg,
     bounces: 0,
     bouncesLeft: roundMod.bounce ?? 2,
     rest: roundMod.rest ?? 0.78,
-    rot: rand(0, TAU), spin: rand(-8, 8),
+    rot: rand(0, TAU), spin: rand(-weapon.spin, weapon.spin),
     age: 0, dead: false, caught: !!opts.catchBonus,
+    weapon: p.char.id, wcolor: weapon.color, wshape: weapon.shape,
+    knock: weapon.knock || 1,
   };
   balls.push(b);
 
@@ -222,7 +225,7 @@ function hitPlayer(p, dmg, dir, ball) {
   p.hitstun = 0.2;
   p.charging = false;
   p.charge = 0;
-  p.vx += dir * 320 * S;
+  p.vx += dir * 320 * S * (ball && ball.knock ? ball.knock : 1);
   p.vy = Math.min(p.vy, -250 * S);
   p.onGround = false;
   roundDamage[p.idx] += dmg;

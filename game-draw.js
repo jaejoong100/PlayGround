@@ -790,7 +790,7 @@ function heartPath(g, x, y, r) {
 
 function drawBalls() {
   for (const b of balls) {
-    const color = b.owner >= 0 ? P_COLORS[b.owner] : '#f7f3e4';
+    const color = b.wcolor || (b.owner >= 0 ? P_COLORS[b.owner] : '#f7f3e4');
     // trail
     const sp = Math.hypot(b.vx, b.vy) || 1;
     const nx = b.vx / sp, ny = b.vy / sp;
@@ -812,10 +812,36 @@ function drawBalls() {
     ctx.beginPath(); ctx.arc(0, 0, b.r, 0, TAU);
     ctx.fillStyle = color; ctx.fill();
     ctx.lineWidth = Math.max(2, b.r * 0.22); ctx.strokeStyle = INK; ctx.stroke();
-    // stripes
+    // weapon mark
+    ctx.save();
+    ctx.rotate(-b.rot);
+    const shape = b.wshape || 'ball';
+    if (shape === 'star') {
+      starPath(ctx, b.r * 0.55, b.r * 0.22, 5);
+      ctx.fillStyle = withA(CREAM, 0.9); ctx.fill();
+    } else if (shape === 'diamond') {
+      ctx.beginPath();
+      ctx.moveTo(0, -b.r * 0.55); ctx.lineTo(b.r * 0.55, 0); ctx.lineTo(0, b.r * 0.55); ctx.lineTo(-b.r * 0.55, 0);
+      ctx.closePath(); ctx.fillStyle = withA(CREAM, 0.85); ctx.fill();
+    } else if (shape === 'ring') {
+      ctx.beginPath(); ctx.arc(0, 0, b.r * 0.42, 0, TAU);
+      ctx.lineWidth = b.r * 0.22; ctx.strokeStyle = withA(INK, 0.85); ctx.stroke();
+    } else if (shape === 'egg') {
+      ctx.beginPath(); ctx.ellipse(0, 0, b.r * 0.5, b.r * 0.62, 0, 0, TAU);
+      ctx.fillStyle = withA(CREAM, 0.75); ctx.fill();
+    } else if (shape === 'feather') {
+      ctx.strokeStyle = withA(INK, 0.8); ctx.lineWidth = b.r * 0.18;
+      ctx.beginPath(); ctx.moveTo(0, -b.r * 0.55); ctx.quadraticCurveTo(b.r * 0.35, 0, 0, b.r * 0.55); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(0, -b.r * 0.55); ctx.quadraticCurveTo(-b.r * 0.35, 0, 0, b.r * 0.55); ctx.stroke();
+    } else if (shape === 'blob') {
+      ctx.fillStyle = withA(CREAM, 0.35);
+      ctx.beginPath(); ctx.arc(-b.r * 0.15, -b.r * 0.1, b.r * 0.35, 0, TAU); ctx.fill();
+    }
+    ctx.restore();
+    // stripes (keep subtle)
     ctx.save();
     ctx.beginPath(); ctx.arc(0, 0, b.r - 1, 0, TAU); ctx.clip();
-    ctx.strokeStyle = withA(CREAM, 0.92);
+    ctx.strokeStyle = withA(CREAM, 0.55);
     ctx.lineWidth = b.r * 0.32;
     ctx.beginPath(); ctx.arc(0, 0, b.r * 0.72, -1.02, 1.02); ctx.stroke();
     ctx.beginPath(); ctx.arc(0, 0, b.r * 0.72, Math.PI - 1.02, Math.PI + 1.02); ctx.stroke();

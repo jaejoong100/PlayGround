@@ -276,6 +276,9 @@ function boot() {
     }
     render();
   });
+  window.addEventListener('orientationchange', () => {
+    setTimeout(() => window.dispatchEvent(new Event('resize')), 120);
+  });
 }
 
 /* ------------------------------ debug helpers (handy for humans too) ------------------------------ */

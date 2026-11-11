@@ -74,8 +74,41 @@ const CHARS = [
     color: '#fff3e0', dark: '#cfae86', skin: '#f4cbb0', skinDark: '#d0a184',
     animal: 'duck', headW: 32, eyeY: -83.5, eyeGap: 7, eyeR: 4.5, cost: 500,
   },
+  {
+    id: 'mochi', name: 'MOCHI', tag: 'Soft. Squishy. Dangerous.',
+    color: '#f7c7e8', dark: '#d48bb0', skin: '#f6d6c2', skinDark: '#d4a88f',
+    animal: 'pig', headW: 33, eyeY: -84, eyeGap: 7, eyeR: 4.6, cost: 600,
+  },
+  {
+    id: 'bolt', name: 'BOLT', tag: 'Zap first, ask later.',
+    color: '#6fe3ff', dark: '#2fb0d9', skin: '#c9e8f5', skinDark: '#9ec8df',
+    animal: 'chicken', headW: 31, eyeY: -84, eyeGap: 6.5, eyeR: 4.4, cost: 700,
+  },
+  {
+    id: 'rex', name: 'REX', tag: 'Tiny arms. Huge ego.',
+    color: '#7bd389', dark: '#3f8f52', skin: '#b8e0a8', skinDark: '#8fc07a',
+    animal: 'lion', headW: 34, eyeY: -82.5, eyeGap: 7, eyeR: 4.8, cost: 800,
+  },
+  {
+    id: 'squid', name: 'SQUID', tag: 'Ink happens.',
+    color: '#a06cff', dark: '#6a3fb0', skin: '#c9b3e8', skinDark: '#9a82c4',
+    animal: 'frog', headW: 36, eyeY: -88.5, eyeGap: 9.5, eyeR: 5.2, cost: 900,
+  },
 ];
 const CHAR_BY_ID = Object.fromEntries(CHARS.map(c => [c.id, c]));
+const WEAPONS = {
+  gloop: { name: 'SLIMEBALL', color: '#8fe34f', size: 1.12, speed: 0.92, damage: 1.0, spin: 4, shape: 'blob', knock: 1.05 },
+  pickle: { name: 'FISHBONE', color: '#2ec4b6', size: 0.95, speed: 1.18, damage: 0.95, spin: 10, shape: 'diamond', knock: 0.95 },
+  toast: { name: 'FIREBALL', color: '#ff8c42', size: 1.0, speed: 1.12, damage: 1.05, spin: 12, shape: 'star', knock: 1.0 },
+  donut: { name: 'DONUT', color: '#ff9fc4', size: 1.28, speed: 0.88, damage: 1.1, spin: 6, shape: 'ring', knock: 1.15 },
+  nugget: { name: 'EGG', color: '#fff3a8', size: 1.0, speed: 1.0, damage: 1.0, spin: 8, shape: 'egg', knock: 1.0 },
+  egg: { name: 'FEATHER', color: '#fffaf0', size: 0.85, speed: 1.25, damage: 0.9, spin: 14, shape: 'feather', knock: 0.85 },
+  mochi: { name: 'MARSHMALLOW', color: '#f7c7e8', size: 1.35, speed: 0.82, damage: 1.15, spin: 3, shape: 'blob', knock: 1.2 },
+  bolt: { name: 'SPARK', color: '#6fe3ff', size: 0.8, speed: 1.35, damage: 0.9, spin: 16, shape: 'diamond', knock: 0.8 },
+  rex: { name: 'BOULDER', color: '#8a6a3a', size: 1.4, speed: 0.78, damage: 1.25, spin: 4, shape: 'egg', knock: 1.35 },
+  squid: { name: 'INKBALL', color: '#a06cff', size: 1.05, speed: 1.05, damage: 1.0, spin: 9, shape: 'ring', knock: 1.0 },
+};
+function weaponOf(charId) { return WEAPONS[charId] || WEAPONS.gloop; }
 const P_COLORS = [P1C, P2C];
 
 /* ------------------------------ round modifiers ------------------------------ */
