@@ -81,8 +81,7 @@ function renderArcade() {
         <div class="cc-name">${c.name}</div>
         <div class="cc-tag">${c.tag}</div>
         <div class="cc-weapon">${(weaponOf(c.id).name)}</div>
-        <div class="cc-status ${owned ? 'ready' : ''}">${owned ? 'READY TO RUMBLE' : 'LOCKED'}</div>
-        ${owned ? '' : `<button class="buy-btn" data-char-buy="${c.id}">UNLOCK</button>`}
+        <div class="cc-status ready">READY TO RUMBLE</div>
       </div>`;
     }).join('')}</div>`;
     // paint portraits
