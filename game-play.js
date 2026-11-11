@@ -666,7 +666,7 @@ function updatePlayer(p, dt) {
   }
 
   if (p.charging && canControl) {
-    p.charge = Math.min(1, p.charge + dt / 0.62);
+    p.charge = Math.min(1, p.charge + dt / 1.24);
     p.chargeFx = (p.chargeFx || 0) - dt;
     if (p.chargeFx <= 0) {
       p.chargeFx = 0.07;

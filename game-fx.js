@@ -45,11 +45,12 @@ function spawnBall(p, charge, opts = {}) {
   const weapon = weaponOf(p.char.id);
   const pow = 1 + 0.08 * upgradeBonus('power');
   const baseDmg = weapon.base || 12;
-  const dmg = Math.round((baseDmg + 12 * charge) * pow * (roundMod.damage || 1) * (opts.catchBonus ? 1.2 : 1));
-  const r = (12 + 9 * charge) * S * (roundMod.ballSize || 1) * weapon.size;
+  const dmg = Math.round(baseDmg * pow * (roundMod.damage || 1) * (opts.catchBonus ? 1.2 : 1));
+  const r = 12 * S * (roundMod.ballSize || 1) * weapon.size;
+  const speedMul = 1 + charge;
   const b = {
     x: plan.hand.x, y: plan.hand.y,
-    vx: plan.vx * weapon.speed, vy: plan.vy * weapon.speed,
+    vx: plan.vx * weapon.speed * speedMul, vy: plan.vy * weapon.speed * speedMul,
     r, owner: p.idx, charge,
     damage: dmg,
     bounces: 0,

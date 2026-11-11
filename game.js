@@ -491,7 +491,7 @@ function throwPlan(p, charge) {
   const h = handPoint(p);
   const t = aimTarget(p);
   const dx = t.x - h.x, dy = t.y - h.y;
-  let T = clamp(Math.hypot(dx, dy) / (1080 * S), 0.34, 0.76) * (1 - 0.16 * charge);
+  let T = clamp(Math.hypot(dx, dy) / (1080 * S), 0.34, 0.76);
   const tx = t.x;
   const ty = t.y;
   const g = ballGravityFor();
