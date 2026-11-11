@@ -50,7 +50,7 @@ function spawnBall(p, charge, opts = {}) {
   const speedMul = 1 + charge;
   const b = {
     x: plan.hand.x, y: plan.hand.y,
-    vx: plan.vx * weapon.speed * speedMul, vy: plan.vy * weapon.speed * speedMul,
+    vx: plan.vx * weapon.speed * speedMul * 0.5, vy: plan.vy * weapon.speed * speedMul * 0.5,
     r, owner: p.idx, charge,
     damage: dmg,
     bounces: 0,
@@ -238,8 +238,8 @@ function spawnSplit(b, out) {
     const sp = 180 * S;
     out.push({
       x: b.x, y: b.y,
-      vx: Math.cos(ang) * sp * (b.vx >= 0 ? 1 : -1) * 0.6 + b.vx * 0.3,
-      vy: Math.sin(ang) * sp - 40 * S,
+      vx: (Math.cos(ang) * sp * (b.vx >= 0 ? 1 : -1) * 0.6 + b.vx * 0.3) * 0.5,
+      vy: (Math.sin(ang) * sp - 40 * S) * 0.5,
       r: Math.max(5 * S, b.r * 0.35),
       owner: b.owner, charge: b.charge * 0.4,
       damage: 4,
@@ -258,7 +258,7 @@ function spawnStormBall() {
   const x = rand(arena.left + 40 * S, arena.right - 40 * S);
   balls.push({
     x, y: arena.top + 26 * S,
-    vx: rand(-70, 70) * S, vy: rand(80, 170) * S,
+    vx: rand(-70, 70) * S * 0.5, vy: rand(80, 170) * S * 0.5,
     r: 14 * S, owner: -1, charge: 0.25, damage: 8,
     bounces: 0, bouncesLeft: 3, rest: 0.82,
     rot: rand(0, TAU), spin: rand(-6, 6), age: 0, dead: false,
