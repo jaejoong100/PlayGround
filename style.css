@@ -238,7 +238,7 @@ kbd{
 @keyframes countPop{0%,100%{transform:scale(1)}30%{transform:scale(1.14)}}
 
 /* ---------------- touch pads ---------------- */
-.touch{position:absolute;inset:0;z-index:30;pointer-events:none}
+.touch{position:absolute;left:0;right:0;bottom:0;height:160px;z-index:30;pointer-events:auto}
 .touch .pad{
   --joy:clamp(86px,13vh,118px);
   --btn:clamp(48px,7.2vh,62px);
@@ -278,10 +278,9 @@ kbd{
 .joystick.active .stick-knob{background:#fff;transition:transform 0s,background .1s ease}
 .touch .actions{display:flex;flex-direction:column;gap:6px;height:var(--joy);pointer-events:auto}
 .tbtn{
-  pointer-events:auto;touch-action:none;appearance:none;cursor:pointer;
+  pointer-events:auto;touch-action:none;appearance:none;cursor:pointer;position:relative;z-index:2;
   border:2.5px solid var(--ink);border-radius:15px;background:rgba(255,244,216,.9);
   color:var(--ink);font-family:"Bungee",sans-serif;font-size:13px;line-height:1;
-  box-shadow:0 4px 0 var(--ink),inset 0 -3px 0 rgba(0,0,0,.08);
   display:flex;align-items:center;justify-content:center;
   transition:transform .06s,background .06s;
 }
