@@ -396,6 +396,7 @@ body:not(.touch) .corner-btn{top:calc(max(10px,env(safe-area-inset-top)) + 84px)
 .char-card.locked canvas{filter:grayscale(.65) opacity(.6)}
 .cc-name{font-family:"Bungee",sans-serif;font-size:13px;line-height:1.1;margin-top:2px}
 .cc-tag{font-size:10px;color:#6f5b83;font-weight:600;line-height:1.25;min-height:24px}
+.cc-weapon{font-family:"Bungee",sans-serif;font-size:9px;letter-spacing:.08em;color:#a06cff;margin-top:3px}
 .cc-status{font-size:10px;font-weight:700;letter-spacing:.08em;color:#7a668f;margin-top:1px}
 .cc-status.ready{color:#0f9488}
 .trophy-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}

@@ -46,7 +46,6 @@ function openArcade(tab) {
   el.screenArcade.classList.remove('hidden');
   modalOpen = true;
   renderArcade();
-  updateGoldUI();
   sfx.ui();
 }
 function closeArcade() {
@@ -72,18 +71,18 @@ function renderArcade() {
     trophies: `${profile.ach.length}/${ACHIEVEMENTS.length} trophies unlocked.`,
   };
   el.arcadeSub.textContent = sub[currentArcadeTab] || '';
-  updateGoldUI();
 
   if (currentArcadeTab === 'brawlers') {
     el.arcadeBody.innerHTML = `<div class="char-grid">${CHARS.map(c => {
       const owned = profile.unlocked.includes(c.id);
-      const afford = profile.gold >= c.cost;
+      const afford = true;
       return `<div class="char-card ${owned ? '' : 'locked'}">
         <canvas width="96" height="96" data-char="${c.id}"></canvas>
         <div class="cc-name">${c.name}</div>
         <div class="cc-tag">${c.tag}</div>
+        <div class="cc-weapon">${(weaponOf(c.id).name)}</div>
         <div class="cc-status ${owned ? 'ready' : ''}">${owned ? 'READY TO RUMBLE' : 'LOCKED'}</div>
-        ${owned ? '' : `<button class="buy-btn" data-char-buy="${c.id}" ${afford ? '' : 'disabled'}>UNLOCK<span class="cost">${c.cost} COINS</span></button>`}
+        ${owned ? '' : `<button class="buy-btn" data-char-buy="${c.id}">UNLOCK</button>`}
       </div>`;
     }).join('')}</div>`;
     // paint portraits
@@ -117,20 +116,16 @@ function buyUpgrade(id) {
   unlock('shopper');
   if (lvl + 1 >= u.max) unlock('maxed');
   saveProfile();
-  updateGoldUI();
   renderArcade();
 }
 
 function unlockCharacter(id) {
   const c = CHAR_BY_ID[id];
   if (!c || profile.unlocked.includes(id)) return;
-  if (profile.gold < c.cost) { sfx.ui(); return; }
-  profile.gold -= c.cost;
   profile.unlocked.push(id);
   sfx.buy();
-  toast('NEW BRAWLER', c.name, '🎉', c.cost, true);
+  toast('NEW BRAWLER', c.name, '🎉', 0, true);
   saveProfile();
-  updateGoldUI();
   renderArcade();
 }
 
@@ -305,11 +300,9 @@ window.__bonk = {
   knock: i => { if (players[i]) knockout(players[i]); },
   hurt: (i, amount) => { if (players[i]) hitPlayer(players[i], amount || 30, players[i].facing, { owner: 1 - i, bounces: 0 }); },
   toss: (i, charge = 0.6) => { if (players[i]) { players[i].throwCd = 0; spawnBall(players[i], charge, {}); players[i].throwAnim = 0.3; } },
-  gold: n => { profile.gold = Math.max(0, n); saveProfile(); updateGoldUI(); },
-  addGold: n => awardGold(n),
   unlock: id => unlock(id),
   profile: () => profile,
-  arcade: tab => openArcade(tab || 'upgrades'),
+  arcade: tab => openArcade(tab || 'brawlers'),
   menu: () => quitToMenu(),
   rematch: () => rematch(),
   setPositions: (x1, x2) => {

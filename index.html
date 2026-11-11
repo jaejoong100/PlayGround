@@ -43,8 +43,8 @@
   </header>
 
   <div id="deskHints" class="desk-hints hidden">
-    <div class="dh p1"><b>P1</b> A / D move · W jump · <kbd>SPACE</kbd> throw</div>
-    <div class="dh p2"><b>P2</b> <kbd>←</kbd><kbd>→</kbd> move · <kbd>↑</kbd> jump · <kbd>ENTER</kbd> throw</div>
+    <div class="dh p1"><b>P1</b> A / D move (auto-charge) · W jump · <kbd>SPACE</kbd> fire</div>
+    <div class="dh p2"><b>P2</b> <kbd>←</kbd><kbd>→</kbd> move (auto-charge) · <kbd>↑</kbd> jump · <kbd>ENTER</kbd> fire</div>
   </div>
 
   <!-- ============ TITLE ============ -->
@@ -79,7 +79,6 @@
         <button class="btn small" id="btnHow">HOW TO PLAY</button>
       </div>
       <div class="title-foot">
-        <span class="gold-chip"><span class="coin-ico"></span><span class="gold-amount" id="goldTitle">0</span></span>
         <span class="tiny-note">FIRST TO 3 ROUNDS · RANDOM MAYHEM</span>
       </div>
     </div>
@@ -154,10 +153,9 @@
       <div class="arcade-head">
         <div>
           <h2>ARCADE LOUNGE</h2>
-          <div class="arcade-sub" id="arcadeSub">Spend your hard-earned coins.</div>
+          <div class="arcade-sub" id="arcadeSub">Unlock brawlers and chase trophies.</div>
         </div>
         <div class="arcade-head-right">
-          <span class="gold-chip big"><span class="coin-ico"></span><span class="gold-amount" id="goldArcade">0</span></span>
           <button class="btn close-btn" id="btnArcadeClose" aria-label="Close arcade">&#10005;</button>
         </div>
       </div>
@@ -181,17 +179,17 @@
           <div class="how-p">PLAYER 1</div>
           <div class="how-keys"><kbd>A</kbd><kbd>D</kbd> move</div>
           <div class="how-keys"><kbd>W</kbd> jump / double jump</div>
-          <div class="how-keys"><kbd>SPACE</kbd> charge &amp; throw</div>
+          <div class="how-keys"><kbd>SPACE</kbd> auto-charge &amp; fire</div>
         </div>
         <div class="how-card p2">
           <div class="how-p">PLAYER 2</div>
           <div class="how-keys"><kbd>&larr;</kbd><kbd>&rarr;</kbd> move</div>
           <div class="how-keys"><kbd>&uarr;</kbd> jump / double jump</div>
-          <div class="how-keys"><kbd>ENTER</kbd> charge &amp; throw</div>
+          <div class="how-keys"><kbd>ENTER</kbd> auto-charge &amp; fire</div>
         </div>
       </div>
       <ul class="how-list">
-        <li><b>Auto-aim.</b> Your dodgeball curves straight at your rival. Hold to charge for a bigger, faster, harder BONK.</li>
+        <li><b>Auto-aim &amp; auto-charge.</b> Move to charge your shot automatically; release the joystick (or SPACE) to fire. It curves toward your rival.</li>
         <li><b>Catch!</b> Tap throw just as an incoming ball gets close to catch it and hurl it right back, extra spicy.</li>
         <li><b>Grab the loot.</b> Hearts drop onto the court for a quick heal.</li>
         <li><b>Win.</b> First to 3 round wins takes the match. Each round rolls a brand new modifier, so stay on your toes.</li>
