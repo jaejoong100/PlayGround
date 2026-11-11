@@ -16,7 +16,7 @@ function makePlayer(idx, charId) {
     ai: false, aiTimer: rand(0.5, 1.4), aiMove: 0, aiJumpCd: 0,
     aiStrafe: pick([-1, 0, 1]), aiStrafeTimer: rand(0.6, 1.5),
     aiHold: 0.5, aiCharge: 0, demo: false, demoT: rand(0, 10), demoThrow: rand(1.4, 3.2),
-    chargeFx: 0, wasGround: true,
+    chargeFx: 0, wasGround: true, needsMove: false,
   };
   return p;
 }
@@ -152,7 +152,7 @@ function resetPlayerForRound(p) {
   p.blink = 0; p.blinkTimer = rand(1.2, 3.4);
   p.aiTimer = rand(0.6, 1.6); p.aiMove = 0; p.aiJumpCd = 0;
   p.aiStrafe = pick([-1, 0, 1]); p.aiStrafeTimer = rand(0.6, 1.5);
-  p.chargeFx = 0;
+  p.chargeFx = 0; p.needsMove = false;
   const bw = arena.right - arena.left;
   p.x = arena.left + bw * (p.idx === 0 ? 0.22 : 0.78);
   p.y = floorY;
@@ -640,6 +640,18 @@ function updatePlayer(p, dt) {
   const canControl = state === 'play' && !paused;
   let dir = canControl ? getInputDir(p) : 0;
   if (p.hitstun > 0) dir = 0;
+
+  // auto-charge / auto-fire for human players
+  if (state === 'play' && canControl && !p.ai && !p.ko && p.hitstun <= 0) {
+    const moving = Math.abs(dir) > 0.15;
+    if (moving) {
+      p.needsMove = false;
+      if (!p.charging && p.throwCd <= 0) beginThrow(p);
+    } else if (p.charging && p.onGround) {
+      releaseThrow(p);
+      p.needsMove = true;
+    }
+  }
 
   // jump buffering
   if (p.jumpBuffer > 0 && canControl) {
