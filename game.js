@@ -213,9 +213,10 @@ function ensureAudio() {
 function setMuted(m, silent) {
   profile.muted = !!m;
   if (masterGain) masterGain.gain.value = m ? 0 : 0.34;
-  el.btnMute.innerHTML = m ? '&#10005;' : '&#9834;';
-  el.btnMute.title = m ? 'Sound off' : 'Sound on';
-  el.btnMute.style.opacity = m ? '.5' : '1';
+  el.btnMute.classList.toggle('muted', !!m);
+  el.btnMute.setAttribute('aria-pressed', m ? 'true' : 'false');
+  el.btnMute.setAttribute('aria-label', m ? 'Unmute sound' : 'Mute sound');
+  el.btnMute.title = m ? 'Unmute sound' : 'Mute sound';
   if (!silent) { saveSoon(); if (!m) ensureAudio(); }
 }
 function blip(freq, dur, type = 'sine', vol = 0.18, slide = 0, delay = 0) {
@@ -336,7 +337,7 @@ function computeLayout() {
 
   isTouch = window.matchMedia('(pointer: coarse)').matches;
   document.body.classList.toggle('touch', isTouch);
-  S = clamp(Math.sqrt(W * H) / 920, 0.7, 1.25);
+  S = clamp(Math.sqrt(W * H) / 860, 0.66, 1.3);
   apron = isTouch ? clamp(H * 0.27, 96, 134) : clamp(H * 0.075, 44, 66);
   arenaTop = isTouch ? 78 : 96;
   floorY = H - apron;
@@ -371,31 +372,38 @@ function computeLayout() {
 
 function generatePlatforms() {
   const bw = arena.right - arena.left;
-  const bh = floorY - arena.top;
   const mirror = Math.random() < 0.5;
-  const w1 = clamp(250 * S, bw * 0.22, bw * 0.34);
-  const w2 = clamp(215 * S, bw * 0.20, bw * 0.30);
-  const w3 = clamp(185 * S, bw * 0.17, bw * 0.26);
+  const w = [
+    clamp(250 * S, bw * 0.22, bw * 0.34),
+    clamp(215 * S, bw * 0.20, bw * 0.30),
+    clamp(185 * S, bw * 0.17, bw * 0.26),
+  ];
 
-  // Stepped heights: every step is clearable with a single jump.
-  const step = Math.min(112 * S, bh * 0.26);
-  const maxTop = arena.top + Math.max(54 * S, bh * 0.11);
-  let scale = 1;
-  if (floorY - step * 3 < maxTop) scale = Math.max(0.35, (floorY - maxTop) / (step * 3));
-  const y1 = floorY - step * scale;
-  const y2 = floorY - step * 2 * scale;
-  const y3 = floorY - step * 3 * scale;
+  // Keep the lowest ledge above a brawler's head (plus badge) and keep every
+  // step within a single jump. Short/landscape screens get fewer ledges rather
+  // than a cramped stack that clips through the fighters.
+  const step = 125 * S;
+  const maxRise = Math.max(step, floorY - (arena.top + 54 * S));
+  let levels = 1;
+  if (maxRise >= step * 2) levels = 2;
+  if (maxRise >= step * 3) levels = 3;
 
   // Chain the platforms horizontally so each one overlaps the next.
-  const x1 = arena.left + bw * 0.05;
-  const x2 = Math.min(x1 + w1 - w2 * 0.34, arena.right - w2 - 10);
-  const x3 = Math.min(x2 + w2 - w3 * 0.34, arena.right - w3 - 10);
+  const xs = [arena.left + bw * 0.05];
+  for (let i = 1; i < levels; i++) {
+    xs[i] = Math.min(xs[i - 1] + w[i - 1] - w[i] * 0.34, arena.right - w[i] - 10);
+  }
 
-  platforms = [
-    { x: x1, y: y1, w: w1, h: 24 * S, style: 0 },
-    { x: x2, y: y2, w: w2, h: 24 * S, style: 1 },
-    { x: x3, y: y3, w: w3, h: 24 * S, style: 2 },
-  ];
+  platforms = [];
+  for (let i = 0; i < levels; i++) {
+    platforms.push({
+      x: xs[i],
+      y: floorY - step * (i + 1),
+      w: w[i],
+      h: 22 * S,
+      style: i,
+    });
+  }
 
   if (mirror) {
     for (const p of platforms) p.x = arena.left + (arena.right - p.x - p.w);

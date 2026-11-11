@@ -72,7 +72,7 @@
         </div>
       </div>
 
-      <button class="btn primary" id="btnPlay" aria-label="Play"><span class="btn-ico">&#9679;</span> PLAY</button>
+      <button class="btn primary" id="btnPlay" aria-label="Play">PLAY</button>
       <div class="title-sub-row">
         <button class="btn small" id="btnSolo">SOLO VS BOT</button>
         <button class="btn small" id="btnArcade">ARCADE</button>
@@ -116,7 +116,14 @@
     </div>
   </div>
 
-  <button id="btnMute" class="corner-btn" aria-label="Toggle sound" title="Sound on/off">&#9834;</button>
+  <button id="btnMute" class="corner-btn" aria-label="Mute sound" aria-pressed="false" title="Mute sound">
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path class="spk" d="M4 9.2h3.8L13 5.4v13.2l-5.2-3.8H4z"/>
+      <path class="wave w1" d="M16.2 8.5a5 5 0 0 1 0 7"/>
+      <path class="wave w2" d="M18.7 6.1a8.6 8.6 0 0 1 0 11.8"/>
+      <path class="xmark" d="M16 9.2l5.2 5.6M21.2 9.2L16 14.8"/>
+    </svg>
+  </button>
 
   <!-- ============ MATCH END ============ -->
   <section id="screenEnd" class="screen hidden">

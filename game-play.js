@@ -50,7 +50,7 @@ function resetDemoStage() {
   players.forEach((p, i) => {
     p.demo = true;
     p.ai = true;
-    p.x = arena.left + (arena.right - arena.left) * (i === 0 ? 0.2 : 0.8);
+    p.x = arena.left + (arena.right - arena.left) * (i === 0 ? 0.13 : 0.87);
     p.y = floorY;
     p.facing = i === 0 ? 1 : -1;
     p.maxHp = p.hp = maxHpFor();
@@ -642,7 +642,7 @@ function updateAI(p, dt) {
   if (state === 'title') {
     p.demoT += dt;
     p.demoThrow -= dt;
-    const home = arena.left + (arena.right - arena.left) * (p.idx === 0 ? 0.2 : 0.8);
+    const home = arena.left + (arena.right - arena.left) * (p.idx === 0 ? 0.13 : 0.87);
     const tx = home + Math.sin(p.demoT * 0.55 + p.idx * 2.1) * 70 * S;
     p.aiMove = clamp((tx - p.x) / (70 * S), -1, 1);
     if (p.charging) {

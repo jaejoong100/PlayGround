@@ -402,8 +402,8 @@ function drawPlayer(p, t) {
 
   // player ID badge above the head
   if (state !== 'title' && state !== 'matchEnd') {
-    const bw = 19 * S, bh = 16 * S;
-    const by = p.y - 104 * S;
+    const bw = Math.max(15, 18 * S), bh = Math.max(11, 13 * S);
+    const by = p.y - 90 * S;
     ctx.save();
     ctx.translate(p.x, by);
     rr(ctx, -bw / 2, -bh / 2, bw, bh, 7 * S);
@@ -419,7 +419,7 @@ function drawPlayer(p, t) {
     ctx.closePath();
     ctx.fillStyle = color; ctx.fill();
     ctx.strokeStyle = INK; ctx.lineWidth = 2.2 * S; ctx.stroke();
-    ctx.font = `${11 * S}px Bungee, sans-serif`;
+    ctx.font = `${Math.max(8, 10 * S)}px Bungee, sans-serif`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillStyle = p.idx === 0 ? INK : CREAM;
@@ -429,8 +429,8 @@ function drawPlayer(p, t) {
   if (state === 'play' && !p.ko) {
     const b = nearbyCatchable(p);
     if (b && !p.charging) {
-      const r = 38 * S + Math.sin(t * 8 + p.idx) * 3 * S;
-      ctx.beginPath(); ctx.arc(p.x, p.y - 38 * S, r, 0, TAU);
+      const r = 66 * S + Math.sin(t * 8 + p.idx) * 3 * S;
+      ctx.beginPath(); ctx.arc(p.x, p.y - 40 * S, r, 0, TAU);
       ctx.strokeStyle = withA(color, 0.5);
       ctx.lineWidth = 2.5 * S;
       ctx.setLineDash([5 * S, 6 * S]);
@@ -439,7 +439,7 @@ function drawPlayer(p, t) {
       ctx.font = `${9 * S}px Bungee, sans-serif`;
       ctx.textAlign = 'center';
       ctx.fillStyle = withA(CREAM, 0.85);
-      ctx.fillText('CATCH!', p.x, p.y - 88 * S);
+      ctx.fillText('CATCH!', p.x, p.y - 73 * S);
     }
   }
 
@@ -681,14 +681,6 @@ function drawFloor(t) {
     ctx.lineWidth = 1.5 * S; ctx.strokeStyle = 'rgba(36,19,53,.7)'; ctx.stroke();
   }
 
-  // apron lettering
-  const apronH = H - floorY;
-  if (apronH > 42) {
-    ctx.save();
-    ctx.globalAlpha = 0.12;
-    outlineText(ctx, 'BONK BALL', W / 2, floorY + apronH * 0.62, Math.min(30 * S, apronH * 0.5), CREAM, 'rgba(0,0,0,0)', 0);
-    ctx.restore();
-  }
 }
 
 function drawPlatforms(t) {
