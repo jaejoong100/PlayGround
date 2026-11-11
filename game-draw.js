@@ -29,45 +29,51 @@ function drawShoe(g, x, y, ang, color = CREAM) {
 function drawLegs(g, char, o) {
   const pitch = o.phase || 0;
   const run = o.run || 0;
-  const bottom = char.bodyBottom;
-  const swing = o.onGround ? Math.sin(pitch) * 8 * run : 0;
-  const lift1 = o.onGround ? Math.max(0, Math.sin(pitch)) * 4 * run : 5;
-  const lift2 = o.onGround ? Math.max(0, -Math.sin(pitch)) * 4 * run : 5;
-  const bx = 9;
+  const hip = -35;
+  const swing = o.onGround ? Math.sin(pitch) * 7 * run : 0;
+  const lift1 = o.onGround ? Math.max(0, Math.sin(pitch)) * 3.5 * run : 4;
+  const lift2 = o.onGround ? Math.max(0, -Math.sin(pitch)) * 3.5 * run : 4;
+  const bx = 7.5;
   // back leg
-  limb(g, -bx, bottom + 3, -bx - swing, -2 - lift2, 5.4, char.dark, 2.4);
-  drawShoe(g, -bx - swing, -2 - lift2 + 1, o.onGround ? -0.06 * Math.sin(pitch) * run : -0.25);
+  limb(g, -bx, hip, -bx - swing, -6 - lift2, 5.2, char.skinDark, 2.2);
+  drawShoe(g, -bx - swing, -5 - lift2, o.onGround ? -0.06 * Math.sin(pitch) * run : -0.22);
   // front leg
-  limb(g, bx, bottom + 3, bx + swing, -2 - lift1, 5.4, char.dark, 2.4);
-  drawShoe(g, bx + swing, -2 - lift1 + 1, o.onGround ? 0.06 * Math.sin(pitch) * run : 0.2);
+  limb(g, bx, hip, bx + swing, -6 - lift1, 5.2, char.skin, 2.2);
+  drawShoe(g, bx + swing, -5 - lift1, o.onGround ? 0.06 * Math.sin(pitch) * run : 0.18);
 }
 
 function drawArm(g, char, o, aim, front) {
-  const shoulderX = aim * 11;
-  const shoulderY = -44;
+  const shoulderX = aim * 14;
+  const shoulderY = -59;
   let hx, hy;
   if (front && (o.throwAnim || 0) > 0) {
     const k = 1 - clamp(o.throwAnim / 0.3, 0, 1);
-    hx = aim * lerp(12, 40, k);
-    hy = lerp(-32, -52, k);
+    hx = aim * lerp(16, 40, k);
+    hy = lerp(-48, -62, k);
   } else if (front && o.charging) {
-    hx = aim * 10;
-    hy = -32;
+    hx = aim * 14;
+    hy = -48;
   } else if (front && (o.catchAnim || 0) > 0) {
     hx = aim * 30;
-    hy = -43;
+    hy = -54;
   } else if (front) {
-    hx = aim * 24;
-    hy = -31;
+    hx = aim * 22;
+    hy = -48;
   } else {
-    hx = -aim * 17;
-    hy = -26;
+    hx = -aim * 16;
+    hy = -44;
   }
-  limb(g, shoulderX, shoulderY, hx, hy, 4.6, char.dark, 2.2);
-  // glove
+  limb(g, shoulderX, shoulderY, hx, hy, 4.8, front ? char.skin : char.skinDark, 2.2);
+  // jersey sleeve cap
+  g.beginPath(); g.arc(shoulderX, shoulderY, 7.2, 0, TAU);
+  g.fillStyle = char.color; g.fill();
+  g.lineWidth = 2.8; g.strokeStyle = INK; g.stroke();
+  // team glove
   g.beginPath(); g.arc(hx, hy, 5.8, 0, TAU);
-  g.fillStyle = CREAM; g.fill();
+  g.fillStyle = o.color; g.fill();
   g.lineWidth = 2.4; g.strokeStyle = INK; g.stroke();
+  g.beginPath(); g.arc(hx - 1.6, hy - 1.8, 1.6, 0, TAU);
+  g.fillStyle = 'rgba(255,255,255,.55)'; g.fill();
 
   if (front && o.showBall) {
     const br = o.ballRadius || 8;
@@ -101,241 +107,246 @@ function paintBody(g, fill) {
 }
 
 function drawBody(g, char, o) {
+  // neck
+  rr(g, -6, -70, 12, 12, 5);
+  g.fillStyle = char.skin; g.fill();
+  g.lineWidth = 3.4; g.strokeStyle = INK; g.stroke();
+
+  // jersey torso
+  g.beginPath();
+  g.moveTo(-18, -62);
+  g.quadraticCurveTo(-20, -51, -15, -41);
+  g.quadraticCurveTo(0, -38, 15, -41);
+  g.quadraticCurveTo(20, -51, 18, -62);
+  g.quadraticCurveTo(9, -67, 0, -67);
+  g.quadraticCurveTo(-9, -67, -18, -62);
+  g.closePath();
+  paintBody(g, char.color);
+
+  // team stripe across the chest
+  g.save();
+  g.clip();
+  g.strokeStyle = o.color; g.lineWidth = 6; g.lineCap = 'round';
+  g.beginPath(); g.moveTo(-20, -56); g.lineTo(20, -49); g.stroke();
+  g.strokeStyle = withA(CREAM, 0.72); g.lineWidth = 2;
+  g.beginPath(); g.moveTo(-20, -59); g.lineTo(20, -52); g.stroke();
+  g.restore();
+
+  // team star emblem
+  g.save();
+  g.translate(0, -45.5);
+  starPath(g, 6.4, 2.8, 5);
+  g.fillStyle = o.color; g.fill();
+  g.lineWidth = 2; g.strokeStyle = INK; g.stroke();
+  g.restore();
+
+  // shorts
+  rr(g, -16, -43, 32, 14, 5);
+  paintBody(g, char.dark);
+  // waistband
+  rr(g, -14, -40, 28, 3.4, 1.7);
+  g.fillStyle = o.color; g.fill();
+  // short hems
+  g.strokeStyle = 'rgba(36,19,53,.4)'; g.lineWidth = 1.6;
+  g.beginPath(); g.moveTo(-12, -29.5); g.lineTo(-5, -29.5); g.stroke();
+  g.beginPath(); g.moveTo(5, -29.5); g.lineTo(12, -29.5); g.stroke();
+}
+
+function drawEyes(g, char, o) {
+  const ey = char.eyeY, gap = char.eyeGap, r = char.eyeR;
+  const lookX = (o.lookX || 0) * 1.5;
+  const lookY = (o.lookY || 0) * 1.2;
+  const ko = o.ko;
+  const blink = o.blink && !ko;
+
+  if (ko) {
+    g.strokeStyle = INK; g.lineWidth = 2.7; g.lineCap = 'round';
+    [-gap, gap].forEach(x => {
+      g.beginPath();
+      g.moveTo(x - r * 0.7, ey - r * 0.7); g.lineTo(x + r * 0.7, ey + r * 0.7);
+      g.moveTo(x + r * 0.7, ey - r * 0.7); g.lineTo(x - r * 0.7, ey + r * 0.7);
+      g.stroke();
+    });
+    return;
+  }
+
+  [-gap, gap].forEach((x, i) => {
+    if (blink) {
+      g.strokeStyle = INK; g.lineWidth = 2.4; g.lineCap = 'round';
+      g.beginPath();
+      g.moveTo(x - r * 0.8, ey + (i ? -0.4 : 0.4));
+      g.quadraticCurveTo(x, ey + 1.8, x + r * 0.8, ey + (i ? -0.4 : 0.4));
+      g.stroke();
+    } else {
+      g.beginPath(); g.arc(x, ey, r, 0, TAU);
+      g.fillStyle = PAPER; g.fill();
+      g.lineWidth = 2.2; g.strokeStyle = INK; g.stroke();
+      g.beginPath(); g.arc(x + lookX, ey + lookY, r * 0.48, 0, TAU);
+      g.fillStyle = INK; g.fill();
+      g.beginPath(); g.arc(x + lookX - r * 0.18, ey + lookY - r * 0.2, r * 0.14, 0, TAU);
+      g.fillStyle = '#fff'; g.fill();
+    }
+  });
+
+  if (o.charging || (o.hurt || 0) > 0) {
+    g.strokeStyle = INK; g.lineWidth = 2.2; g.lineCap = 'round';
+    g.beginPath(); g.moveTo(-gap - r * 0.8, ey - r * 1.7); g.lineTo(-gap + r * 0.5, ey - r * 1.3); g.stroke();
+    g.beginPath(); g.moveTo(gap + r * 0.8, ey - r * 1.7); g.lineTo(gap - r * 0.5, ey - r * 1.3); g.stroke();
+  }
+}
+
+function drawAnimalHead(g, char, o) {
   const c = char.color, d = char.dark;
-  if (char.body === 'blob') {
-    g.beginPath();
-    g.moveTo(-31, -58);
-    g.bezierCurveTo(-36, -40, -34, -25, -23, -20);
-    g.quadraticCurveTo(-16, -13, -8, -20);
-    g.quadraticCurveTo(0, -12, 8, -20);
-    g.quadraticCurveTo(16, -13, 23, -20);
-    g.bezierCurveTo(34, -25, 36, -40, 31, -58);
-    g.bezierCurveTo(28, -78, 11, -83, 0, -82);
-    g.bezierCurveTo(-13, -83, -28, -76, -31, -58);
-    g.closePath();
+
+  if (char.animal === 'frog') {
+    // bulging eye sockets
+    [-1, 1].forEach(s => {
+      g.beginPath(); g.arc(s * 9.5, -88, 7.6, 0, TAU);
+      paintBody(g, c);
+    });
+    // wide froggy head
+    g.beginPath(); g.ellipse(0, -78.5, 18, 14.5, 0, 0, TAU);
     paintBody(g, c);
-    // inner drip details
-    g.strokeStyle = withA(d, 0.55); g.lineWidth = 3;
-    g.beginPath(); g.moveTo(-22, -27); g.quadraticCurveTo(-20, -20, -15, -19); g.stroke();
-    g.beginPath(); g.moveTo(24, -29); g.quadraticCurveTo(22, -22, 17, -21); g.stroke();
-    // highlight
-    g.beginPath(); g.ellipse(-13, -63, 10, 6, -0.5, 0, TAU);
-    g.fillStyle = 'rgba(255,255,255,.34)'; g.fill();
-  } else if (char.body === 'pickle') {
-    rr(g, -19, -84, 38, 66, 19);
+    // smile
+    g.strokeStyle = INK; g.lineWidth = 2.6; g.lineCap = 'round';
+    g.beginPath(); g.moveTo(-11, -75.5); g.quadraticCurveTo(0, -69.5, 11, -75.5); g.stroke();
+    // nostrils + cheeks
+    g.fillStyle = withA(d, 0.85);
+    g.beginPath(); g.arc(-4, -82, 1.3, 0, TAU); g.fill();
+    g.beginPath(); g.arc(4, -82, 1.3, 0, TAU); g.fill();
+    g.fillStyle = 'rgba(255,93,93,.24)';
+    g.beginPath(); g.ellipse(-11, -77, 3.2, 2.1, 0, 0, TAU); g.fill();
+    g.beginPath(); g.ellipse(11, -77, 3.2, 2.1, 0, 0, TAU); g.fill();
+    drawEyes(g, char, o);
+  } else if (char.animal === 'croc') {
+    // scaly skull
+    g.beginPath(); g.ellipse(-1, -81, 16, 13, 0, 0, TAU);
     paintBody(g, c);
-    // bumpy warts
-    g.fillStyle = withA(d, 0.5);
-    [[-15, -72, 3], [13, -64, 2.5], [-16, -48, 2.2], [15, -40, 3], [-6, -35, 2], [8, -76, 2]].forEach(([x, y, r]) => {
+    // long snout
+    rr(g, -1, -81, 23, 11, 5);
+    paintBody(g, c);
+    // nostrils
+    g.fillStyle = withA(d, 0.9);
+    g.beginPath(); g.arc(16.5, -78, 1.3, 0, TAU); g.fill();
+    g.beginPath(); g.arc(20, -78, 1.3, 0, TAU); g.fill();
+    // jaw line + teeth
+    g.strokeStyle = INK; g.lineWidth = 2.2; g.lineCap = 'round';
+    g.beginPath(); g.moveTo(2, -71.5); g.lineTo(21, -71.5); g.stroke();
+    g.fillStyle = CREAM;
+    [4.5, 9.5, 14.5, 19].forEach(x => {
+      g.beginPath(); g.moveTo(x - 1.2, -71.5); g.lineTo(x + 1.2, -71.5); g.lineTo(x, -68.4); g.closePath(); g.fill();
+    });
+    // scales
+    g.fillStyle = withA(d, 0.55);
+    [[-11, -86, 1.3], [-5, -90, 1], [5, -88, 1.1], [11, -84, 1.2], [-13, -78, 1]].forEach(([x, y, r]) => {
       g.beginPath(); g.arc(x, y, r, 0, TAU); g.fill();
     });
-    // shiny streak
-    g.strokeStyle = 'rgba(255,255,255,.3)'; g.lineWidth = 4; g.lineCap = 'round';
-    g.beginPath(); g.moveTo(-9, -76); g.quadraticCurveTo(-15, -62, -12, -50); g.stroke();
-    // leaf
-    g.beginPath(); g.moveTo(0, -83);
-    g.bezierCurveTo(-4, -94, -15, -96, -18, -90);
-    g.bezierCurveTo(-10, -87, -5, -85, 0, -83);
-    g.fillStyle = '#4c9f3a'; g.fill();
-    g.lineWidth = 2.6; g.strokeStyle = INK; g.stroke();
-    g.beginPath(); g.moveTo(0, -83); g.quadraticCurveTo(3, -90, 1, -93);
-    g.lineWidth = 2.2; g.strokeStyle = '#357c2f'; g.stroke();
-  } else if (char.body === 'toast') {
+    drawEyes(g, char, o);
+  } else if (char.animal === 'lion') {
+    // mane
     g.beginPath();
-    g.moveTo(-27, -25);
-    g.lineTo(-29, -61);
-    g.bezierCurveTo(-29, -78, -18, -83, -9, -77);
-    g.quadraticCurveTo(0, -71, 9, -77);
-    g.bezierCurveTo(18, -83, 29, -78, 29, -61);
-    g.lineTo(27, -25);
-    g.quadraticCurveTo(27, -18, 19, -18);
-    g.lineTo(-19, -18);
-    g.quadraticCurveTo(-27, -18, -27, -25);
+    const spikes = 18;
+    for (let i = 0; i < spikes; i++) {
+      const a = i / spikes * TAU;
+      const r = i % 2 ? 14.5 : 17.5;
+      const x = Math.cos(a) * r, y = -79 + Math.sin(a) * r;
+      i ? g.lineTo(x, y) : g.moveTo(x, y);
+    }
     g.closePath();
+    paintBody(g, d);
+    // ears
+    [-1, 1].forEach(s => {
+      g.beginPath(); g.arc(s * 11, -90, 4.8, 0, TAU);
+      g.fillStyle = c; g.fill(); g.lineWidth = 2.8; g.strokeStyle = INK; g.stroke();
+    });
+    // face
+    g.beginPath(); g.ellipse(0, -79, 14.5, 13.5, 0, 0, TAU);
     paintBody(g, c);
-    // crust inner
-    g.save();
-    g.beginPath();
-    g.moveTo(-22, -28); g.lineTo(-23, -61);
-    g.bezierCurveTo(-23, -73, -15, -76, -8, -71);
-    g.quadraticCurveTo(0, -65, 8, -71);
-    g.bezierCurveTo(15, -76, 23, -73, 23, -61);
-    g.lineTo(22, -28);
-    g.quadraticCurveTo(20, -24, 15, -24);
-    g.lineTo(-15, -24);
-    g.quadraticCurveTo(-20, -24, -22, -28);
-    g.closePath();
-    g.fillStyle = '#ffe0a3'; g.fill();
-    g.restore();
-    // butter
-    g.save();
-    g.translate(-2, -82); g.rotate(-0.08);
-    rr(g, -11, -4, 24, 9, 3);
-    g.fillStyle = '#ffd84f'; g.fill();
-    g.lineWidth = 2.6; g.strokeStyle = INK; g.stroke();
-    g.beginPath(); g.moveTo(-6, -1.5); g.lineTo(5, -1.5);
-    g.strokeStyle = 'rgba(255,255,255,.55)'; g.lineWidth = 2; g.stroke();
-    g.restore();
-  } else if (char.body === 'donut') {
-    g.beginPath(); g.arc(0, -52, 32, 0, TAU);
+    // muzzle
+    g.beginPath(); g.ellipse(0, -72.5, 8, 5.4, 0, 0, TAU);
+    g.fillStyle = '#ffe6b8'; g.fill();
+    g.lineWidth = 2.2; g.strokeStyle = INK; g.stroke();
+    // nose + mouth
+    g.beginPath(); g.moveTo(-2.3, -76); g.lineTo(2.3, -76); g.lineTo(0, -73.7); g.closePath();
+    g.fillStyle = INK; g.fill();
+    g.strokeStyle = INK; g.lineWidth = 1.7; g.lineCap = 'round';
+    g.beginPath(); g.moveTo(0, -73.7); g.lineTo(0, -71.6); g.stroke();
+    g.beginPath(); g.moveTo(0, -71.6); g.quadraticCurveTo(-3, -69.8, -5, -71.4); g.stroke();
+    g.beginPath(); g.moveTo(0, -71.6); g.quadraticCurveTo(3, -69.8, 5, -71.4); g.stroke();
+    // mane shading
+    g.strokeStyle = withA('#6d421d', 0.4); g.lineWidth = 1.8;
+    g.beginPath(); g.moveTo(-15, -86); g.lineTo(-12.5, -89); g.stroke();
+    g.beginPath(); g.moveTo(15, -86); g.lineTo(12.5, -89); g.stroke();
+    drawEyes(g, char, o);
+  } else if (char.animal === 'pig') {
+    // ears
+    [-1, 1].forEach(s => {
+      g.beginPath();
+      g.moveTo(s * 8, -91); g.lineTo(s * 16, -96); g.lineTo(s * 14, -86);
+      g.closePath();
+      g.fillStyle = c; g.fill(); g.lineWidth = 2.8; g.strokeStyle = INK; g.stroke();
+    });
+    // head
+    g.beginPath(); g.ellipse(0, -80, 16, 14, 0, 0, TAU);
     paintBody(g, c);
-    // frosting drips
-    g.fillStyle = withA(d, 0.35);
-    g.beginPath(); g.arc(-19, -25, 7, 0, TAU); g.fill();
-    g.beginPath(); g.arc(-3, -21, 5.5, 0, TAU); g.fill();
-    g.beginPath(); g.arc(15, -24, 6.5, 0, TAU); g.fill();
-    // hole
-    g.beginPath(); g.arc(0, -64, 9.5, 0, TAU);
-    g.fillStyle = '#1a0c2e'; g.fill();
-    g.lineWidth = 3.4; g.strokeStyle = INK; g.stroke();
-    g.beginPath(); g.arc(0, -64, 7.7, 3.4, 5.9); g.strokeStyle = 'rgba(255,244,216,.25)'; g.lineWidth = 2; g.stroke();
-    // sprinkles
-    const sprinkles = [[-23, -58, 0.7], [-14, -73, -0.4], [15, -75, 0.3], [24, -60, -0.7], [21, -42, 0.6], [-21, -40, -0.2], [8, -30, 0.9], [-7, -78, 0.2]];
+    // snout
+    g.beginPath(); g.ellipse(0, -73.5, 8.2, 5.6, 0, 0, TAU);
+    g.fillStyle = '#ffd0e1'; g.fill();
+    g.lineWidth = 2.2; g.strokeStyle = INK; g.stroke();
+    g.fillStyle = withA(d, 0.95);
+    g.beginPath(); g.ellipse(-3, -73.5, 1.3, 1.9, 0, 0, TAU); g.fill();
+    g.beginPath(); g.ellipse(3, -73.5, 1.3, 1.9, 0, 0, TAU); g.fill();
+    // sprinkle freckles
+    const sprinkles = [[-11, -79, 0.6], [-12, -74, -0.5], [11, -79, -0.4], [12, -75, 0.7]];
     sprinkles.forEach(([x, y, rot], i) => {
       g.save(); g.translate(x, y); g.rotate(rot);
-      rr(g, -4, -1.6, 8, 3.2, 1.6);
+      rr(g, -2.2, -0.9, 4.4, 1.8, 0.9);
       g.fillStyle = ['#fff4d8', '#2ec4b6', '#ffd23f', '#a06cff'][i % 4];
       g.fill();
       g.restore();
     });
-    g.beginPath(); g.ellipse(-11, -50, 6, 3.5, -0.5, 0, TAU);
-    g.fillStyle = 'rgba(255,255,255,.4)'; g.fill();
-  } else if (char.body === 'nugget') {
-    g.beginPath();
-    const pts = [[-28, -28], [-33, -45], [-27, -62], [-14, -76], [2, -77], [18, -72], [28, -60], [30, -42], [24, -27], [12, -19], [-4, -17], [-19, -20]];
-    pts.forEach(([x, y], i) => i ? g.lineTo(x, y) : g.moveTo(x, y));
-    g.quadraticCurveTo(-31, -23, -28, -28);
-    g.closePath();
+    drawEyes(g, char, o);
+  } else if (char.animal === 'chicken') {
+    // comb
+    g.fillStyle = '#e8434f';
+    [-5.5, 0, 5.5].forEach((x, i) => {
+      g.beginPath(); g.arc(x, -93 + (i === 1 ? -1 : 0), 3.2, 0, TAU);
+      g.fill(); g.lineWidth = 1.8; g.strokeStyle = INK; g.stroke();
+    });
+    // head
+    g.beginPath(); g.ellipse(0, -81, 14.5, 13.5, 0, 0, TAU);
     paintBody(g, c);
-    g.fillStyle = withA(d, 0.5);
-    [[-19, -55, 2.4], [12, -64, 2], [19, -37, 2.8], [-8, -27, 2], [7, -70, 1.7]].forEach(([x, y, r]) => {
-      g.beginPath(); g.arc(x, y, r, 0, TAU); g.fill();
-    });
-    g.beginPath(); g.ellipse(-13, -63, 8, 4, -0.6, 0, TAU);
-    g.fillStyle = 'rgba(255,255,255,.32)'; g.fill();
-    // crispy edge
-    g.strokeStyle = withA('#8a5210', 0.45); g.lineWidth = 2; g.lineJoin = 'round';
-    g.beginPath(); g.moveTo(-27, -29); g.quadraticCurveTo(-22, -22, -14, -21); g.stroke();
+    // beak
+    g.beginPath(); g.moveTo(4, -77); g.lineTo(17, -73.6); g.lineTo(4, -70.5); g.closePath();
+    g.fillStyle = '#ffa32e'; g.fill();
+    g.lineWidth = 2.3; g.strokeStyle = INK; g.stroke();
+    g.beginPath(); g.moveTo(4, -70.5); g.lineTo(14, -72); g.lineTo(4, -68.8); g.closePath();
+    g.fillStyle = '#e07f16'; g.fill(); g.lineWidth = 1.8; g.strokeStyle = INK; g.stroke();
+    // wattle
+    g.beginPath(); g.ellipse(7, -66.5, 3, 4.2, 0.2, 0, TAU);
+    g.fillStyle = '#e8434f'; g.fill(); g.lineWidth = 1.8; g.strokeStyle = INK; g.stroke();
+    // nostril
+    g.fillStyle = INK;
+    g.beginPath(); g.arc(10, -75.5, 0.9, 0, TAU); g.fill();
+    drawEyes(g, char, o);
   } else {
-    // egg
-    g.beginPath();
-    g.moveTo(0, -83);
-    g.bezierCurveTo(16, -83, 28, -69, 28, -51);
-    g.bezierCurveTo(28, -28, 16, -17, 0, -17);
-    g.bezierCurveTo(-16, -17, -28, -28, -28, -51);
-    g.bezierCurveTo(-28, -69, -16, -83, 0, -83);
-    g.closePath();
+    // duck
+    g.beginPath(); g.ellipse(0, -80, 15, 13.5, 0, 0, TAU);
     paintBody(g, c);
-    g.strokeStyle = withA(d, 0.7); g.lineWidth = 2.4; g.lineJoin = 'round';
-    g.beginPath();
-    g.moveTo(-11, -79); g.lineTo(-4, -72); g.lineTo(3, -77); g.lineTo(11, -70);
-    g.stroke();
-    g.fillStyle = withA(d, 0.55);
-    [[-16, -44, 1.5], [17, -52, 1.3], [9, -29, 1.2], [-6, -60, 1]].forEach(([x, y, r]) => {
-      g.beginPath(); g.arc(x, y, r, 0, TAU); g.fill();
-    });
-    g.beginPath(); g.ellipse(-10, -64, 6, 3.2, -0.5, 0, TAU);
-    g.fillStyle = 'rgba(255,255,255,.55)'; g.fill();
+    // feather tuft
+    g.strokeStyle = withA(d, 0.85); g.lineWidth = 2; g.lineCap = 'round';
+    g.beginPath(); g.moveTo(-3, -93); g.quadraticCurveTo(-5, -97, -1, -98); g.stroke();
+    g.beginPath(); g.moveTo(1, -93); g.quadraticCurveTo(0, -97, 4, -98); g.stroke();
+    // bill
+    rr(g, 1, -77.5, 17, 6.5, 3.2);
+    g.fillStyle = '#ffae3b'; g.fill();
+    g.lineWidth = 2.4; g.strokeStyle = INK; g.stroke();
+    g.beginPath(); g.moveTo(3, -74); g.lineTo(17, -74);
+    g.strokeStyle = 'rgba(36,19,53,.45)'; g.lineWidth = 1.4; g.stroke();
+    g.fillStyle = INK;
+    g.beginPath(); g.arc(9, -75.5, 0.8, 0, TAU); g.fill();
+    drawEyes(g, char, o);
   }
-  return char.bodyBottom;
-}
-
-function drawFace(g, char, o) {
-  const ey = char.eyeY, gap = char.eyeGap, r = char.eyeR;
-  const lookX = (o.lookX || 0) * 2.6;
-  const lookY = (o.lookY || 0) * 2.1;
-  const ko = o.ko;
-  const blink = o.blink && !ko;
-  const excited = o.charging || (o.hurt || 0) > 0;
-
-  if (ko) {
-    g.strokeStyle = INK; g.lineWidth = 3.4; g.lineCap = 'round';
-    [-gap, gap].forEach(x => {
-      g.beginPath();
-      g.moveTo(x - r * 0.6, ey - r * 0.6); g.lineTo(x + r * 0.6, ey + r * 0.6);
-      g.moveTo(x + r * 0.6, ey - r * 0.6); g.lineTo(x - r * 0.6, ey + r * 0.6);
-      g.stroke();
-    });
-  } else {
-    [-gap, gap].forEach((x, i) => {
-      if (blink) {
-        g.strokeStyle = INK; g.lineWidth = 3; g.lineCap = 'round';
-        g.beginPath();
-        g.moveTo(x - r * 0.8, ey + (i ? -0.5 : 0.5));
-        g.quadraticCurveTo(x, ey + 2.2, x + r * 0.8, ey + (i ? -0.5 : 0.5));
-        g.stroke();
-      } else {
-        g.beginPath(); g.arc(x, ey, r, 0, TAU);
-        g.fillStyle = PAPER; g.fill();
-        g.lineWidth = 3.2; g.strokeStyle = INK; g.stroke();
-        g.beginPath(); g.arc(x + lookX, ey + lookY, r * 0.44, 0, TAU);
-        g.fillStyle = INK; g.fill();
-        g.beginPath(); g.arc(x + lookX - r * 0.18, ey + lookY - r * 0.2, r * 0.13, 0, TAU);
-        g.fillStyle = '#fff'; g.fill();
-      }
-    });
-    // eyebrows
-    if (excited) {
-      g.strokeStyle = INK; g.lineWidth = 3; g.lineCap = 'round';
-      g.beginPath(); g.moveTo(-gap - r * 0.8, ey - r * 1.5); g.lineTo(-gap + r * 0.6, ey - r * 1.1); g.stroke();
-      g.beginPath(); g.moveTo(gap + r * 0.8, ey - r * 1.5); g.lineTo(gap - r * 0.6, ey - r * 1.1); g.stroke();
-    }
-  }
-
-  // cheeks
-  if (!ko) {
-    g.fillStyle = 'rgba(255,93,93,.22)';
-    g.beginPath(); g.ellipse(-char.bodyW * 0.34, ey + r + 6, 5, 3, 0, 0, TAU); g.fill();
-    g.beginPath(); g.ellipse(char.bodyW * 0.34, ey + r + 6, 5, 3, 0, 0, TAU); g.fill();
-  }
-
-  const my = char.mouthY;
-  if (ko) {
-    g.beginPath(); g.ellipse(0, my + 3, 6, 7.5, 0, 0, TAU);
-    g.fillStyle = INK; g.fill();
-    g.fillStyle = '#ff6f8f';
-    g.beginPath(); g.ellipse(0, my + 6, 3.4, 2.2, 0, 0, TAU); g.fill();
-  } else if (excited) {
-    g.beginPath(); g.ellipse(0, my + 4, 7, 8, 0, 0, TAU);
-    g.fillStyle = INK; g.fill();
-    g.beginPath(); g.ellipse(0, my + 7, 4, 3, 0, 0, TAU);
-    g.fillStyle = '#ff6f8f'; g.fill();
-  } else {
-    g.strokeStyle = INK; g.lineWidth = 2.8; g.lineCap = 'round';
-    g.beginPath();
-    g.moveTo(-6, my);
-    g.quadraticCurveTo(0, my + 5, 6, my);
-    g.stroke();
-  }
-}
-
-function drawBand(g, char, o) {
-  const y = char.bandY;
-  const w = char.bodyW + 4;
-  const h = 8.5;
-  // tails
-  g.beginPath();
-  g.moveTo(-w / 2 + 2, y - 1);
-  g.lineTo(-w / 2 - 11, y - 7);
-  g.lineTo(-w / 2 - 7, y + 3);
-  g.closePath();
-  g.fillStyle = o.color; g.fill();
-  g.lineWidth = 2.6; g.strokeStyle = INK; g.stroke();
-  g.beginPath();
-  g.moveTo(-w / 2 + 2, y + 3);
-  g.lineTo(-w / 2 - 9, y + 8);
-  g.lineTo(-w / 2 - 4, y + 1);
-  g.closePath();
-  g.fillStyle = o.color; g.fill();
-  g.stroke();
-  // band
-  rr(g, -w / 2, y - h / 2, w, h, h / 2);
-  g.fillStyle = o.color; g.fill();
-  g.lineWidth = 3; g.strokeStyle = INK; g.stroke();
-  // emblem
-  starPath(g, 4.4, 2, 4);
-  g.fillStyle = CREAM; g.fill();
-  g.lineWidth = 1.6; g.strokeStyle = 'rgba(36,19,53,.55)'; g.stroke();
 }
 
 function drawCharacter(g, char, o) {
@@ -356,8 +367,7 @@ function drawCharacter(g, char, o) {
   drawLegs(g, char, o);
   drawArm(g, char, o, -(o.aim || 1), false);
   drawBody(g, char, o);
-  drawFace(g, char, o);
-  drawBand(g, char, o);
+  drawAnimalHead(g, char, o);
   drawArm(g, char, o, (o.aim || 1), true);
   g.restore();
 }
@@ -403,7 +413,7 @@ function drawPlayer(p, t) {
   // player ID badge above the head
   if (state !== 'title' && state !== 'matchEnd') {
     const bw = Math.max(15, 18 * S), bh = Math.max(11, 13 * S);
-    const by = p.y - 90 * S;
+    const by = p.y - 104 * S;
     ctx.save();
     ctx.translate(p.x, by);
     rr(ctx, -bw / 2, -bh / 2, bw, bh, 7 * S);
@@ -438,8 +448,11 @@ function drawPlayer(p, t) {
       ctx.setLineDash([]);
       ctx.font = `${9 * S}px Bungee, sans-serif`;
       ctx.textAlign = 'center';
-      ctx.fillStyle = withA(CREAM, 0.85);
-      ctx.fillText('CATCH!', p.x, p.y - 73 * S);
+      ctx.lineWidth = 3 * S;
+      ctx.strokeStyle = 'rgba(36,19,53,.8)';
+      ctx.strokeText('CATCH!', p.x, p.y + 24 * S);
+      ctx.fillStyle = CREAM;
+      ctx.fillText('CATCH!', p.x, p.y + 24 * S);
     }
   }
 

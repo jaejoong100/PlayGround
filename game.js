@@ -46,33 +46,33 @@ const P2C = '#ff3ea5';
 const CHARS = [
   {
     id: 'gloop', name: 'GLOOP', tag: '100% goo. 0% manners.',
-    color: '#8fe34f', dark: '#4f9a24', body: 'blob', bodyW: 64,
-    eyeY: -58, eyeGap: 13.5, eyeR: 11.5, bandY: -73, mouthY: -37, bodyBottom: -18, cost: 0,
+    color: '#8fe34f', dark: '#4f9a24', skin: '#e7b184', skinDark: '#c78a5d',
+    animal: 'frog', headW: 36, eyeY: -88.5, eyeGap: 9.5, eyeR: 5.2, cost: 0,
   },
   {
     id: 'pickle', name: 'SIR PICKLE', tag: 'Big dill energy.',
-    color: '#72cd57', dark: '#357c2f', body: 'pickle', bodyW: 44,
-    eyeY: -58, eyeGap: 11, eyeR: 10.5, bandY: -73, mouthY: -38, bodyBottom: -18, cost: 0,
+    color: '#72cd57', dark: '#357c2f', skin: '#a86b45', skinDark: '#7f4c2d',
+    animal: 'croc', headW: 34, eyeY: -88.5, eyeGap: 7.5, eyeR: 4.8, cost: 0,
   },
   {
     id: 'toast', name: 'TOASTY', tag: 'Butter late than never.',
-    color: '#f2c47c', dark: '#b47c3e', body: 'toast', bodyW: 58,
-    eyeY: -55, eyeGap: 12.5, eyeR: 10.5, bandY: -69, mouthY: -34, bodyBottom: -20, cost: 150,
+    color: '#f2c47c', dark: '#b47c3e', skin: '#f3c9a0', skinDark: '#cfa276',
+    animal: 'lion', headW: 34, eyeY: -82.5, eyeGap: 7, eyeR: 4.8, cost: 150,
   },
   {
     id: 'donut', name: 'DONUT DAN', tag: 'Glazed and confused.',
-    color: '#ff9fc4', dark: '#d45c8d', body: 'donut', bodyW: 62,
-    eyeY: -44, eyeGap: 12, eyeR: 9.5, bandY: -23, mouthY: -29, bodyBottom: -20, cost: 250,
+    color: '#ff9fc4', dark: '#d45c8d', skin: '#df9a78', skinDark: '#bd7455',
+    animal: 'pig', headW: 33, eyeY: -84.5, eyeGap: 7, eyeR: 4.6, cost: 250,
   },
   {
     id: 'nugget', name: 'NUGGET NED', tag: 'Crispy outside. Chaos inside.',
-    color: '#f5b84d', dark: '#c07f1e', body: 'nugget', bodyW: 58,
-    eyeY: -55, eyeGap: 12, eyeR: 10.5, bandY: -69, mouthY: -34, bodyBottom: -20, cost: 350,
+    color: '#f5b84d', dark: '#c07f1e', skin: '#cf9564', skinDark: '#a76f42',
+    animal: 'chicken', headW: 31, eyeY: -84, eyeGap: 6.5, eyeR: 4.4, cost: 350,
   },
   {
     id: 'egg', name: 'EGGBERT', tag: 'Hard-boiled. Soft-hearted.',
-    color: '#fff3e0', dark: '#cfae86', body: 'egg', bodyW: 52,
-    eyeY: -55, eyeGap: 12, eyeR: 10.5, bandY: -69, mouthY: -34, bodyBottom: -18, cost: 500,
+    color: '#fff3e0', dark: '#cfae86', skin: '#f4cbb0', skinDark: '#d0a184',
+    animal: 'duck', headW: 32, eyeY: -83.5, eyeGap: 7, eyeR: 4.5, cost: 500,
   },
 ];
 const CHAR_BY_ID = Object.fromEntries(CHARS.map(c => [c.id, c]));
@@ -400,7 +400,7 @@ function generatePlatforms() {
       x: xs[i],
       y: floorY - step * (i + 1),
       w: w[i],
-      h: 22 * S,
+      h: 18 * S,
       style: i,
     });
   }
