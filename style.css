@@ -238,15 +238,15 @@ kbd{
 @keyframes countPop{0%,100%{transform:scale(1)}30%{transform:scale(1.14)}}
 
 /* ---------------- touch pads ---------------- */
-.touch{position:absolute;inset:0;z-index:30;pointer-events:none}
-.touch .pad{
+#touch{position:absolute;inset:0;z-index:30;pointer-events:none}
+#touch .pad{
   --btn:clamp(44px,5.6vh,56px);
   position:absolute;bottom:max(7px,env(safe-area-inset-bottom));
   display:grid;grid-template-columns:var(--btn) var(--btn) var(--btn);
   grid-template-rows:var(--btn) var(--btn);gap:6px;pointer-events:none;
 }
-.touch .pad.p1{left:max(9px,env(safe-area-inset-left))}
-.touch .pad.p2{right:max(9px,env(safe-area-inset-right))}
+#touch .pad.p1{left:max(9px,env(safe-area-inset-left))}
+#touch .pad.p2{right:max(9px,env(safe-area-inset-right))}
 .tbtn{
   pointer-events:auto;touch-action:none;appearance:none;
   border:2.5px solid var(--ink);border-radius:15px;background:rgba(255,244,216,.9);
@@ -256,8 +256,8 @@ kbd{
   transition:transform .06s,background .06s;
 }
 .tbtn:active,.tbtn.pressed{transform:translateY(3px);box-shadow:0 1px 0 var(--ink);background:#fff}
-.touch .pad.p1 .tbtn{background:rgba(206,250,255,.92)}
-.touch .pad.p2 .tbtn{background:rgba(255,220,239,.92)}
+#touch .pad.p1 .tbtn{background:rgba(206,250,255,.92)}
+#touch .pad.p2 .tbtn{background:rgba(255,220,239,.92)}
 .tbtn.move{font-size:16px;grid-row:2}
 .tbtn.move[data-act="left"]{grid-column:1}
 .tbtn.move[data-act="right"]{grid-column:2}
