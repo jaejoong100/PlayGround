@@ -303,6 +303,7 @@ window.__bonk = {
   unlock: id => unlock(id),
   profile: () => profile,
   arcade: tab => openArcade(tab || 'brawlers'),
+  index: tab => openArcade(tab || 'brawlers'),
   menu: () => quitToMenu(),
   rematch: () => rematch(),
   setPositions: (x1, x2) => {
