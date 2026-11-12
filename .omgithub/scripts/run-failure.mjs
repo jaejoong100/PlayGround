@@ -25,7 +25,7 @@ export function modelFailureReason(log) {
 // Delivery problems happen after the AI finished; never blame an earlier model attempt for them.
 export function deliveryFailureReason(message) {
   const text = String(message || '')
-  if (/timed out/i.test(text)) return 'Publishing timed out: the game was not ready within 10 minutes of the AI finishing. Open the workflow logs for details.'
+  if (/timed out/i.test(text)) return 'Publishing timed out: the game was not ready within 20 minutes of the AI finishing. Open the workflow logs for details.'
   if (/Incomplete production delivery/i.test(text)) return 'Publishing failed: the preview or screenshots were incomplete. Open the workflow logs for details.'
   if (/index\.html|package project|preview/i.test(text)) return 'Publishing failed: no playable game was produced. Open the workflow logs for details.'
   return 'Publishing failed after the AI finished. Open the workflow logs for details.'

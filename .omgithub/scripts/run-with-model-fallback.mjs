@@ -1,6 +1,6 @@
 import { createV2Client, finishedV2Message } from './opencode-v2-api.mjs'
 import { collectSessionStats, finishStats } from './opencode-stats.mjs'
-import { spawn } from 'node:child_process'
+import { spawn, spawnSync } from 'node:child_process'
 import { appendFileSync, openSync, writeSync, closeSync, readFileSync, writeFileSync, renameSync } from 'node:fs'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -88,6 +88,43 @@ export function pingHeartbeat(env = process.env) {
   if (!Number.isInteger(port) || port < 1) return Promise.resolve()
   return fetch(`http://127.0.0.1:${port}/omgithub/heartbeat`, { signal: AbortSignal.timeout(3000) }).then(() => {}, () => {})
 }
+export function fusionAuthFailure(model, error) {
+  if (model !== fusionModel || !error || typeof error !== 'object') return false
+  const status = Number(error.status), text = String(error.type || '') + ' ' + String(error.message || '')
+  return status === 401 || status === 403 || /HTTP 40[13]|unauthori[sz]ed|forbidden|invalid api key/i.test(text)
+}
+
+// Ask the server for a shared lease after the account token is rejected, then restart
+// the OpenCode server so the Fusion plugin picks up the new credentials and upstream.
+export async function switchToSharedFusion(env = process.env, { request = fetch, restart = null, binary = '' } = {}) {
+  const origin = String(env.OMGITHUB_ORIGIN || 'https://omgithub.com').replace(/\/+$/, '')
+  const repository = String(env.GITHUB_REPOSITORY || ''), issue = String(env.TRIGGER_ISSUE_NUMBER || '')
+  const run = String(env.GITHUB_RUN_ID || ''), attempt = Number(env.GITHUB_RUN_ATTEMPT || 1)
+  if (!/^[\w.-]+\/[\w.-]+$/.test(repository) || !/^[1-9]\d*$/.test(issue) || !/^[1-9]\d*$/.test(run) || !env.OMGITHUB_CALLBACK_TOKEN) return false
+  let lease
+  try {
+    const response = await request(origin + '/api/github/' + repository + '/issues/' + issue + '/fusion/fallback', {
+      method: 'POST', headers: { authorization: 'Bearer ' + env.OMGITHUB_CALLBACK_TOKEN, 'content-type': 'application/json' },
+      body: JSON.stringify({ run, attempt }), signal: AbortSignal.timeout(20000)
+    })
+    if (!response.ok) return false
+    lease = await response.json()
+  } catch { return false }
+  if (!lease || lease.route !== 'shared' || typeof lease.token !== 'string' || !lease.token || typeof lease.upstream !== 'string' || !lease.upstream) return false
+  env.FUSION_ACCESS_TOKEN = lease.token
+  env.FUSION_UPSTREAM = lease.upstream
+  env.FUSION_ROUTE = 'shared'
+  if (env.GITHUB_ENV) appendFileSync(env.GITHUB_ENV, 'FUSION_ROUTE=shared\n')
+  if (binary) env.OPENCODE_BIN = binary
+  const doRestart = restart || (() => {
+    let proxy = ''
+    try { proxy = readFileSync(join(env.OPENCODE_WEB_DIR, 'opencode-proxy'), 'utf8').trim() } catch {}
+    const result = spawnSync('bash', [join(env.RUNTIME_DIR, 'scripts/start-opencode-serve.sh'), proxy, '--wait'], { env, stdio: 'inherit', timeout: 120000 })
+    return result.status === 0
+  })
+  try { return await doRestart() } catch { return false }
+}
+
 export function fusionFallbackError(model, error) {
   if (model !== fusionModel || !error || typeof error !== 'object') return false
   const status = Number(error.status), type = String(error.type || ''), message = String(error.message || '')
@@ -204,7 +241,7 @@ export async function runModels({ binary, port, promptFile, logFile, exitFile, s
   const queue = applySkipDirectRouting(appendBackupModel(candidates, env), env)
   let sessionID = env.RESUME_SESSION_ID || '', child, interrupted = false, code = 1
   const attempts = []
-  let switched = false, dropped = false
+  let switched = false, fusionSwitched = false, dropped = false
   const stop = signal => { interrupted = true; child?.kill(signal) }
   const onTerm = () => stop('SIGTERM'), onInt = () => stop('SIGINT')
   process.on('SIGTERM', onTerm); process.on('SIGINT', onInt)
@@ -272,6 +309,15 @@ export async function runModels({ binary, port, promptFile, logFile, exitFile, s
         attempts.at(-1).proxy_drop = ok ? 'ok' : 'failed'
         writeFileSync(join(directory, 'model-attempts.json'), JSON.stringify(attempts))
         if (ok) { appendFileSync(logFile, `[model-fallback] Proxy dropped; retrying ${model}.\n`); index--; continue }
+      }
+      if (code !== 0 && !interrupted && !fusionSwitched && env.FUSION_ROUTE === 'own' && fusionAuthFailure(model, failure)) {
+        fusionSwitched = true
+        appendFileSync(logFile, '[model-fallback] Copilot rejected the account token; switching to shared Fusion capacity.\n')
+        const ok = await switchToSharedFusion(env, { binary }).catch(() => false)
+        attempts.at(-1).fusion_switch = ok ? 'shared' : 'failed'
+        writeFileSync(join(directory, 'model-attempts.json'), JSON.stringify(attempts))
+        if (ok) { appendFileSync(logFile, '[model-fallback] Shared Fusion ready; retrying ' + model + '.\n'); index--; continue }
+        appendFileSync(logFile, '[model-fallback] Shared Fusion unavailable; keeping the current fallback.\n')
       }
       if (code === 0 || interrupted || !retryable) break
       if (!switched && switchProxy && freeEgressModel(model) && attempts.at(-1).error_class === 'free-limit') {

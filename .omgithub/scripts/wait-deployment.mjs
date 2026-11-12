@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url'
 
 // Waits for the final main turn's delivery. When that turn asked the user a question
 // (state awaiting_reply), keep waiting for a reply prompt, then re-arm on the next turn.
-export async function waitForDeployment({ directory, now = Date.now, pause = setTimeout, timeoutMs = 10 * 60_000, replyTimeoutMs = 60 * 60_000, overallMs = 240 * 60_000, deadlineAt = Infinity, reconcile = async () => {}, log = () => {} }) {
+export async function waitForDeployment({ directory, now = Date.now, pause = setTimeout, timeoutMs = 20 * 60_000, replyTimeoutMs = 60 * 60_000, overallMs = 240 * 60_000, deadlineAt = Infinity, reconcile = async () => {}, log = () => {} }) {
   const read = name => {
     try { return JSON.parse(readFileSync(join(directory, name), 'utf8')) }
     catch (error) { if (error.code === 'ENOENT' || error instanceof SyntaxError) return null; throw error }
