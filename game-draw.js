@@ -781,17 +781,21 @@ function drawPickups(t) {
     const pulse = 1 + Math.sin(t * 6 + pk.ph) * 0.06;
     ctx.scale(pulse, pulse);
     if (pk.type === 'chicken') {
-      // chicken booster
-      ctx.beginPath(); ctx.ellipse(0, 2 * S, 12 * S, 10 * S, 0, 0, TAU);
-      ctx.fillStyle = '#ffd23f'; ctx.fill();
+      // chicken feed / corn
+      ctx.beginPath(); ctx.ellipse(0, 0, 9 * S, 13 * S, 0, 0, TAU);
+      ctx.fillStyle = '#ffe066'; ctx.fill();
       ctx.lineWidth = 3 * S; ctx.strokeStyle = INK; ctx.stroke();
-      ctx.beginPath(); ctx.arc(0, -10 * S, 7 * S, 0, TAU);
-      ctx.fillStyle = '#fff4d8'; ctx.fill();
-      ctx.lineWidth = 2.5 * S; ctx.strokeStyle = INK; ctx.stroke();
-      ctx.beginPath(); ctx.moveTo(6 * S, -10 * S); ctx.lineTo(13 * S, -8 * S); ctx.lineTo(6 * S, -6 * S);
-      ctx.fillStyle = '#ff8c42'; ctx.fill();
-      ctx.beginPath(); ctx.arc(2 * S, -11 * S, 1.6 * S, 0, TAU);
-      ctx.fillStyle = INK; ctx.fill();
+      for (let i = -2; i <= 2; i++) {
+        for (let j = -3; j <= 3; j++) {
+          ctx.beginPath(); ctx.arc(i * 3.2 * S, j * 3.2 * S, 1.5 * S, 0, TAU);
+          ctx.fillStyle = '#ffb703'; ctx.fill();
+        }
+      }
+      ctx.beginPath();
+      ctx.moveTo(-9 * S, 6 * S); ctx.lineTo(-14 * S, 14 * S); ctx.lineTo(-4 * S, 10 * S);
+      ctx.moveTo(9 * S, 6 * S); ctx.lineTo(14 * S, 14 * S); ctx.lineTo(4 * S, 10 * S);
+      ctx.fillStyle = '#7bc96f'; ctx.fill();
+      ctx.lineWidth = 2 * S; ctx.strokeStyle = INK; ctx.stroke();
       ctx.restore();
     } else {
       heartPath(ctx, 0, 0, 14 * S);
