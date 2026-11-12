@@ -892,7 +892,7 @@ function update(dtRaw) {
     if (heartTimer <= 0) {
       heartTimer = rand(2.5, 4);
       const hearts = pickups.filter(p => p.type === 'heart').length;
-      if (players.some(p => p.hp < p.maxHp * 0.7) && hearts < 2) spawnPickup('heart');
+      if (players.some(p => p.hp < p.maxHp * 0.7) && hearts < 1) spawnPickup('heart');
     }
     chickenTimer -= sdt;
     if (chickenTimer <= 0) {
