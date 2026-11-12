@@ -350,19 +350,21 @@ function generatePlatforms() {
   const bw = arena.right - arena.left;
   const mirror = Math.random() < 0.5;
   const w = [
-    clamp(250 * S, bw * 0.22, bw * 0.34),
-    clamp(215 * S, bw * 0.20, bw * 0.30),
-    clamp(185 * S, bw * 0.17, bw * 0.26),
+    clamp(190 * S, bw * 0.16, bw * 0.24),
+    clamp(160 * S, bw * 0.14, bw * 0.20),
+    clamp(135 * S, bw * 0.12, bw * 0.18),
+    clamp(115 * S, bw * 0.10, bw * 0.15),
   ];
 
   // Keep the lowest ledge above a brawler's head (plus badge) and keep every
   // step within a single jump. Short/landscape screens get fewer ledges rather
   // than a cramped stack that clips through the fighters.
-  const step = 125 * S;
+  const step = 110 * S;
   const maxRise = Math.max(step, floorY - (arena.top + 54 * S));
   let levels = 1;
   if (maxRise >= step * 2) levels = 2;
   if (maxRise >= step * 3) levels = 3;
+  if (maxRise >= step * 4) levels = 4;
 
   // Chain the platforms horizontally so each one overlaps the next.
   const xs = [arena.left + bw * 0.05];
@@ -376,7 +378,7 @@ function generatePlatforms() {
       x: xs[i],
       y: floorY - step * (i + 1),
       w: w[i],
-      h: 18 * S,
+      h: 16 * S,
       style: i,
       vx: (i % 2 === 0 ? 1 : -1) * rand(40, 110) * S,
     });
