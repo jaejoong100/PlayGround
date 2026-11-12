@@ -711,7 +711,7 @@ function updatePlayer(p, dt) {
   p.wasGround = p.onGround;
   const prevY = p.y;
   p.vy += gravityFor() * dt;
-  p.vy = Math.min(p.vy, 1900 * S);
+  p.vy = Math.min(p.vy, 3800 * S);
   p.x += p.vx * dt;
   p.y += p.vy * dt;
   p.x = clamp(p.x, arena.left + 18 * S, arena.right - 18 * S);
