@@ -811,7 +811,7 @@ function drawPickups(t) {
       ctx.fillText('🍗', 0, 0);
       ctx.restore();
     } else if (pk.type === 'shield') {
-      ctx.font = `${28 * S}px serif`;
+      ctx.font = `${32 * S}px serif`;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.fillText('🛡️', 0, 0);
