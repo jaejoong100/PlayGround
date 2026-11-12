@@ -805,16 +805,44 @@ function drawPickups(t) {
     ctx.scale(pulse, pulse);
     if (pk.type === 'chicken') {
       ctx.globalAlpha = 1;
-      // turkey leg
-      ctx.beginPath(); ctx.ellipse(0, -2 * S, 7 * S, 16 * S, 0, 0, TAU);
-      ctx.fillStyle = '#b86b3a'; ctx.fill();
-      ctx.lineWidth = 3 * S; ctx.strokeStyle = INK; ctx.stroke();
-      ctx.beginPath(); ctx.ellipse(0, 6 * S, 10 * S, 9 * S, 0, 0, TAU);
-      ctx.fillStyle = '#d9824a'; ctx.fill();
-      ctx.lineWidth = 3 * S; ctx.strokeStyle = INK; ctx.stroke();
-      ctx.beginPath(); ctx.ellipse(0, -15 * S, 4 * S, 6 * S, 0, 0, TAU);
-      ctx.fillStyle = '#f4e7d7'; ctx.fill();
+      // sword on fire
+      // blade
+      ctx.beginPath();
+      ctx.moveTo(0, -18 * S);
+      ctx.lineTo(5 * S, -10 * S);
+      ctx.lineTo(5 * S, 6 * S);
+      ctx.lineTo(-5 * S, 6 * S);
+      ctx.lineTo(-5 * S, -10 * S);
+      ctx.closePath();
+      ctx.fillStyle = '#cfd8dc'; ctx.fill();
       ctx.lineWidth = 2.5 * S; ctx.strokeStyle = INK; ctx.stroke();
+      // guard
+      ctx.beginPath(); ctx.rect(-9 * S, 5 * S, 18 * S, 3 * S);
+      ctx.fillStyle = '#8d6e63'; ctx.fill();
+      ctx.lineWidth = 2 * S; ctx.strokeStyle = INK; ctx.stroke();
+      // handle
+      ctx.beginPath(); ctx.rect(-3 * S, 8 * S, 6 * S, 10 * S);
+      ctx.fillStyle = '#5d4037'; ctx.fill();
+      ctx.lineWidth = 2 * S; ctx.strokeStyle = INK; ctx.stroke();
+      // pommel
+      ctx.beginPath(); ctx.arc(0, 19 * S, 3.5 * S, 0, TAU);
+      ctx.fillStyle = '#ffd54f'; ctx.fill();
+      ctx.lineWidth = 2 * S; ctx.strokeStyle = INK; ctx.stroke();
+      // fire around blade
+      for (let i = 0; i < 5; i++) {
+        const fx = (i - 2) * 2.2 * S;
+        const fy = -12 * S + Math.sin(t * 8 + i) * 3 * S;
+        const h = (8 + Math.sin(t * 10 + i * 1.5) * 3) * S;
+        ctx.beginPath();
+        ctx.moveTo(fx - 3 * S, fy + 2 * S);
+        ctx.quadraticCurveTo(fx - 4 * S, fy - h * 0.5, fx, fy - h);
+        ctx.quadraticCurveTo(fx + 4 * S, fy - h * 0.5, fx + 3 * S, fy + 2 * S);
+        ctx.closePath();
+        ctx.globalAlpha = 0.85;
+        ctx.fillStyle = i % 2 === 0 ? '#ff6b35' : '#ffd23f';
+        ctx.fill();
+        ctx.globalAlpha = 1;
+      }
       ctx.restore();
     } else if (pk.type === 'shield') {
       ctx.globalAlpha = 1;
