@@ -543,8 +543,19 @@ function bindJoysticks() {
 
     const centerOf = () => {
       const r = base.getBoundingClientRect();
-      j.max = Math.max(1, r.width * 0.3);
-      return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+      const bounds = joyEl.getBoundingClientRect();
+      const x = r.left + r.width / 2;
+      const y = r.top + r.height / 2;
+      // Anchor the knob to the base's measured center, not an assumed 50% of
+      // its parent. This stays centered if the base and joystick ever diverge.
+      knob.style.left = `${((x - bounds.left) / bounds.width) * 100}%`;
+      knob.style.top = `${((y - bounds.top) / bounds.height) * 100}%`;
+      j.max = Math.max(1, Math.min(r.width, r.height) * 0.3);
+      return { x, y };
+    };
+    j.centerKnob = () => {
+      centerOf();
+      knob.style.transform = 'translate(-50%, -50%)';
     };
     const setAxis = (dx, dy) => {
       const raw = Math.hypot(dx, dy);
@@ -582,7 +593,7 @@ function bindJoysticks() {
       j.jumpLatch = false;
       touchAxes[pIdx] = 0;
       joyEl.classList.remove('active');
-      knob.style.transform = 'translate(-50%, -50%)';
+      j.centerKnob();
     };
     const canUse = () => (state === 'play' || state === 'title') && !paused;
 
@@ -615,7 +626,7 @@ function resetJoysticks() {
   for (const j of joysticks) {
     j.pointerId = null;
     j.jumpLatch = false;
-    j.knob.style.transform = 'translate(-50%, -50%)';
+    j.centerKnob();
   }
   pointerOwners.clear();
   document.querySelectorAll('.tbtn.pressed').forEach(b => b.classList.remove('pressed'));
