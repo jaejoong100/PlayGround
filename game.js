@@ -97,40 +97,12 @@ const MODS = [
   { id: 'storm', name: 'BALL STORM', desc: 'Bonus dodgeballs rain from the sky.', storm: true },
 ];
 
-/* ------------------------------ upgrades ------------------------------ */
-const UPGRADES = {
-  speed: { name: 'SPEEDY SNEAKERS', desc: '+5% run speed per level.', max: 3, costs: [60, 130, 230], icon: 'shoe', color: '#ffd23f' },
-  jump: { name: 'SPRING HEELS', desc: '+5% jump per level.', max: 3, costs: [60, 130, 230], icon: 'spring', color: '#2ec4b6' },
-  power: { name: 'POWER GLOVES', desc: '+8% bonk damage per level.', max: 3, costs: [80, 160, 280], icon: 'fist', color: '#ff8fab' },
-  hp: { name: 'IRON BELLY', desc: '+10 max HP per level.', max: 3, costs: [80, 160, 280], icon: 'heart', color: '#25d9f2' },
-};
-const UPGRADE_IDS = Object.keys(UPGRADES);
-
-/* ------------------------------ achievements ------------------------------ */
-const ACHIEVEMENTS = [
-  { id: 'random', name: 'RANDOM RUMBLE', desc: 'Start a match with random brawlers.', reward: 20, icon: '🎲' },
-  { id: 'first', name: 'FIRST BONK', desc: 'Land your very first hit.', reward: 25, icon: '💥' },
-  { id: 'catcher', name: 'NICE CATCH', desc: 'Catch an incoming dodgeball.', reward: 40, icon: '🧤' },
-  { id: 'wall', name: 'OFF THE WALL', desc: 'Bonk someone with a bounced ball.', reward: 30, icon: '🪃' },
-  { id: 'trick', name: 'TRICK SHOT', desc: 'Hit after two or more bounces.', reward: 60, icon: '🎯' },
-  { id: 'untouchable', name: 'UNTOUCHABLE', desc: 'Win a round without getting hit.', reward: 75, icon: '🛡️' },
-  { id: 'coin25', name: 'COIN PURSE', desc: 'Collect 25 coins total.', reward: 50, icon: '🪙' },
-  { id: 'shopper', name: 'BIG SPENDER', desc: 'Buy an upgrade.', reward: 50, icon: '🛒' },
-  { id: 'maxed', name: 'FULLY LOADED', desc: 'Max out any upgrade.', reward: 200, icon: '💪' },
-  { id: 'regular', name: 'ARCADE REGULAR', desc: 'Play 5 matches.', reward: 80, icon: '🎟️' },
-  { id: 'champion', name: 'CHAMPION', desc: 'Win a match.', reward: 100, icon: '👑' },
-  { id: 'sweep', name: 'CLEAN SWEEP', desc: 'Win a match 3–0.', reward: 150, icon: '🧹' },
-];
-const ACH_BY_ID = Object.fromEntries(ACHIEVEMENTS.map(a => [a.id, a]));
-
 /* ------------------------------ save profile ------------------------------ */
 const SAVE_KEY = 'bonkball.profile.v1';
 function defaultProfile() {
   return {
-    upgrades: { speed: 0, jump: 0, power: 0, hp: 0 },
-    unlocked: CHARS.filter(c => c.cost === 0).map(c => c.id),
-    ach: [],
-    stats: { matches: 0, wins: 0, hits: 0, catches: 0, coins: 0, ricochets: 0, rounds: 0, botWins: 0 },
+    unlocked: CHARS.map(c => c.id),
+    stats: { matches: 0, wins: 0, hits: 0, catches: 0, rounds: 0, botWins: 0 },
     muted: false,
   };
 }
@@ -143,13 +115,11 @@ function loadProfile() {
     if (!p || typeof p !== 'object') return base;
     return {
       ...base, ...p,
-      upgrades: { ...base.upgrades, ...(p.upgrades || {}) },
       stats: { ...base.stats, ...(p.stats || {}) },
       unlocked: [...new Set([
         ...base.unlocked,
         ...(Array.isArray(p.unlocked) ? p.unlocked.filter(id => CHAR_BY_ID[id]) : []),
       ])],
-      ach: Array.isArray(p.ach) ? [...new Set(p.ach.filter(id => ACH_BY_ID[id]))] : [],
       muted: !!p.muted,
     };
   } catch { return base; }
@@ -164,10 +134,7 @@ function saveSoon() {
   saveTimer = setTimeout(saveProfile, 160);
 }
 
-function upgradeBonus(key) {
-  return profile.upgrades[key] || 0;
-}
-function maxHpFor() { return 100 + upgradeBonus('hp') * 10; }
+function maxHpFor() { return 100; }
 
 /* ------------------------------ dom ------------------------------ */
 const $ = sel => document.querySelector(sel);
@@ -462,7 +429,6 @@ function playerColor(p) { return P_COLORS[p.idx]; }
 function getOpponent(p) { return players[1 - p.idx]; }
 function runSpeedFor() {
   let v = 330 * S;
-  v *= 1 + 0.05 * upgradeBonus('speed');
   v *= roundMod.speed || 1;
   return v;
 }
@@ -470,7 +436,7 @@ function gravityFor() {
   return 2100 * S * (roundMod.grav || 1);
 }
 function jumpSpeedFor() {
-  return 790 * S * (roundMod.jump || 1) * (1 + 0.05 * upgradeBonus('jump'));
+  return 790 * S * (roundMod.jump || 1);
 }
 function ballGravityFor() {
   return 1650 * S * (roundMod.ballGrav || 1);

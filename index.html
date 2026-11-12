@@ -105,19 +105,11 @@
         <div class="stick-base"></div>
         <div class="stick-knob"></div>
       </div>
-      <div class="actions" aria-label="Player 1 actions">
-        <button type="button" class="tbtn jump" data-act="jump" aria-label="Player 1 jump">JUMP</button>
-        <button type="button" class="tbtn throw" data-act="throw" aria-label="Player 1 throw">THROW</button>
-      </div>
     </div>
     <div class="pad p2" data-player="1">
       <div class="joystick" role="application" aria-label="Player 2 movement joystick">
         <div class="stick-base"></div>
         <div class="stick-knob"></div>
-      </div>
-      <div class="actions" aria-label="Player 2 actions">
-        <button type="button" class="tbtn jump" data-act="jump" aria-label="Player 2 jump">JUMP</button>
-        <button type="button" class="tbtn throw" data-act="throw" aria-label="Player 2 throw">THROW</button>
       </div>
     </div>
   </div>
@@ -164,14 +156,11 @@
           <div class="arcade-sub" id="arcadeSub">Unlock brawlers and chase trophies.</div>
         </div>
         <div class="arcade-head-right">
-          <div class="gold-chip" aria-label="Coins"><i class="coin-ico"></i><span id="arcadeGold">0</span></div>
           <button class="btn close-btn" id="btnArcadeClose" aria-label="Close arcade">&#10005;</button>
         </div>
       </div>
-      <div class="tabs" role="tablist" aria-label="Arcade sections">
+      <div class="tabs" role="tablist" aria-label="Arcade sections" hidden>
         <button class="tab active" data-tab="brawlers" role="tab" aria-selected="true">BRAWLERS</button>
-        <button class="tab" data-tab="upgrades" role="tab" aria-selected="false">UPGRADES</button>
-        <button class="tab" data-tab="trophies" role="tab" aria-selected="false">TROPHIES</button>
       </div>
       <div class="arcade-body" id="arcadeBody"></div>
     </div>
