@@ -33,9 +33,6 @@ function toast(title, name, icon, amount, negative) {
     setTimeout(() => { t.remove(); toastCount = Math.max(0, toastCount - 1); }, 320);
   }, 3800);
 }
-function toastAchievement(a) {
-  toast('ACHIEVEMENT UNLOCKED', a.name, a.icon, a.reward, false);
-}
 
 /* ------------------------------ arcade ------------------------------ */
 function openArcade(tab) {
@@ -70,9 +67,7 @@ function renderArcade() {
   });
   if (el.gold) el.gold.textContent = String(profile.stats.coins || 0);
   const sub = {
-    upgrades: 'Upgrades apply to BOTH brawlers — fair’s fair.',
     brawlers: 'Unlock the weirdos. Collect the whole fridge.',
-    trophies: `${profile.ach.length}/${ACHIEVEMENTS.length} trophies unlocked.`,
   };
   el.arcadeSub.textContent = sub[currentArcadeTab] || '';
 
@@ -86,58 +81,22 @@ function renderArcade() {
         <div class="cc-name">${c.name}</div>
         <div class="cc-tag">${c.tag}</div>
         <div class="cc-weapon">${weaponOf(c.id).name}</div>
-        <button class="buy-btn cc-buy" data-char-buy="${c.id}" ${owned || !affordable ? 'disabled' : ''}>${action}</button>
+        <button class="buy-btn cc-buy" data-char-buy="${c.id}" ${owned ? 'disabled' : ''}>${action}</button>
       </div>`;
     }).join('')}</div>`;
     el.arcadeBody.querySelectorAll('canvas[data-char]').forEach(c => renderPortrait(c, c.dataset.char, '#ffd23f'));
-  } else if (currentArcadeTab === 'upgrades') {
-    el.arcadeBody.innerHTML = `<div class="up-grid">${UPGRADE_IDS.map(id => {
-      const u = UPGRADES[id], level = Math.min(u.max, profile.upgrades[id] || 0);
-      const cost = u.costs[level], affordable = level >= u.max || (profile.stats.coins || 0) >= cost;
-      return `<div class="up-card">
-        <div class="up-icon">${ICONS[u.icon]}</div>
-        <div class="up-info"><div class="up-name">${u.name}</div><div class="up-desc">${u.desc}</div>
-          <div class="up-levels" aria-label="Level ${level} of ${u.max}">${Array.from({ length: u.max }, (_, i) => `<i class="${i < level ? 'on' : ''}"></i>`).join('')}</div>
-        </div><div class="up-buy"><button class="buy-btn" data-upgrade-buy="${id}" ${level >= u.max || !affordable ? 'disabled' : ''}>${level >= u.max ? 'MAX' : `BUY<span class="cost">🪙 ${cost}</span>`}</button></div>
-      </div>`;
-    }).join('')}</div>`;
-  } else if (currentArcadeTab === 'trophies') {
-    el.arcadeBody.innerHTML = `<div class="trophy-grid">${ACHIEVEMENTS.map(a => {
-      const got = profile.ach.includes(a.id);
-      return `<div class="trophy-card ${got ? 'got' : ''}">
-        <div class="tr-icon">${a.icon}</div><div class="tr-info"><div class="tr-name">${a.name}</div><div class="tr-desc">${a.desc}</div></div>
-        <div class="tr-reward">${got ? 'EARNED' : `🪙 ${a.reward}`}</div>
-      </div>`;
-    }).join('')}</div>`;
   }
 }
 
 function unlockCharacter(id) {
   const c = CHAR_BY_ID[id];
-  if (!c || profile.unlocked.includes(id) || (profile.stats.coins || 0) < c.cost) return;
-  profile.stats.coins -= c.cost;
+  if (!c || profile.unlocked.includes(id)) return;
   profile.unlocked.push(id);
   sfx.buy();
-  toast('NEW BRAWLER', c.name, '🎉', c.cost, true);
   saveProfile();
   renderArcade();
 }
 
-function buyUpgrade(id) {
-  const u = UPGRADES[id];
-  const level = profile.upgrades[id] || 0;
-  if (!u || level >= u.max) return;
-  const cost = u.costs[level];
-  if ((profile.stats.coins || 0) < cost) return;
-  profile.stats.coins -= cost;
-  profile.upgrades[id] = level + 1;
-  sfx.buy();
-  toast('UPGRADE BOUGHT', u.name, '⬆️', cost, true);
-  unlock('shopper');
-  if (profile.upgrades[id] >= u.max) unlock('maxed');
-  saveProfile();
-  renderArcade();
-}
 
 /* ------------------------------ how to play ------------------------------ */
 function openHow() {
@@ -189,8 +148,6 @@ function bindUI() {
   el.arcadeBody.addEventListener('click', e => {
     const ch = e.target.closest('[data-char-buy]');
     if (ch) { unlockCharacter(ch.dataset.charBuy); return; }
-    const upgrade = e.target.closest('[data-upgrade-buy]');
-    if (upgrade) buyUpgrade(upgrade.dataset.upgradeBuy);
   });
 
   el.btnMute.addEventListener('click', () => { setMuted(!profile.muted); if (!profile.muted) sfx.ui(); });
@@ -310,7 +267,6 @@ window.__bonk = {
   knock: i => { if (players[i]) knockout(players[i]); },
   hurt: (i, amount) => { if (players[i]) hitPlayer(players[i], amount || 30, players[i].facing, { owner: 1 - i, bounces: 0 }); },
   toss: (i, charge = 0.6) => { if (players[i]) { players[i].throwCd = 0; spawnBall(players[i], charge, {}); players[i].throwAnim = 0.3; } },
-  unlock: id => unlock(id),
   profile: () => profile,
   arcade: tab => openArcade(tab || 'brawlers'),
   index: tab => openArcade(tab || 'brawlers'),

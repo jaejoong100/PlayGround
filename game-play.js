@@ -105,7 +105,7 @@ function newMatch(mode = '2p', chars = null) {
     lastMod: null, hits: 0, catches: 0,
     chars: duo.slice(),
   };
-  matchEarnings = { hits: 0, rounds: 0, victory: 0, ach: 0 };
+  matchEarnings = { hits: 0, rounds: 0, victory: 0 };
   roundDamage = [0, 0];
   endShown = false;
   paused = false;
@@ -113,8 +113,6 @@ function newMatch(mode = '2p', chars = null) {
   timeScale = 1; timeScaleTarget = 1; slowmoT = 0;
 
   profile.stats.matches = (profile.stats.matches || 0) + 1;
-  unlock('random');
-  if (profile.stats.matches >= 5) unlock('regular');
   saveSoon();
 
   hideAllScreens();
@@ -214,7 +212,6 @@ function finishRound(winner, reason) {
     match.scores[winner]++;
     profile.stats.rounds = (profile.stats.rounds || 0) + 1;
     awardMatchCoins('rounds', 20);
-    if (roundDamage[winner] === 0) unlock('untouchable');
     updatePips();
     const wname = players[winner].char.name;
     if (reason === 'ko') showAnnounce('K.O.!', `${wname} TAKES ROUND ${match.round}`);
@@ -237,8 +234,6 @@ function endMatch(winner) {
   slowmoT = 1.2;
   profile.stats.wins = (profile.stats.wins || 0) + 1;
   awardMatchCoins('victory', 50);
-  unlock('champion');
-  if (match.scores[winner] === 3 && match.scores[1 - winner] === 0) unlock('sweep');
   confettiBurst(W / 2, arena.top + 60 * S, 70);
   sfx.win();
   el.touch.classList.add('hidden');
@@ -273,13 +268,12 @@ function showEndScreen() {
     : quips[match.round % quips.length];
   renderPortrait(el.endPortrait, winner.char.id, color);
 
-  const e = matchEarnings || { hits: 0, rounds: 0, victory: 0, ach: 0 };
-  const total = e.hits + e.rounds + e.victory + e.ach;
+  const e = matchEarnings || { hits: 0, rounds: 0, victory: 0 };
+  const total = e.hits + e.rounds + e.victory;
   el.earnings.innerHTML = [
     ['Bonks landed', e.hits],
     ['Round wins', e.rounds],
     ['Match bonus', e.victory],
-    ['Achievements', e.ach],
   ].map(([label, val]) => `<div class="earn-row"><span>${label}</span><span>+${val}</span></div>`).join('') +
     `<div class="earn-row total"><span>TOTAL EARNED</span><span>+${total}</span></div>`;
   el.hud.classList.add('hidden');
@@ -323,24 +317,10 @@ let goldUiDirty = false;
 function awardMatchCoins(category, amount) {
   if (!matchEarnings || !Object.hasOwn(matchEarnings, category) || amount <= 0) return;
   matchEarnings[category] += amount;
-  profile.stats.coins = (profile.stats.coins || 0) + amount;
   saveProfile();
   refreshArcadeIfOpen();
-  if (profile.stats.coins >= 25) unlock('coin25');
 }
-function unlock(id) {
-  const achievement = ACH_BY_ID[id];
-  if (!achievement || profile.ach.includes(id)) return false;
-  profile.ach.push(id);
-  profile.stats.coins = (profile.stats.coins || 0) + achievement.reward;
-  if (matchEarnings && !['title', 'matchEnd'].includes(state)) {
-    matchEarnings.ach += achievement.reward;
-  }
-  saveProfile();
-  toastAchievement(achievement);
-  refreshArcadeIfOpen();
-  return true;
-}
+
 function fmtTime(sec) {
   const s = Math.max(0, Math.ceil(sec));
   return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;

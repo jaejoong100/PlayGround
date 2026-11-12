@@ -43,7 +43,7 @@ function releaseThrow(p) {
 function spawnBall(p, charge, opts = {}) {
   const plan = throwPlan(p, charge);
   const weapon = weaponOf(p.char.id);
-  const pow = 1 + 0.08 * upgradeBonus('power');
+  const pow = 1;
   const baseDmg = weapon.base || 12;
   const dmg = Math.round(baseDmg * pow * (roundMod.damage || 1) * (opts.catchBonus ? 1.2 : 1));
   const r = 12 * S * (roundMod.ballSize || 1) * weapon.size;
@@ -99,7 +99,6 @@ function doCatch(p, b) {
   sfx.catchBall();
   profile.stats.catches = (profile.stats.catches || 0) + 1;
   if (match) match.catches++;
-  unlock('catcher');
   spawnBall(p, Math.min(1, (b.charge || 0.2) + 0.45), { catchBonus: true });
   return true;
 }
@@ -303,9 +302,7 @@ function hitPlayer(p, dmg, dir, ball) {
     profile.stats.hits = (profile.stats.hits || 0) + 1;
     if (match) match.hits++;
     awardMatchCoins('hits', 5);
-    unlock('first');
-    if (ball.bounces >= 2) { unlock('trick'); profile.stats.ricochets = (profile.stats.ricochets || 0) + 1; }
-    else if (ball.bounces >= 1) unlock('wall');
+    if (ball.bounces >= 2) { profile.stats.ricochets = (profile.stats.ricochets || 0) + 1; }
   }
 
   if (p.hp <= 0) knockout(p);
