@@ -387,13 +387,23 @@ function drawPlayer(p, t) {
   }
 
   if (p.rageT > 0) {
-    ctx.beginPath();
-    ctx.arc(p.x, p.y - 42 * S, 46 * S, 0, TAU);
-    ctx.fillStyle = `rgba(255,140,40,${0.16 + Math.sin(t * 10) * 0.05})`;
-    ctx.fill();
-    ctx.lineWidth = 3 * S;
-    ctx.strokeStyle = 'rgba(255,210,63,.8)';
-    ctx.stroke();
+    const flames = 8;
+    for (let i = 0; i < flames; i++) {
+      const a = (i / flames) * TAU + t * 3.2 + p.idx * 1.7;
+      const r = 40 * S + Math.sin(t * 9 + i * 1.3) * 7 * S;
+      const fx = p.x + Math.cos(a) * r;
+      const fy = p.y - 42 * S + Math.sin(a) * r * 0.55;
+      const h = (14 + Math.sin(t * 11 + i) * 4) * S;
+      ctx.beginPath();
+      ctx.moveTo(fx - 6 * S, fy + 4 * S);
+      ctx.quadraticCurveTo(fx - 8 * S, fy - h * 0.5, fx, fy - h);
+      ctx.quadraticCurveTo(fx + 8 * S, fy - h * 0.5, fx + 6 * S, fy + 4 * S);
+      ctx.closePath();
+      ctx.fillStyle = i % 2 === 0 ? '#ff6b35' : '#ffd23f';
+      ctx.globalAlpha = 0.85;
+      ctx.fill();
+      ctx.globalAlpha = 1;
+    }
   }
   if (p.shieldT > 0) {
     ctx.beginPath();
