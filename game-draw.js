@@ -804,7 +804,8 @@ function drawPickups(t) {
     const pulse = 1 + Math.sin(t * 6 + pk.ph) * 0.06;
     ctx.scale(pulse, pulse);
     if (pk.type === 'chicken') {
-      ctx.font = `${28 * S}px serif`;
+      ctx.globalAlpha = 1;
+      ctx.font = `${32 * S}px serif`;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.fillText('🍗', 0, 0);
