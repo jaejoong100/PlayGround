@@ -196,7 +196,7 @@ function beginPlay() {
   showAnnounce('FIGHT!');
   sfx.fight();
   updateHud();
-  setTimeout(() => { if (state === 'play') showAnnounce(''); }, 950);
+  setTimeout(() => { if (state === 'play') showAnnounce(''); }, 2000);
 }
 
 function finishRound(winner, reason) {
