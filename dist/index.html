@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#241335">
+<title>DODGE THE BALL — 2-Player Dodgebrawl</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='27' fill='%23ff5d5d' stroke='%23241335' stroke-width='6'/%3E%3Cpath d='M8 30c16-10 32-10 48 0M8 40c16-10 32-10 48 0' fill='none' stroke='%23fff4d8' stroke-width='5'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bungee&family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="app">
+  <canvas id="game" aria-label="Bonk Ball game arena"></canvas>
+
+  <!-- ============ HUD ============ -->
+  <header id="hud" class="hidden" aria-live="off">
+    <div class="fighter-card p1">
+      <div class="fc-top">
+        <span class="p-tag">P1</span>
+        <span class="fc-name" id="p1Name">GLOOP</span>
+        <span class="fc-hp" id="p1HpNum">100</span>
+      </div>
+      <div class="hp-track"><div class="hp-fill" id="p1Hp"></div><div class="hp-shine"></div></div>
+      <div class="pips" id="p1Pips"><i></i><i></i><i></i></div>
+    </div>
+    <div class="hud-center">
+      <div class="round-tag" id="roundTag">ROUND 1</div>
+      <div class="timer" id="timer">1:00</div>
+      <div class="mod-badge" id="modBadge">CLASSIC RULES</div>
+    </div>
+    <div class="fighter-card p2">
+      <div class="fc-top">
+        <span class="fc-hp" id="p2HpNum">100</span>
+        <span class="fc-name" id="p2Name">PICKLE</span>
+        <span class="p-tag">P2</span>
+      </div>
+      <div class="hp-track"><div class="hp-fill" id="p2Hp"></div><div class="hp-shine"></div></div>
+      <div class="pips" id="p2Pips"><i></i><i></i><i></i></div>
+    </div>
+  </header>
+
+  <div id="deskHints" class="desk-hints hidden">
+    <div class="dh p1"><b>P1</b> A / D move (auto-charge) · W jump · <kbd>SPACE</kbd> fire</div>
+    <div class="dh p2"><b>P2</b> <kbd>←</kbd><kbd>→</kbd> move (auto-charge) · <kbd>↑</kbd> jump · <kbd>ENTER</kbd> fire</div>
+  </div>
+
+  <!-- ============ TITLE ============ -->
+  <section id="screenTitle" class="screen">
+    <div class="title-panel">
+      <div class="logo-wrap">
+        <div class="logo" aria-label="Dodge the Ball">
+          <span class="l-bonk">DODGE</span><span class="l-bang">!</span>
+          <span class="l-ball">THE BALL</span>
+        </div>
+        <div class="tagline">2-PLAYER DODGEBRAWL</div>
+      </div>
+
+      <div class="brawler-row">
+        <div class="brawler-card p1" id="titleP1">
+          <canvas class="portrait" width="120" height="120"></canvas>
+          <div class="bc-meta"><span class="bc-p">PLAYER 1</span><strong id="titleP1Name">GLOOP</strong></div>
+        </div>
+        <button class="btn dice" id="btnReroll" title="Roll new random brawlers" aria-label="Roll new random brawlers">
+          <span class="dice-face">?</span>
+        </button>
+        <div class="brawler-card p2" id="titleP2">
+          <canvas class="portrait" width="120" height="120"></canvas>
+          <div class="bc-meta"><span class="bc-p">PLAYER 2</span><strong id="titleP2Name">PICKLE</strong></div>
+        </div>
+      </div>
+
+      <button class="btn primary" id="btnPlay" aria-label="Play">PLAY</button>
+      <div class="title-sub-row">
+        <button class="btn small" id="btnSolo">SOLO VS BOT</button>
+        <button class="btn small" id="btnArcade">INDEX</button>
+        <button class="btn small" id="btnHow">HOW TO PLAY</button>
+      </div>
+      <div class="title-foot">
+        <span class="tiny-note">FIRST TO 3 ROUNDS · RANDOM MAYHEM</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ ROUND INTRO ============ -->
+  <div id="roundCard" class="round-card hidden">
+    <div class="rc-round" id="rcRound">ROUND 1</div>
+    <div class="rc-vs" id="rcVs">GLOOP <span>VS</span> PICKLE</div>
+    <div class="rc-mod-wrap">
+      <div class="rc-kicker">THIS ROUND</div>
+      <div class="rc-mod" id="rcMod">CLASSIC RULES</div>
+      <div class="rc-desc" id="rcDesc">No funny business. (Allegedly.)</div>
+    </div>
+    <div class="rc-count" id="rcCount">3</div>
+  </div>
+
+  <div id="announce" class="announce" aria-live="polite"></div>
+
+  <!-- ============ TOUCH CONTROLS ============ -->
+  <div id="touch" class="touch hidden">
+    <div class="pad p1" data-player="0">
+      <div class="joystick" role="application" aria-label="Player 1 movement joystick">
+        <div class="stick-base"></div>
+        <div class="stick-knob"></div>
+      </div>
+    </div>
+    <div class="pad p2" data-player="1">
+      <div class="joystick" role="application" aria-label="Player 2 movement joystick">
+        <div class="stick-base"></div>
+        <div class="stick-knob"></div>
+      </div>
+    </div>
+  </div>
+
+  <button class="tbtn pause-mini" id="btnPauseTouch" aria-label="Pause">II</button>
+
+  <button id="btnMute" class="corner-btn" aria-label="Mute sound" aria-pressed="false" title="Mute sound">
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path class="spk" d="M4 9.2h3.8L13 5.4v13.2l-5.2-3.8H4z"/>
+      <path class="wave w1" d="M16.2 8.5a5 5 0 0 1 0 7"/>
+      <path class="wave w2" d="M18.7 6.1a8.6 8.6 0 0 1 0 11.8"/>
+      <path class="xmark" d="M16 9.2l5.2 5.6M21.2 9.2L16 14.8"/>
+    </svg>
+  </button>
+
+  <!-- ============ MATCH END ============ -->
+  <section id="screenEnd" class="screen hidden">
+    <div class="panel end-panel">
+      <div class="end-kicker">MATCH OVER</div>
+      <div class="end-winner" id="endWinner">PLAYER 1 WINS!</div>
+      <div class="end-hero">
+        <canvas id="endPortrait" class="portrait big" width="180" height="180"></canvas>
+        <div class="end-meta">
+          <div class="end-char" id="endChar">GLOOP</div>
+          <div class="end-score" id="endScore">3 — 1</div>
+          <div class="end-bot" id="endSub">A hard-fought bonk-off.</div>
+        </div>
+      </div>
+      <div class="earnings" id="earnings"></div>
+      <div class="btn-row">
+        <button class="btn primary" id="btnRematch">REMATCH</button>
+        <button class="btn" id="btnEndArcade">INDEX</button>
+        <button class="btn" id="btnEndMenu">MENU</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ ARCADE / SHOP ============ -->
+  <section id="screenArcade" class="screen overlay hidden">
+    <div class="panel arcade-panel">
+      <div class="arcade-head">
+        <div>
+          <h2>INDEX</h2>
+          <div class="arcade-sub" id="arcadeSub">Unlock brawlers and chase trophies.</div>
+        </div>
+        <div class="arcade-head-right">
+          <button class="btn close-btn" id="btnArcadeClose" aria-label="Close arcade">&#10005;</button>
+        </div>
+      </div>
+      <div class="tabs" role="tablist" aria-label="Arcade sections" hidden>
+        <button class="tab active" data-tab="brawlers" role="tab" aria-selected="true">BRAWLERS</button>
+      </div>
+      <div class="arcade-body" id="arcadeBody"></div>
+    </div>
+  </section>
+
+  <!-- ============ HOW TO PLAY ============ -->
+  <section id="screenHow" class="screen overlay hidden">
+    <div class="panel how-panel">
+      <div class="arcade-head">
+        <h2>HOW TO PLAY</h2>
+        <button class="btn close-btn" id="btnHowClose" aria-label="Close how to play">&#10005;</button>
+      </div>
+      <div class="how-grid">
+        <div class="how-card p1">
+          <div class="how-p">PLAYER 1</div>
+          <div class="how-keys"><kbd>A</kbd><kbd>D</kbd> move</div>
+          <div class="how-keys"><kbd>W</kbd> jump / double jump</div>
+          <div class="how-keys"><kbd>SPACE</kbd> auto-charge &amp; fire</div>
+        </div>
+        <div class="how-card p2">
+          <div class="how-p">PLAYER 2</div>
+          <div class="how-keys"><kbd>&larr;</kbd><kbd>&rarr;</kbd> move</div>
+          <div class="how-keys"><kbd>&uarr;</kbd> jump / double jump</div>
+          <div class="how-keys"><kbd>ENTER</kbd> auto-charge &amp; fire</div>
+        </div>
+      </div>
+      <ul class="how-list">
+        <li><b>Auto-aim &amp; auto-charge.</b> Move to charge your shot automatically; release the joystick (or SPACE) to fire. It curves toward your rival.</li>
+        <li><b>Catch!</b> Tap throw just as an incoming ball gets close to catch it and hurl it right back, extra spicy.</li>
+        <li><b>Grab the loot.</b> Hearts drop onto the court for a quick heal.</li>
+        <li><b>Win.</b> First to 3 round wins takes the match. Each round rolls a brand new modifier, so stay on your toes.</li>
+      </ul>
+      <div class="how-note">TABLET / PHONE: drag the joystick to move; flick up to jump. Auto-throw while moving. Landscape recommended!</div>
+    </div>
+  </section>
+
+  <!-- ============ PAUSE ============ -->
+  <section id="screenPause" class="screen overlay hidden">
+    <div class="panel pause-panel">
+      <h2>PAUSED</h2>
+      <div class="pause-buttons">
+        <button class="btn primary" id="btnResume">RESUME</button>
+        <button class="btn" id="btnRestart">RESTART MATCH</button>
+        <button class="btn" id="btnPauseHow">HOW TO PLAY</button>
+        <button class="btn" id="btnPauseMenu">QUIT TO MENU</button>
+      </div>
+      <div class="pause-note">Press <kbd>ESC</kbd> to resume · <kbd>M</kbd> to mute</div>
+    </div>
+  </section>
+
+  <div id="toasts" class="toasts"></div>
+</div>
+<script src="game.js"></script>
+<script src="game-draw.js"></script>
+<script src="game-play.js"></script>
+<script src="game-fx.js"></script>
+<script src="game-ui.js"></script>
+</body>
+</html>
