@@ -638,8 +638,8 @@ function bindJoysticks() {
       cy = Math.max(halfH, Math.min(cy, window.innerHeight - halfH));
       joyEl.style.removeProperty('inset');
       joyEl.style.position = 'absolute';
-      joyEl.style.left = (cx - padRect.left) + 'px';
-      joyEl.style.top = (cy - padRect.top) + 'px';
+      joyEl.style.left = (cx - padRect.left - halfW) + 'px';
+      joyEl.style.top = (cy - padRect.top - halfH) + 'px';
       joyEl.style.right = 'auto';
       joyEl.style.bottom = 'auto';
       j.pointerId = e.pointerId;

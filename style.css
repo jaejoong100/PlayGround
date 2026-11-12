@@ -244,14 +244,12 @@ kbd{
   --joy:clamp(112px,16.9vh,153px);
   --btn:clamp(48px,7.2vh,62px);
   position:absolute;bottom:max(7px,env(safe-area-inset-bottom));
-  width:50%;height:130px;box-sizing:border-box;
   display:flex;align-items:flex-end;gap:8px;pointer-events:auto;
 }
-.touch .pad.p1{left:0}
-.touch .pad.p2{right:0;flex-direction:row-reverse}
+.touch .pad.p1{left:max(9px,env(safe-area-inset-left))}
+.touch .pad.p2{right:max(9px,env(safe-area-inset-right));flex-direction:row-reverse}
 .joystick{
-  position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
-  width:var(--joy);height:var(--joy);flex:0 0 auto;
+  position:relative;width:var(--joy);height:var(--joy);flex:0 0 auto;
   border-radius:50%;pointer-events:auto;touch-action:none;
   -webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none;
 }

@@ -359,14 +359,56 @@ function spawnPickup(type) {
     }
   } while (tries < 12 && players.some(p => dist(p.x, p.y - 40 * S, x, y) < 80 * S));
   const color = type === 'chicken' ? '#ffd23f' : type === 'shield' ? '#7dd3fc' : '#ff5d5d';
-  pickups.push({ type, x, y, ph: rand(0, TAU), life: 26 });
+  const speed = rand(120, 220) * S;
+  const ang = rand(0, TAU);
+  pickups.push({ type, x, y, ph: rand(0, TAU), life: 26, r: 12 * S, vx: Math.cos(ang) * speed, vy: Math.sin(ang) * speed });
   addParticle({ x, y, life: 0.45, size: 10 * S, color, kind: 'ring', grav: 0 });
 }
 
 function updatePickups(dt) {
   for (const pk of pickups) {
     if (pk.dead) continue;
+    if (pk.vx === undefined) { pk.vx = rand(-180, 180) * S; pk.vy = rand(-180, 180) * S; pk.r = pk.r || 12 * S; }
     pk.life -= dt;
+    pk.x += pk.vx * dt;
+    pk.y += pk.vy * dt;
+    // bounce off arena bounds
+    if (pk.x - pk.r < arena.left) { pk.x = arena.left + pk.r; pk.vx = Math.abs(pk.vx); }
+    if (pk.x + pk.r > arena.right) { pk.x = arena.right - pk.r; pk.vx = -Math.abs(pk.vx); }
+    if (pk.y - pk.r < arena.top) { pk.y = arena.top + pk.r; pk.vy = Math.abs(pk.vy); }
+    if (pk.y + pk.r > floorY) { pk.y = floorY - pk.r; pk.vy = -Math.abs(pk.vy); }
+    // bounce off platforms
+    for (const pl of platforms) {
+      const nx = clamp(pk.x, pl.x, pl.x + pl.w);
+      const ny = clamp(pk.y, pl.y, pl.y + pl.h);
+      const dx = pk.x - nx, dy = pk.y - ny;
+      const d2 = dx * dx + dy * dy;
+      if (d2 > pk.r * pk.r) continue;
+      let nX, nY;
+      const d = Math.sqrt(d2);
+      if (d < 0.001) {
+        const l = pk.x - pl.x, r = pl.x + pl.w - pk.x, t = pk.y - pl.y, bo = pl.y + pl.h - pk.y;
+        const m = Math.min(l, r, t, bo);
+        if (m === l) { nX = -1; nY = 0; pk.x = pl.x - pk.r; }
+        else if (m === r) { nX = 1; nY = 0; pk.x = pl.x + pl.w + pk.r; }
+        else if (m === t) { nX = 0; nY = -1; pk.y = pl.y - pk.r; }
+        else { nX = 0; nY = 1; pk.y = pl.y + pl.h + pk.r; }
+      } else {
+        nX = dx / d; nY = dy / d;
+        pk.x = nx + nX * pk.r;
+        pk.y = ny + nY * pk.r;
+      }
+      const dot = pk.vx * nX + pk.vy * nY;
+      if (dot < 0) {
+        pk.vx -= (1 + 0.85) * dot * nX;
+        pk.vy -= (1 + 0.85) * dot * nY;
+        pk.vx *= 0.99;
+        pk.vy *= 0.99;
+      }
+    }
+    // keep moving (avoid stall)
+    const sp = Math.hypot(pk.vx, pk.vy);
+    if (sp < 40 * S) { const a = rand(0, TAU); pk.vx = Math.cos(a) * 90 * S; pk.vy = Math.sin(a) * 90 * S; }
     for (const p of players) {
       if (!p || p.ko) continue;
       if (dist(p.x, p.y - 40 * S, pk.x, pk.y) < 38 * S) {

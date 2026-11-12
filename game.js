@@ -341,7 +341,7 @@ function computeLayout() {
       p.y = Math.min(p.y, floorY);
     }
     for (const b of balls) { b.x *= sx; b.y *= sy; }
-    for (const pk of pickups) { pk.x *= sx; pk.y = Math.min(pk.y * sy, floorY - 20); }
+    for (const pk of pickups) { pk.x *= sx; pk.y = Math.min(pk.y * sy, floorY - 20); pk.vx = (pk.vx || 0) * sx; pk.vy = (pk.vy || 0) * sy; pk.r = (pk.r || 12) * Math.min(sx, sy); }
     if (state === 'title' || state === 'matchEnd') generatePlatforms();
   }
 }
