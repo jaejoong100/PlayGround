@@ -680,7 +680,7 @@ function updatePlayer(p, dt) {
   const maxSp = runSpeedFor() * (p.charging ? 0.58 : 1) * (p.hitstun > 0 ? 0.5 : 1);
   if (dir !== 0) {
     p.facing = Math.sign(dir) || p.facing;
-    p.vx += dir * 2900 * S * dt;
+    p.vx += dir * 5800 * S * dt;
     p.vx = clamp(p.vx, -maxSp, maxSp);
   } else {
     p.vx *= Math.pow(0.0009, dt);
