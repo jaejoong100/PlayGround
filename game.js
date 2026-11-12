@@ -90,7 +90,7 @@ const P_COLORS = [P1C, P2C];
 /* ------------------------------ round modifiers ------------------------------ */
 const MODS = [
   { id: 'classic', name: 'CLASSIC RULES', desc: 'No funny business. (Allegedly.)' },
-  { id: 'bouncy', name: 'SUPER BALL', desc: 'Dodgeballs bounce like caffeinated kangaroos.', bounce: 3, rest: 1.02 },
+  { id: 'bouncy', name: 'SUPER BALL', desc: 'Dodgeballs bounce like caffeinated kangaroos.', bounce: 12, rest: 1.02 },
   { id: 'moon', name: 'MOON SHOES', desc: 'Low gravity. Maximum hang time.', grav: 0.56, jump: 0.78, ballGrav: 0.58 },
   { id: 'speedy', name: 'HYPER SOCKS', desc: 'Everyone moves extra fast. Good luck.', speed: 1.34 },
   { id: 'big', name: 'BIG BALL ENERGY', desc: 'Giant dodgeballs. Giant bonks.', ballSize: 1.5, damage: 1.12 },

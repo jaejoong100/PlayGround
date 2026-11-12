@@ -54,7 +54,7 @@ function spawnBall(p, charge, opts = {}) {
     r, owner: p.idx, charge,
     damage: dmg,
     bounces: 0,
-    bouncesLeft: roundMod.bounce ?? 1,
+    bouncesLeft: roundMod.bounce ?? BALL_BOUNCE_LIMIT,
     rest: roundMod.rest ?? 0.78,
     rot: rand(0, TAU), spin: rand(-weapon.spin, weapon.spin),
     age: 0, dead: false, caught: !!opts.catchBonus,
@@ -104,6 +104,9 @@ function doCatch(p, b) {
 }
 
 /* ------------------------------ dodgeballs ------------------------------ */
+const BALL_BOUNCE_LIMIT = 8;
+const BALL_MAX_AGE = 8;
+
 function collideBallRect(b, pl) {
   const nx = clamp(b.x, pl.x, pl.x + pl.w);
   const ny = clamp(b.y, pl.y, pl.y + pl.h);
@@ -138,7 +141,7 @@ function offBounce(b, x, y) {
   b.bounces++;
   b.bouncesLeft--;
   b.spin += rand(-6, 6);
-  if (b.bouncesLeft < 0) {
+  if (b.bouncesLeft <= 0) {
     b.dead = true;
     dust(x, y, 5);
     burst(x, y, b.owner >= 0 ? P_COLORS[b.owner] : CREAM, 4, 0.6, 'dot');
@@ -224,7 +227,7 @@ function updateBalls(dt) {
         }
       }
     }
-    if (b.age > 1.0) b.dead = true;
+    if (b.age > BALL_MAX_AGE) b.dead = true;
   }
   balls = balls.filter(b => !b.dead && b.y < H + 200);
   if (splitSpawns.length) balls.push(...splitSpawns);
@@ -242,7 +245,7 @@ function spawnSplit(b, out) {
       r: Math.max(5 * S, b.r * 0.35),
       owner: b.owner, charge: b.charge * 0.4,
       damage: 4,
-      bounces: 0, bouncesLeft: 1, rest: 0.75,
+      bounces: 0, bouncesLeft: BALL_BOUNCE_LIMIT, rest: 0.75,
       rot: rand(0, TAU), spin: rand(-10, 10),
       age: 0, dead: false, caught: false,
       weapon: b.weapon, wcolor: b.wcolor, wshape: b.wshape,
@@ -259,7 +262,7 @@ function spawnStormBall() {
     x, y: arena.top + 26 * S,
     vx: rand(-70, 70) * S * 0.5, vy: rand(80, 170) * S * 0.5,
     r: 14 * S, owner: -1, charge: 0.25, damage: 8,
-    bounces: 0, bouncesLeft: 1, rest: 0.82,
+    bounces: 0, bouncesLeft: BALL_BOUNCE_LIMIT, rest: 0.82,
     rot: rand(0, TAU), spin: rand(-6, 6), age: 0, dead: false,
   });
   addParticle({ x, y: arena.top + 26 * S, life: 0.5, size: 18 * S, color: '#ff5d5d', kind: 'ring', grav: 0 });
