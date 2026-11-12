@@ -167,7 +167,7 @@ function startRound() {
   roundDamage = [0, 0];
   roundWinner = null;
   balls = []; particles = []; floaters = []; pickups = [];
-  stormTimer = 2.6; heartTimer = 4.5;
+  stormTimer = 2.6; heartTimer = 2.25;
   shake = 0; hitstop = 0;
   timeScale = 1; timeScaleTarget = 1; slowmoT = 0;
   generatePlatforms();
@@ -888,8 +888,9 @@ function update(dtRaw) {
     }
     heartTimer -= sdt;
     if (heartTimer <= 0) {
-      heartTimer = rand(5, 8);
-      if (players.some(p => p.hp < p.maxHp * 0.7) && !pickups.some(p => p.type === 'heart')) spawnPickup('heart');
+      heartTimer = rand(2.5, 4);
+      const hearts = pickups.filter(p => p.type === 'heart').length;
+      if (players.some(p => p.hp < p.maxHp * 0.7) && hearts < 2) spawnPickup('heart');
     }
   }
 
