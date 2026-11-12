@@ -372,20 +372,20 @@ function updatePickups(dt) {
       if (dist(p.x, p.y - 40 * S, pk.x, pk.y) < 38 * S) {
         pk.dead = true;
         if (pk.type === 'chicken') {
-          p.rageT = 3;
+          p.rageT = 2.5;
           chickenTimer = rand(5, 10);
           addFloater('ENRAGED!', pk.x, pk.y - 22 * S, '#ffd23f', 22);
           burst(pk.x, pk.y, '#ffd23f', 12, 0.8, 'star');
           sfx.ui();
         } else if (pk.type === 'shield') {
-          p.shieldT = 3;
+          p.shieldT = 2.5;
           shieldTimer = rand(5, 10);
           addFloater('SHIELDED!', pk.x, pk.y - 22 * S, '#7dd3fc', 22);
           burst(pk.x, pk.y, '#7dd3fc', 12, 0.8, 'star');
           sfx.ui();
         } else {
-          p.hp = Math.min(p.maxHp, p.hp + 30);
-          addFloater('+30', pk.x, pk.y - 22 * S, '#ff6b8a', 22);
+          p.hp = Math.min(p.maxHp, p.hp + 25);
+          addFloater('+25', pk.x, pk.y - 22 * S, '#ff6b8a', 22);
           burst(pk.x, pk.y, '#ff5d5d', 10, 0.7, 'star');
           sfx.heart();
           updateHud();

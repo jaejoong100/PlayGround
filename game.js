@@ -78,11 +78,11 @@ const CHARS = [
 const CHAR_BY_ID = Object.fromEntries(CHARS.map(c => [c.id, c]));
 const WEAPONS = {
   gloop: { name: 'SLIMEBALL', color: '#8fe34f', size: 1.0, speed: 1.0, base: 12, spin: 4, shape: 'blob', knock: 1.0, special: 'heavy' },
-  pickle: { name: 'FISHBONE', color: '#2ec4b6', size: 0.8, speed: 1.3, base: 5, spin: 12, shape: 'diamond', knock: 0.9, special: 'fast' },
-  toast: { name: 'FIREBALL', color: '#ff8c42', size: 1.0, speed: 1.1, base: 10, spin: 12, shape: 'star', knock: 1.0, special: 'explosive' },
-  donut: { name: 'DONUT', color: '#ff9fc4', size: 1.4, speed: 0.75, base: 30, spin: 6, shape: 'ring', knock: 1.2, special: 'split' },
-  nugget: { name: 'EGG', color: '#fff3a8', size: 1.0, speed: 1.0, base: 10, spin: 8, shape: 'egg', knock: 1.0, special: 'homing' },
-  egg: { name: 'FEATHER', color: '#fffaf0', size: 0.7, speed: 1.35, base: 5, spin: 14, shape: 'feather', knock: 0.85, special: 'pierce' },
+  pickle: { name: 'FISHBONE', color: '#2ec4b6', size: 0.8, speed: 1.3, base: 8, spin: 12, shape: 'diamond', knock: 0.9, special: 'fast' },
+  toast: { name: 'FIREBALL', color: '#ff8c42', size: 1.0, speed: 1.1, base: 11, spin: 12, shape: 'star', knock: 1.0, special: 'explosive' },
+  donut: { name: 'DONUT', color: '#ff9fc4', size: 1.4, speed: 0.75, base: 20, spin: 6, shape: 'ring', knock: 1.2, special: 'split' },
+  nugget: { name: 'EGG', color: '#fff3a8', size: 1.0, speed: 1.0, base: 11, spin: 8, shape: 'egg', knock: 1.0, special: 'homing' },
+  egg: { name: 'FEATHER', color: '#fffaf0', size: 0.7, speed: 1.35, base: 8, spin: 14, shape: 'feather', knock: 0.85, special: 'pierce' },
 };
 function weaponOf(charId) { return WEAPONS[charId] || WEAPONS.gloop; }
 const P_COLORS = [P1C, P2C];
