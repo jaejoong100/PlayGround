@@ -50,7 +50,7 @@ jobs:
             if (!response.ok) throw new Error(`Callback authentication HTTP ${response.status}`);
             return response.json();
           }
-          for (let attempt = 0; attempt < 8; attempt++) {
+          for (let attempt = 0; attempt < 3; attempt++) {
             try {
               const identity = await json(url, { headers: { authorization: `Bearer ${env.ACTIONS_ID_TOKEN_REQUEST_TOKEN}` } });
               const { token } = await json(`${origin}/api/github/${env.GITHUB_REPOSITORY}/issues/${env.ISSUE_NUMBER}/callback-token`, {
@@ -61,8 +61,8 @@ jobs:
               appendFileSync(env.GITHUB_ENV, `OMGITHUB_CALLBACK_TOKEN=${token}\n`);
               break;
             } catch (error) {
-              if (attempt === 7) throw error;
-              await new Promise(resolve => setTimeout(resolve, Math.min(20000, 3000 * 2 ** attempt)));
+              if (attempt === 2) throw error;
+              await new Promise(resolve => setTimeout(resolve, 2000 * 2 ** attempt));
             }
           }
           NODE
@@ -191,7 +191,7 @@ jobs:
             if (!response.ok) throw new Error(`Callback authentication HTTP ${response.status}`);
             return response.json();
           }
-          for (let attempt = 0; attempt < 8; attempt++) {
+          for (let attempt = 0; attempt < 3; attempt++) {
             try {
               const identity = await json(url, { headers: { authorization: `Bearer ${env.ACTIONS_ID_TOKEN_REQUEST_TOKEN}` } });
               const { token } = await json(`${origin}/api/github/${env.GITHUB_REPOSITORY}/issues/${env.ISSUE_NUMBER}/callback-token`, {
@@ -202,8 +202,8 @@ jobs:
               appendFileSync(env.GITHUB_ENV, `OMGITHUB_CALLBACK_TOKEN=${token}\n`);
               break;
             } catch (error) {
-              if (attempt === 7) throw error;
-              await new Promise(resolve => setTimeout(resolve, Math.min(20000, 3000 * 2 ** attempt)));
+              if (attempt === 2) throw error;
+              await new Promise(resolve => setTimeout(resolve, 2000 * 2 ** attempt));
             }
           }
           NODE
