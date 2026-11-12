@@ -386,6 +386,15 @@ function drawPlayer(p, t) {
     ctx.fill();
   }
 
+  if (p.rageT > 0) {
+    ctx.beginPath();
+    ctx.arc(p.x, p.y - 42 * S, 46 * S, 0, TAU);
+    ctx.fillStyle = `rgba(255,140,40,${0.16 + Math.sin(t * 10) * 0.05})`;
+    ctx.fill();
+    ctx.lineWidth = 3 * S;
+    ctx.strokeStyle = 'rgba(255,210,63,.8)';
+    ctx.stroke();
+  }
   ctx.save();
   ctx.translate(p.x, p.y);
   if (p.invuln > 0 && state === 'play' && Math.floor(p.invuln * 22) % 2 === 0) ctx.globalAlpha = 0.55;
@@ -771,12 +780,27 @@ function drawPickups(t) {
     ctx.fillStyle = 'rgba(14,6,26,.25)'; ctx.fill();
     const pulse = 1 + Math.sin(t * 6 + pk.ph) * 0.06;
     ctx.scale(pulse, pulse);
-    heartPath(ctx, 0, 0, 14 * S);
-    ctx.fillStyle = '#ff5d5d'; ctx.fill();
-    ctx.lineWidth = 3 * S; ctx.strokeStyle = INK; ctx.stroke();
-    ctx.beginPath(); ctx.ellipse(-5 * S, -5 * S, 3 * S, 5 * S, -0.6, 0, TAU);
-    ctx.fillStyle = 'rgba(255,255,255,.55)'; ctx.fill();
-    ctx.restore();
+    if (pk.type === 'chicken') {
+      // chicken booster
+      ctx.beginPath(); ctx.ellipse(0, 2 * S, 12 * S, 10 * S, 0, 0, TAU);
+      ctx.fillStyle = '#ffd23f'; ctx.fill();
+      ctx.lineWidth = 3 * S; ctx.strokeStyle = INK; ctx.stroke();
+      ctx.beginPath(); ctx.arc(0, -10 * S, 7 * S, 0, TAU);
+      ctx.fillStyle = '#fff4d8'; ctx.fill();
+      ctx.lineWidth = 2.5 * S; ctx.strokeStyle = INK; ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(6 * S, -10 * S); ctx.lineTo(13 * S, -8 * S); ctx.lineTo(6 * S, -6 * S);
+      ctx.fillStyle = '#ff8c42'; ctx.fill();
+      ctx.beginPath(); ctx.arc(2 * S, -11 * S, 1.6 * S, 0, TAU);
+      ctx.fillStyle = INK; ctx.fill();
+      ctx.restore();
+    } else {
+      heartPath(ctx, 0, 0, 14 * S);
+      ctx.fillStyle = '#ff5d5d'; ctx.fill();
+      ctx.lineWidth = 3 * S; ctx.strokeStyle = INK; ctx.stroke();
+      ctx.beginPath(); ctx.ellipse(-5 * S, -5 * S, 3 * S, 5 * S, -0.6, 0, TAU);
+      ctx.fillStyle = 'rgba(255,255,255,.55)'; ctx.fill();
+      ctx.restore();
+    }
   }
 }
 

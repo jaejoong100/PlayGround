@@ -43,7 +43,7 @@ function releaseThrow(p) {
 function spawnBall(p, charge, opts = {}) {
   const plan = throwPlan(p, charge);
   const weapon = weaponOf(p.char.id);
-  const pow = 1;
+  const pow = p.rageT > 0 ? 2 : 1;
   const baseDmg = weapon.base || 12;
   const dmg = Math.round(baseDmg * pow * (roundMod.damage || 1) * (opts.catchBonus ? 1.2 : 1));
   const r = 12 * S * (roundMod.ballSize || 1) * weapon.size;
@@ -338,6 +338,7 @@ function knockout(p) {
 
 /* ------------------------------ loot ------------------------------ */
 function spawnPickup(type) {
+  type = type || 'heart';
   let x, y, tries = 0;
   do {
     tries++;
@@ -350,8 +351,9 @@ function spawnPickup(type) {
       y = floorY - 28 * S;
     }
   } while (tries < 12 && players.some(p => dist(p.x, p.y - 40 * S, x, y) < 80 * S));
-  pickups.push({ type: 'heart', x, y, ph: rand(0, TAU), life: 26 });
-  addParticle({ x, y, life: 0.45, size: 10 * S, color: '#ff5d5d', kind: 'ring', grav: 0 });
+  const color = type === 'chicken' ? '#ffd23f' : '#ff5d5d';
+  pickups.push({ type, x, y, ph: rand(0, TAU), life: 26 });
+  addParticle({ x, y, life: 0.45, size: 10 * S, color, kind: 'ring', grav: 0 });
 }
 
 function updatePickups(dt) {
@@ -362,11 +364,18 @@ function updatePickups(dt) {
       if (!p || p.ko) continue;
       if (dist(p.x, p.y - 40 * S, pk.x, pk.y) < 38 * S) {
         pk.dead = true;
-        p.hp = Math.min(p.maxHp, p.hp + 30);
-        addFloater('+30', pk.x, pk.y - 22 * S, '#ff6b8a', 22);
-        burst(pk.x, pk.y, '#ff5d5d', 10, 0.7, 'star');
-        sfx.heart();
-        updateHud();
+        if (pk.type === 'chicken') {
+          p.rageT = 3;
+          addFloater('ENRAGED!', pk.x, pk.y - 22 * S, '#ffd23f', 22);
+          burst(pk.x, pk.y, '#ffd23f', 12, 0.8, 'star');
+          sfx.ui();
+        } else {
+          p.hp = Math.min(p.maxHp, p.hp + 30);
+          addFloater('+30', pk.x, pk.y - 22 * S, '#ff6b8a', 22);
+          burst(pk.x, pk.y, '#ff5d5d', 10, 0.7, 'star');
+          sfx.heart();
+          updateHud();
+        }
         break;
       }
     }

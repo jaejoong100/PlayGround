@@ -293,7 +293,7 @@ let hitstop = 0;
 let timeScale = 1, timeScaleTarget = 1, slowmoT = 0;
 let gameT = 0;
 let lastFrame = 0;
-let stormTimer = 0, heartTimer = 0;
+let stormTimer = 0, heartTimer = 0, chickenTimer = 0;
 let countdownLabel = '';
 let lastTimerLabel = '';
 
