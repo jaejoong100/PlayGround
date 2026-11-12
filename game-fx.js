@@ -43,7 +43,7 @@ function releaseThrow(p) {
 function spawnBall(p, charge, opts = {}) {
   const plan = throwPlan(p, charge);
   const weapon = weaponOf(p.char.id);
-  const pow = p.rageT > 0 ? 2 : 1;
+  const pow = p.rageT > 0 ? 1.5 : 1;
   const baseDmg = weapon.base || 12;
   const dmg = Math.round(baseDmg * pow * (roundMod.damage || 1) * (opts.catchBonus ? 1.2 : 1));
   const r = 12 * S * (roundMod.ballSize || 1) * weapon.size;

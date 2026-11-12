@@ -423,13 +423,13 @@ function runSpeedFor() {
   return v;
 }
 function gravityFor() {
-  return 2100 * S * (roundMod.grav || 1);
+  return 4200 * S * (roundMod.grav || 1);
 }
 function jumpSpeedFor() {
   return 790 * S * (roundMod.jump || 1) * 1.2;
 }
 function ballGravityFor() {
-  return 1650 * S * (roundMod.ballGrav || 1);
+  return 3300 * S * (roundMod.ballGrav || 1);
 }
 function handPoint(p) {
   const opp = getOpponent(p);
