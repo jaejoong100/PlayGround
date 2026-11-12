@@ -388,19 +388,27 @@ function drawPlayer(p, t) {
 
   if (p.rageT > 0) {
     const cx = p.x, cy = p.y - 42 * S;
-    const glow = ctx.createRadialGradient(cx, cy, 8 * S, cx, cy, 62 * S);
-    glow.addColorStop(0, 'rgba(255,200,80,0.4)');
-    glow.addColorStop(1, 'rgba(255,80,0,0)');
+    const bob = Math.sin(t * 5) * 6 * S;
+    const glowR = 62 * S + Math.sin(t * 7) * 8 * S;
+    const glow = ctx.createRadialGradient(cx, cy + bob, 8 * S, cx, cy + bob, glowR);
+    glow.addColorStop(0, 'rgba(255,220,100,0.5)');
+    glow.addColorStop(0.5, 'rgba(255,120,20,0.25)');
+    glow.addColorStop(1, 'rgba(255,60,0,0)');
     ctx.fillStyle = glow;
-    ctx.beginPath(); ctx.arc(cx, cy, 62 * S, 0, TAU); ctx.fill();
+    ctx.beginPath(); ctx.arc(cx, cy + bob, glowR, 0, TAU); ctx.fill();
 
-    const pulse = 1 + Math.sin(t * 6) * 0.12;
-    ctx.font = `${96 * S * pulse}px serif`;
+    const pulse = 1 + Math.sin(t * 8) * 0.15 + Math.sin(t * 13) * 0.06;
+    const rot = Math.sin(t * 4) * 0.12;
+    ctx.save();
+    ctx.translate(cx, cy + bob);
+    ctx.rotate(rot);
+    ctx.globalAlpha = 0.95;
+    ctx.font = `${104 * S * pulse}px serif`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.globalAlpha = 0.9;
-    ctx.fillText('🔥', cx, cy + Math.sin(t * 4) * 4 * S);
+    ctx.fillText('🔥', 0, 0);
     ctx.globalAlpha = 1;
+    ctx.restore();
   }
   if (p.shieldT > 0) {
     ctx.beginPath();
