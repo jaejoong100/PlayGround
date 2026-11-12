@@ -167,7 +167,7 @@ function startRound() {
   roundDamage = [0, 0];
   roundWinner = null;
   balls = []; particles = []; floaters = []; pickups = [];
-  stormTimer = 2.6; heartTimer = 2.25; chickenTimer = 5;
+  stormTimer = 2.6; heartTimer = 2.25; chickenTimer = 10;
   shake = 0; hitstop = 0;
   timeScale = 1; timeScaleTarget = 1; slowmoT = 0;
   generatePlatforms();
@@ -895,7 +895,7 @@ function update(dtRaw) {
     }
     chickenTimer -= sdt;
     if (chickenTimer <= 0) {
-      chickenTimer = rand(6, 9);
+      chickenTimer = 10;
       const chickens = pickups.filter(p => p.type === 'chicken').length;
       if (chickens < 1) spawnPickup('chicken');
     }
