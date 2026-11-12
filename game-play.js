@@ -511,6 +511,15 @@ function bindTouch() {
 }
 
 /* ------------------------------ virtual joysticks ------------------------------ */
+function restoreJoystickPosition(joyEl) {
+  joyEl.style.removeProperty('inset');
+  joyEl.style.position = '';
+  joyEl.style.left = '';
+  joyEl.style.top = '';
+  joyEl.style.right = '';
+  joyEl.style.bottom = '';
+}
+
 function bindJoysticks() {
   joysticks.length = 0;
   document.querySelectorAll('#touch .joystick').forEach(joyEl => {
@@ -558,12 +567,8 @@ function bindJoysticks() {
         releaseThrow(p);
         p.needsMove = true;
       }
-      // restore default position
-      joyEl.style.position = '';
-      joyEl.style.left = '';
-      joyEl.style.top = '';
-      joyEl.style.right = '';
-      joyEl.style.bottom = '';
+      // Return the stick to the center of its player's control half.
+      restoreJoystickPosition(joyEl);
       j.pointerId = null;
       j.jumpLatch = false;
       touchAxes[pIdx] = 0;
@@ -631,9 +636,10 @@ function bindJoysticks() {
       if (idx === 0) cx = Math.max(halfW, Math.min(cx, mid - halfW));
       else cx = Math.max(mid + halfW, Math.min(cx, window.innerWidth - halfW));
       cy = Math.max(halfH, Math.min(cy, window.innerHeight - halfH));
+      joyEl.style.removeProperty('inset');
       joyEl.style.position = 'absolute';
-      joyEl.style.left = (cx - padRect.left - halfW) + 'px';
-      joyEl.style.top = (cy - padRect.top - halfH) + 'px';
+      joyEl.style.left = (cx - padRect.left) + 'px';
+      joyEl.style.top = (cy - padRect.top) + 'px';
       joyEl.style.right = 'auto';
       joyEl.style.bottom = 'auto';
       j.pointerId = e.pointerId;
@@ -650,9 +656,17 @@ function resetJoysticks() {
   touchAxes[0] = 0;
   touchAxes[1] = 0;
   for (const j of joysticks) {
+    const pointerId = j.pointerId;
     j.pointerId = null;
     j.jumpLatch = false;
+    restoreJoystickPosition(j.el);
+    j.el.classList.remove('active');
     j.knob.style.transform = 'translate(-50%, -50%)';
+    if (pointerId !== null) {
+      try {
+        if (j.el.hasPointerCapture(pointerId)) j.el.releasePointerCapture(pointerId);
+      } catch {}
+    }
   }
   pointerOwners.clear();
   document.querySelectorAll('.tbtn.pressed').forEach(b => b.classList.remove('pressed'));
