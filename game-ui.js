@@ -1,6 +1,6 @@
 'use strict';
 /* =========================================================================
-   BONK BALL — arcade UI, shop, achievements, boot
+   BONK BALL — arcade UI, boot
    ========================================================================= */
 
 const ICONS = {
@@ -74,8 +74,7 @@ function renderArcade() {
   if (currentArcadeTab === 'brawlers') {
     el.arcadeBody.innerHTML = `<div class="char-grid">${CHARS.map(c => {
       const owned = profile.unlocked.includes(c.id);
-      const affordable = (profile.stats.coins || 0) >= c.cost;
-      const action = owned ? 'OWNED' : c.cost === 0 ? 'UNLOCK' : `BUY <span class="cost">🪙 ${c.cost}</span>`;
+      const action = owned ? 'OWNED' : 'UNLOCK';
       return `<div class="char-card ${owned ? '' : 'locked'}">
         <canvas width="96" height="96" data-char="${c.id}"></canvas>
         <div class="cc-name">${c.name}</div>
@@ -140,7 +139,7 @@ function bindUI() {
   el.btnPlay.addEventListener('click', () => { ensureAudio(); sfx.ui(); newMatch('2p', titleChars); });
   el.btnSolo.addEventListener('click', () => { ensureAudio(); sfx.ui(); newMatch('bot', titleChars); });
   el.btnReroll.addEventListener('click', rerollTitle);
-  el.btnArcade.addEventListener('click', () => openArcade('upgrades'));
+  el.btnArcade.addEventListener('click', () => openArcade('brawlers'));
   el.btnHow.addEventListener('click', () => openHow());
   el.btnArcadeClose.addEventListener('click', closeArcade);
   el.btnHowClose.addEventListener('click', closeHow);
@@ -165,7 +164,7 @@ function bindUI() {
     paused = false; elsPause(false); sfx.ui(); quitToMenu();
   });
   el.btnRematch.addEventListener('click', () => { sfx.ui(); rematch(); });
-  el.btnEndArcade.addEventListener('click', () => openArcade('upgrades'));
+  el.btnEndArcade.addEventListener('click', () => openArcade('brawlers'));
   el.btnEndMenu.addEventListener('click', () => { sfx.ui(); quitToMenu(); });
 
   // click outside of panels to close overlays (desktop nicety)

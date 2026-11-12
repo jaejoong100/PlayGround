@@ -312,8 +312,7 @@ function elsPause(on) {
   if (on) el.screenArcade.classList.add('hidden');
 }
 
-/* ------------------------------ HUD / gold / achievements ------------------------------ */
-let goldUiDirty = false;
+/* ------------------------------ HUD ------------------------------ */
 function awardMatchCoins(category, amount) {
   if (!matchEarnings || !Object.hasOwn(matchEarnings, category) || amount <= 0) return;
   matchEarnings[category] += amount;
