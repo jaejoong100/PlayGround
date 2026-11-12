@@ -588,6 +588,27 @@ function bindJoysticks() {
   });
 }
 
+  // Global multi-touch routing keeps both joysticks responsive even if
+  // pointer capture is lost or a finger drifts outside its pad.
+  if (!window.__bonkJoyBound) {
+    window.__bonkJoyBound = true;
+    window.addEventListener('pointermove', e => {
+      const j = joysticks.find(x => x.pointerId === e.pointerId);
+      if (!j) return;
+      e.preventDefault();
+      const c = j.centerOf();
+      j.setAxis(e.clientX - c.x, e.clientY - c.y);
+    }, { passive: false });
+    const end = e => {
+      const j = joysticks.find(x => x.pointerId === e.pointerId);
+      if (!j) return;
+      j.releaseFn(e);
+    };
+    window.addEventListener('pointerup', end);
+    window.addEventListener('pointercancel', end);
+    window.addEventListener('lostpointercapture', end);
+  }
+
 function resetJoysticks() {
   touchAxes[0] = 0;
   touchAxes[1] = 0;
