@@ -161,7 +161,7 @@ function startRound() {
   paused = false;
   elsPause(false);
   roundMod = chooseMod();
-  roundTime = 55;
+  roundTime = 60;
   countdown = 3.0;
   countdownLabel = '3';
   roundDamage = [0, 0];
@@ -191,7 +191,7 @@ function startRound() {
 
 function beginPlay() {
   state = 'play';
-  roundTime = 55;
+  roundTime = 60;
   el.roundCard.classList.add('hidden');
   showAnnounce('FIGHT!');
   sfx.fight();
@@ -711,7 +711,7 @@ function updatePlayer(p, dt) {
   p.wasGround = p.onGround;
   const prevY = p.y;
   p.vy += gravityFor() * dt;
-  p.vy = Math.min(p.vy, 1900 * S);
+  p.vy = Math.min(p.vy, 3800 * S);
   p.x += p.vx * dt;
   p.y += p.vy * dt;
   p.x = clamp(p.x, arena.left + 18 * S, arena.right - 18 * S);
