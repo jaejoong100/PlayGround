@@ -456,6 +456,7 @@ body.overlay-open .toasts{
 
 /* ---------------- responsive ---------------- */
 @media (max-width:640px){
+  .touch .pad{--joy:clamp(88px,30vw,116px);--btn:clamp(40px,11vw,46px);gap:5px}
   .title-panel{padding:16px 15px 14px}
   .logo{font-size:clamp(24px,7vw,34px);filter:drop-shadow(3px 3px 0 var(--ink))}
   .brawler-card{padding:4px}
