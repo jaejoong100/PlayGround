@@ -402,12 +402,11 @@ function drawPlayer(p, t) {
     ctx.save();
     ctx.translate(cx, cy + bob);
     ctx.rotate(rot);
-    ctx.globalAlpha = 0.95;
+    ctx.globalAlpha = 1;
     ctx.font = `${104 * S * pulse}px serif`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillText('🔥', 0, 0);
-    ctx.globalAlpha = 1;
     ctx.restore();
   }
   if (p.shieldT > 0) {
