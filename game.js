@@ -430,7 +430,7 @@ function nameOf(p) { return p.char.name; }
 function playerColor(p) { return P_COLORS[p.idx]; }
 function getOpponent(p) { return players[1 - p.idx]; }
 function runSpeedFor() {
-  let v = 330 * S;
+  let v = 660 * S;
   v *= roundMod.speed || 1;
   return v;
 }
