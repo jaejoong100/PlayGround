@@ -847,6 +847,21 @@ function update(dtRaw) {
     if (pl.x < arena.left) { pl.x = arena.left; pl.vx = Math.abs(pl.vx); }
     if (pl.x + pl.w > arena.right) { pl.x = arena.right - pl.w; pl.vx = -Math.abs(pl.vx); }
   }
+   // keep platforms on the same row from phasing through each other
+   for (let i = 0; i < platforms.length; i++) {
+     for (let j = i + 1; j < platforms.length; j++) {
+       const a = platforms[i], b = platforms[j];
+       if (Math.abs(a.y - b.y) > 6 * S) continue;
+       const overlap = Math.min(a.x + a.w, b.x + b.w) - Math.max(a.x, b.x);
+       if (overlap > 0) {
+         const push = overlap / 2 + 0.5 * S;
+         a.x -= push; b.x += push;
+         const va = a.vx; a.vx = b.vx; b.vx = va;
+         a.x = clamp(a.x, arena.left, arena.right - a.w);
+         b.x = clamp(b.x, arena.left, arena.right - b.w);
+       }
+     }
+   }
 
   if (state === 'title') {
     for (const p of players) updatePlayer(p, sdt);
