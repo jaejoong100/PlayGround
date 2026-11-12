@@ -800,32 +800,32 @@ function drawPickups(t) {
     const pulse = 1 + Math.sin(t * 6 + pk.ph) * 0.06;
     ctx.scale(pulse, pulse);
     if (pk.type === 'chicken') {
-      // chicken feed / corn
-      ctx.beginPath(); ctx.ellipse(0, 0, 9 * S, 13 * S, 0, 0, TAU);
-      ctx.fillStyle = '#ffe066'; ctx.fill();
+      // turkey leg
+      ctx.beginPath(); ctx.ellipse(0, -2 * S, 7 * S, 16 * S, 0, 0, TAU);
+      ctx.fillStyle = '#b86b3a'; ctx.fill();
       ctx.lineWidth = 3 * S; ctx.strokeStyle = INK; ctx.stroke();
-      for (let i = -2; i <= 2; i++) {
-        for (let j = -3; j <= 3; j++) {
-          ctx.beginPath(); ctx.arc(i * 3.2 * S, j * 3.2 * S, 1.5 * S, 0, TAU);
-          ctx.fillStyle = '#ffb703'; ctx.fill();
-        }
-      }
-      ctx.beginPath();
-      ctx.moveTo(-9 * S, 6 * S); ctx.lineTo(-14 * S, 14 * S); ctx.lineTo(-4 * S, 10 * S);
-      ctx.moveTo(9 * S, 6 * S); ctx.lineTo(14 * S, 14 * S); ctx.lineTo(4 * S, 10 * S);
-      ctx.fillStyle = '#7bc96f'; ctx.fill();
-      ctx.lineWidth = 2 * S; ctx.strokeStyle = INK; ctx.stroke();
+      ctx.beginPath(); ctx.ellipse(0, 6 * S, 10 * S, 9 * S, 0, 0, TAU);
+      ctx.fillStyle = '#d9824a'; ctx.fill();
+      ctx.lineWidth = 3 * S; ctx.strokeStyle = INK; ctx.stroke();
+      ctx.beginPath(); ctx.ellipse(0, -15 * S, 4 * S, 6 * S, 0, 0, TAU);
+      ctx.fillStyle = '#f4e7d7'; ctx.fill();
+      ctx.lineWidth = 2.5 * S; ctx.strokeStyle = INK; ctx.stroke();
       ctx.restore();
     } else if (pk.type === 'shield') {
-      ctx.beginPath(); ctx.arc(0, 0, 12 * S, 0, TAU);
-      ctx.fillStyle = 'rgba(125,211,252,.35)'; ctx.fill();
-      ctx.lineWidth = 3 * S; ctx.strokeStyle = '#0ea5e9'; ctx.stroke();
       ctx.beginPath();
-      ctx.moveTo(0, -14 * S); ctx.lineTo(10 * S, -6 * S); ctx.lineTo(10 * S, 6 * S);
-      ctx.lineTo(0, 14 * S); ctx.lineTo(-10 * S, 6 * S); ctx.lineTo(-10 * S, -6 * S);
+      ctx.moveTo(0, -15 * S);
+      ctx.lineTo(12 * S, -9 * S);
+      ctx.lineTo(12 * S, 4 * S);
+      ctx.quadraticCurveTo(12 * S, 13 * S, 0, 17 * S);
+      ctx.quadraticCurveTo(-12 * S, 13 * S, -12 * S, 4 * S);
+      ctx.lineTo(-12 * S, -9 * S);
       ctx.closePath();
-      ctx.fillStyle = '#e0f2fe'; ctx.fill();
-      ctx.lineWidth = 2.5 * S; ctx.strokeStyle = INK; ctx.stroke();
+      ctx.fillStyle = '#bfdbfe'; ctx.fill();
+      ctx.lineWidth = 3 * S; ctx.strokeStyle = INK; ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(0, -9 * S); ctx.lineTo(0, 11 * S);
+      ctx.moveTo(-7 * S, 1 * S); ctx.lineTo(7 * S, 1 * S);
+      ctx.lineWidth = 2.5 * S; ctx.strokeStyle = '#2563eb'; ctx.stroke();
       ctx.restore();
     } else {
       heartPath(ctx, 0, 0, 14 * S);
