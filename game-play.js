@@ -10,7 +10,7 @@ function makePlayer(idx, charId) {
     idx, char, x: 0, y: 0, vx: 0, vy: 0, facing: idx === 0 ? 1 : -1,
     onGround: true, coyote: 0, jumpsLeft: 1, jumpBuffer: 0,
     hp: maxHpFor(), maxHp: maxHpFor(),
-    charging: false, charge: 0, throwCd: 0, throwAnim: 0, catchAnim: 0,
+    charging: false, charge: 0, throwCd: 0, throwAnim: 0, catchAnim: 0, rageT: 0,
     invuln: 0, hitstun: 0, ko: false, koT: 0, koDir: 1,
     runPhase: rand(0, TAU), blink: 0, blinkTimer: rand(1.2, 3.4),
     ai: false, aiTimer: rand(0.5, 1.4), aiMove: 0, aiJumpCd: 0,
@@ -144,7 +144,7 @@ function resetPlayerForRound(p) {
   p.hp = p.maxHp;
   p.vx = 0; p.vy = 0;
   p.onGround = true; p.coyote = 0; p.jumpsLeft = 1; p.jumpBuffer = 0;
-  p.charging = false; p.charge = 0; p.throwCd = 0; p.throwAnim = 0; p.catchAnim = 0;
+  p.charging = false; p.charge = 0; p.throwCd = 0; p.throwAnim = 0; p.catchAnim = 0; p.rageT = 0;
   p.invuln = 0; p.hitstun = 0; p.ko = false; p.koT = 0; p.koDir = 1;
   p.blink = 0; p.blinkTimer = rand(1.2, 3.4);
   p.aiTimer = rand(0.6, 1.6); p.aiMove = 0; p.aiJumpCd = 0;
@@ -167,7 +167,7 @@ function startRound() {
   roundDamage = [0, 0];
   roundWinner = null;
   balls = []; particles = []; floaters = []; pickups = [];
-  stormTimer = 2.6; heartTimer = 4.5;
+  stormTimer = 2.6; heartTimer = 2.25; chickenTimer = 10;
   shake = 0; hitstop = 0;
   timeScale = 1; timeScaleTarget = 1; slowmoT = 0;
   generatePlatforms();
@@ -627,6 +627,7 @@ function updatePlayer(p, dt) {
   // timers
   p.throwCd = Math.max(0, p.throwCd - dt);
   p.throwAnim = Math.max(0, p.throwAnim - dt);
+  p.rageT = Math.max(0, (p.rageT || 0) - dt);
   p.catchAnim = Math.max(0, p.catchAnim - dt);
   p.invuln = Math.max(0, p.invuln - dt);
   p.hitstun = Math.max(0, p.hitstun - dt);
@@ -888,8 +889,15 @@ function update(dtRaw) {
     }
     heartTimer -= sdt;
     if (heartTimer <= 0) {
-      heartTimer = rand(5, 8);
-      if (players.some(p => p.hp < p.maxHp * 0.7) && !pickups.some(p => p.type === 'heart')) spawnPickup('heart');
+      heartTimer = rand(2.5, 4);
+      const hearts = pickups.filter(p => p.type === 'heart').length;
+      if (players.some(p => p.hp < p.maxHp * 0.7) && hearts < 2) spawnPickup('heart');
+    }
+    chickenTimer -= sdt;
+    if (chickenTimer <= 0) {
+      chickenTimer = 10;
+      const chickens = pickups.filter(p => p.type === 'chicken').length;
+      if (chickens < 1) spawnPickup('chicken');
     }
   }
 
