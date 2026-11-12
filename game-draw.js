@@ -387,23 +387,35 @@ function drawPlayer(p, t) {
   }
 
   if (p.rageT > 0) {
-    const flames = 8;
-    for (let i = 0; i < flames; i++) {
-      const a = (i / flames) * TAU + t * 3.2 + p.idx * 1.7;
-      const r = 40 * S + Math.sin(t * 9 + i * 1.3) * 7 * S;
-      const fx = p.x + Math.cos(a) * r;
-      const fy = p.y - 42 * S + Math.sin(a) * r * 0.55;
-      const h = (14 + Math.sin(t * 11 + i) * 4) * S;
-      ctx.beginPath();
-      ctx.moveTo(fx - 6 * S, fy + 4 * S);
-      ctx.quadraticCurveTo(fx - 8 * S, fy - h * 0.5, fx, fy - h);
-      ctx.quadraticCurveTo(fx + 8 * S, fy - h * 0.5, fx + 6 * S, fy + 4 * S);
-      ctx.closePath();
-      ctx.fillStyle = i % 2 === 0 ? '#ff6b35' : '#ffd23f';
-      ctx.globalAlpha = 0.85;
-      ctx.fill();
-      ctx.globalAlpha = 1;
+    const cx = p.x, cy = p.y - 42 * S;
+    const glow = ctx.createRadialGradient(cx, cy, 8 * S, cx, cy, 62 * S);
+    glow.addColorStop(0, 'rgba(255,230,120,0.45)');
+    glow.addColorStop(0.5, 'rgba(255,120,20,0.22)');
+    glow.addColorStop(1, 'rgba(255,60,0,0)');
+    ctx.fillStyle = glow;
+    ctx.beginPath(); ctx.arc(cx, cy, 62 * S, 0, TAU); ctx.fill();
+
+    const colors = ['#ff2a00', '#ff7a00', '#ffd23f'];
+    for (let layer = 0; layer < 3; layer++) {
+      const flames = 10;
+      for (let i = 0; i < flames; i++) {
+        const a = (i / flames) * TAU + t * (3.4 + layer * 0.7) + p.idx * 1.7 + layer * 0.35;
+        const r = (34 + layer * 6) * S + Math.sin(t * 9 + i * 1.3 + layer) * (8 + layer * 2) * S;
+        const fx = cx + Math.cos(a) * r;
+        const fy = cy + Math.sin(a) * r * 0.5;
+        const h = (20 + Math.sin(t * 11 + i + layer) * 6) * S * (1 - layer * 0.18);
+        const w = (7 + layer) * S;
+        ctx.beginPath();
+        ctx.moveTo(fx - w, fy + 5 * S);
+        ctx.quadraticCurveTo(fx - w * 1.3, fy - h * 0.45, fx, fy - h);
+        ctx.quadraticCurveTo(fx + w * 1.3, fy - h * 0.45, fx + w, fy + 5 * S);
+        ctx.closePath();
+        ctx.globalAlpha = 0.72 - layer * 0.18;
+        ctx.fillStyle = colors[layer];
+        ctx.fill();
+      }
     }
+    ctx.globalAlpha = 1;
   }
   if (p.shieldT > 0) {
     ctx.beginPath();
