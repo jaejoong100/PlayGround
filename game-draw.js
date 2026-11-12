@@ -395,6 +395,15 @@ function drawPlayer(p, t) {
     ctx.strokeStyle = 'rgba(255,210,63,.8)';
     ctx.stroke();
   }
+  if (p.shieldT > 0) {
+    ctx.beginPath();
+    ctx.arc(p.x, p.y - 42 * S, 52 * S, 0, TAU);
+    ctx.fillStyle = `rgba(125,211,252,${0.18 + Math.sin(t * 8) * 0.05})`;
+    ctx.fill();
+    ctx.lineWidth = 3 * S;
+    ctx.strokeStyle = 'rgba(14,165,233,.85)';
+    ctx.stroke();
+  }
   ctx.save();
   ctx.translate(p.x, p.y);
   if (p.invuln > 0 && state === 'play' && Math.floor(p.invuln * 22) % 2 === 0) ctx.globalAlpha = 0.55;
@@ -796,6 +805,17 @@ function drawPickups(t) {
       ctx.moveTo(9 * S, 6 * S); ctx.lineTo(14 * S, 14 * S); ctx.lineTo(4 * S, 10 * S);
       ctx.fillStyle = '#7bc96f'; ctx.fill();
       ctx.lineWidth = 2 * S; ctx.strokeStyle = INK; ctx.stroke();
+      ctx.restore();
+    } else if (pk.type === 'shield') {
+      ctx.beginPath(); ctx.arc(0, 0, 12 * S, 0, TAU);
+      ctx.fillStyle = 'rgba(125,211,252,.35)'; ctx.fill();
+      ctx.lineWidth = 3 * S; ctx.strokeStyle = '#0ea5e9'; ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(0, -14 * S); ctx.lineTo(10 * S, -6 * S); ctx.lineTo(10 * S, 6 * S);
+      ctx.lineTo(0, 14 * S); ctx.lineTo(-10 * S, 6 * S); ctx.lineTo(-10 * S, -6 * S);
+      ctx.closePath();
+      ctx.fillStyle = '#e0f2fe'; ctx.fill();
+      ctx.lineWidth = 2.5 * S; ctx.strokeStyle = INK; ctx.stroke();
       ctx.restore();
     } else {
       heartPath(ctx, 0, 0, 14 * S);

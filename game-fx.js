@@ -280,6 +280,13 @@ function hitPlayer(p, dmg, dir, ball) {
   }
   if (state !== 'play' || p.invuln > 0) return;
 
+  if (p.shieldT > 0) {
+    burst(p.x, p.y - 44 * S, '#7dd3fc', 12, 0.9, 'ring');
+    addFloater('SHIELDED', p.x, p.y - 96 * S, '#7dd3fc', 26);
+    sfx.ui();
+    return;
+  }
+
   p.hp = Math.max(0, p.hp - dmg);
   p.invuln = 0.55;
   p.hitstun = 0.2;
@@ -351,7 +358,7 @@ function spawnPickup(type) {
       y = floorY - 28 * S;
     }
   } while (tries < 12 && players.some(p => dist(p.x, p.y - 40 * S, x, y) < 80 * S));
-  const color = type === 'chicken' ? '#ffd23f' : '#ff5d5d';
+  const color = type === 'chicken' ? '#ffd23f' : type === 'shield' ? '#7dd3fc' : '#ff5d5d';
   pickups.push({ type, x, y, ph: rand(0, TAU), life: 26 });
   addParticle({ x, y, life: 0.45, size: 10 * S, color, kind: 'ring', grav: 0 });
 }
@@ -368,6 +375,11 @@ function updatePickups(dt) {
           p.rageT = 3;
           addFloater('ENRAGED!', pk.x, pk.y - 22 * S, '#ffd23f', 22);
           burst(pk.x, pk.y, '#ffd23f', 12, 0.8, 'star');
+          sfx.ui();
+        } else if (pk.type === 'shield') {
+          p.shieldT = 3;
+          addFloater('SHIELDED!', pk.x, pk.y - 22 * S, '#7dd3fc', 22);
+          burst(pk.x, pk.y, '#7dd3fc', 12, 0.8, 'star');
           sfx.ui();
         } else {
           p.hp = Math.min(p.maxHp, p.hp + 30);
