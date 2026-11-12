@@ -348,17 +348,8 @@ function computeLayout() {
 
 function generatePlatforms() {
   const bw = arena.right - arena.left;
-  const mirror = Math.random() < 0.5;
-  const w = [
-    clamp(190 * S, bw * 0.16, bw * 0.24),
-    clamp(160 * S, bw * 0.14, bw * 0.20),
-    clamp(135 * S, bw * 0.12, bw * 0.18),
-    clamp(115 * S, bw * 0.10, bw * 0.15),
-  ];
-
-  // Keep the lowest ledge above a brawler's head (plus badge) and keep every
-  // step within a single jump. Short/landscape screens get fewer ledges rather
-  // than a cramped stack that clips through the fighters.
+  // Three times as many, three times smaller ledges: a denser field of
+  // small moving platforms instead of a few big ones.
   const step = 110 * S;
   const maxRise = Math.max(step, floorY - (arena.top + 54 * S));
   let levels = 1;
@@ -366,27 +357,24 @@ function generatePlatforms() {
   if (maxRise >= step * 3) levels = 3;
   if (maxRise >= step * 4) levels = 4;
 
-  // Chain the platforms horizontally so each one overlaps the next.
-  const xs = [arena.left + bw * 0.05];
-  for (let i = 1; i < levels; i++) {
-    xs[i] = Math.min(xs[i - 1] + w[i - 1] - w[i] * 0.34, arena.right - w[i] - 10);
-  }
+  const cols = 3;
+  const pw = clamp(75 * S, bw * 0.08, bw * 0.13);
 
   platforms = [];
   for (let i = 0; i < levels; i++) {
-    platforms.push({
-      x: xs[i],
-      y: floorY - step * (i + 1),
-      w: w[i],
-      h: 16 * S,
-      style: i,
-      vx: (i % 2 === 0 ? 1 : -1) * rand(40, 110) * S,
-    });
+    for (let k = 0; k < cols; k++) {
+      const x = arena.left + (k + 0.5) * (bw / cols) - pw / 2 + rand(-bw * 0.04, bw * 0.04);
+      platforms.push({
+        x: clamp(x, arena.left + 8, arena.right - pw - 8),
+        y: floorY - step * (i + 1),
+        w: pw,
+        h: 14 * S,
+        style: (i + k) % 3,
+        vx: ((i + k) % 2 === 0 ? 1 : -1) * rand(40, 110) * S,
+      });
+    }
   }
 
-  if (mirror) {
-    for (const p of platforms) p.x = arena.left + (arena.right - p.x - p.w);
-  }
   for (const p of platforms) {
     p.x = clamp(p.x, arena.left + 8, arena.right - p.w - 8);
     p.y = Math.max(p.y, arena.top + 54 * S);
