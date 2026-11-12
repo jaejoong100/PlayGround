@@ -389,33 +389,28 @@ function drawPlayer(p, t) {
   if (p.rageT > 0) {
     const cx = p.x, cy = p.y - 42 * S;
     const glow = ctx.createRadialGradient(cx, cy, 8 * S, cx, cy, 62 * S);
-    glow.addColorStop(0, 'rgba(255,230,120,0.45)');
-    glow.addColorStop(0.5, 'rgba(255,120,20,0.22)');
-    glow.addColorStop(1, 'rgba(255,60,0,0)');
+    glow.addColorStop(0, 'rgba(255,200,80,0.4)');
+    glow.addColorStop(1, 'rgba(255,80,0,0)');
     ctx.fillStyle = glow;
     ctx.beginPath(); ctx.arc(cx, cy, 62 * S, 0, TAU); ctx.fill();
 
-    const colors = ['#ff2a00', '#ff7a00', '#ffd23f'];
-    for (let layer = 0; layer < 3; layer++) {
-      const flames = 10;
-      for (let i = 0; i < flames; i++) {
-        const a = (i / flames) * TAU + t * (3.4 + layer * 0.7) + p.idx * 1.7 + layer * 0.35;
-        const r = (34 + layer * 6) * S + Math.sin(t * 9 + i * 1.3 + layer) * (8 + layer * 2) * S;
-        const fx = cx + Math.cos(a) * r;
-        const fy = cy + Math.sin(a) * r * 0.5;
-        const h = (20 + Math.sin(t * 11 + i + layer) * 6) * S * (1 - layer * 0.18);
-        const w = (7 + layer) * S;
-        ctx.beginPath();
-        ctx.moveTo(fx - w, fy + 5 * S);
-        ctx.quadraticCurveTo(fx - w * 1.3, fy - h * 0.45, fx, fy - h);
-        ctx.quadraticCurveTo(fx + w * 1.3, fy - h * 0.45, fx + w, fy + 5 * S);
-        ctx.closePath();
-        ctx.globalAlpha = 0.72 - layer * 0.18;
-        ctx.fillStyle = colors[layer];
-        ctx.fill();
-      }
+    ctx.font = `${22 * S}px serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    const flames = 7;
+    for (let i = 0; i < flames; i++) {
+      const a = (i / flames) * TAU + t * 2.6 + p.idx * 1.7;
+      const r = 44 * S + Math.sin(t * 7 + i * 1.4) * 8 * S;
+      const fx = cx + Math.cos(a) * r;
+      const fy = cy + Math.sin(a) * r * 0.45;
+      const size = (1.0 + Math.sin(t * 9 + i) * 0.25) * 22 * S;
+      ctx.font = `${size}px serif`;
+      ctx.globalAlpha = 0.9;
+      ctx.fillText('🔥', fx, fy);
     }
     ctx.globalAlpha = 1;
+    ctx.font = `${30 * S}px serif`;
+    ctx.fillText('🔥', cx, cy - 18 * S + Math.sin(t * 6) * 4 * S);
   }
   if (p.shieldT > 0) {
     ctx.beginPath();
@@ -812,16 +807,10 @@ function drawPickups(t) {
     const pulse = 1 + Math.sin(t * 6 + pk.ph) * 0.06;
     ctx.scale(pulse, pulse);
     if (pk.type === 'chicken') {
-      // turkey leg
-      ctx.beginPath(); ctx.ellipse(0, -2 * S, 7 * S, 16 * S, 0, 0, TAU);
-      ctx.fillStyle = '#b86b3a'; ctx.fill();
-      ctx.lineWidth = 3 * S; ctx.strokeStyle = INK; ctx.stroke();
-      ctx.beginPath(); ctx.ellipse(0, 6 * S, 10 * S, 9 * S, 0, 0, TAU);
-      ctx.fillStyle = '#d9824a'; ctx.fill();
-      ctx.lineWidth = 3 * S; ctx.strokeStyle = INK; ctx.stroke();
-      ctx.beginPath(); ctx.ellipse(0, -15 * S, 4 * S, 6 * S, 0, 0, TAU);
-      ctx.fillStyle = '#f4e7d7'; ctx.fill();
-      ctx.lineWidth = 2.5 * S; ctx.strokeStyle = INK; ctx.stroke();
+      ctx.font = `${28 * S}px serif`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('🍗', 0, 0);
       ctx.restore();
     } else if (pk.type === 'shield') {
       ctx.font = `${28 * S}px serif`;
