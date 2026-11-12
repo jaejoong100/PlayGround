@@ -812,20 +812,10 @@ function drawPickups(t) {
       ctx.lineWidth = 2.5 * S; ctx.strokeStyle = INK; ctx.stroke();
       ctx.restore();
     } else if (pk.type === 'shield') {
-      ctx.beginPath();
-      ctx.moveTo(0, -15 * S);
-      ctx.lineTo(12 * S, -9 * S);
-      ctx.lineTo(12 * S, 4 * S);
-      ctx.quadraticCurveTo(12 * S, 13 * S, 0, 17 * S);
-      ctx.quadraticCurveTo(-12 * S, 13 * S, -12 * S, 4 * S);
-      ctx.lineTo(-12 * S, -9 * S);
-      ctx.closePath();
-      ctx.fillStyle = '#bfdbfe'; ctx.fill();
-      ctx.lineWidth = 3 * S; ctx.strokeStyle = INK; ctx.stroke();
-      ctx.beginPath();
-      ctx.moveTo(0, -9 * S); ctx.lineTo(0, 11 * S);
-      ctx.moveTo(-7 * S, 1 * S); ctx.lineTo(7 * S, 1 * S);
-      ctx.lineWidth = 2.5 * S; ctx.strokeStyle = '#2563eb'; ctx.stroke();
+      ctx.font = `${28 * S}px serif`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('🛡️', 0, 0);
       ctx.restore();
     } else {
       heartPath(ctx, 0, 0, 14 * S);
