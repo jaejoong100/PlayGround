@@ -558,6 +558,12 @@ function bindJoysticks() {
         releaseThrow(p);
         p.needsMove = true;
       }
+      // restore default position
+      joyEl.style.position = '';
+      joyEl.style.left = '';
+      joyEl.style.top = '';
+      joyEl.style.right = '';
+      joyEl.style.bottom = '';
       j.pointerId = null;
       j.jumpLatch = false;
       touchAxes[pIdx] = 0;
@@ -568,8 +574,19 @@ function bindJoysticks() {
 
     joyEl.addEventListener('pointerdown', e => {
       e.preventDefault();
+      e.stopImmediatePropagation();
       ensureAudio();
       if (!canUse() || j.pointerId !== null) return;
+      // float the joystick to the touch point
+      const pad = joyEl.closest('.pad');
+      const padRect = pad.getBoundingClientRect();
+      const halfW = joyEl.offsetWidth / 2;
+      const halfH = joyEl.offsetHeight / 2;
+      joyEl.style.position = 'absolute';
+      joyEl.style.left = (e.clientX - padRect.left - halfW) + 'px';
+      joyEl.style.top = (e.clientY - padRect.top - halfH) + 'px';
+      joyEl.style.right = 'auto';
+      joyEl.style.bottom = 'auto';
       j.pointerId = e.pointerId;
       joyEl.classList.add('active');
       try { joyEl.setPointerCapture(e.pointerId); } catch {}
@@ -711,7 +728,7 @@ function updatePlayer(p, dt) {
   p.wasGround = p.onGround;
   const prevY = p.y;
   p.vy += gravityFor() * dt;
-  p.vy = Math.min(p.vy, 3800 * S);
+  p.vy = Math.min(p.vy, 1900 * S);
   p.x += p.vx * dt;
   p.y += p.vy * dt;
   p.x = clamp(p.x, arena.left + 18 * S, arena.right - 18 * S);
