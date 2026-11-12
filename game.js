@@ -426,7 +426,7 @@ function gravityFor() {
   return 2100 * S * (roundMod.grav || 1);
 }
 function jumpSpeedFor() {
-  return 790 * S * (roundMod.jump || 1);
+  return 790 * S * (roundMod.jump || 1) * 1.2;
 }
 function ballGravityFor() {
   return 1650 * S * (roundMod.ballGrav || 1);
