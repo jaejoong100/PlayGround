@@ -161,7 +161,7 @@ function startRound() {
   paused = false;
   elsPause(false);
   roundMod = chooseMod();
-  roundTime = 55;
+  roundTime = 60;
   countdown = 3.0;
   countdownLabel = '3';
   roundDamage = [0, 0];
@@ -191,7 +191,7 @@ function startRound() {
 
 function beginPlay() {
   state = 'play';
-  roundTime = 55;
+  roundTime = 60;
   el.roundCard.classList.add('hidden');
   showAnnounce('FIGHT!');
   sfx.fight();
