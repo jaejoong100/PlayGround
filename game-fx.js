@@ -373,11 +373,13 @@ function updatePickups(dt) {
         pk.dead = true;
         if (pk.type === 'chicken') {
           p.rageT = 3;
+          chickenTimer = rand(5, 10);
           addFloater('ENRAGED!', pk.x, pk.y - 22 * S, '#ffd23f', 22);
           burst(pk.x, pk.y, '#ffd23f', 12, 0.8, 'star');
           sfx.ui();
         } else if (pk.type === 'shield') {
           p.shieldT = 3;
+          shieldTimer = rand(5, 10);
           addFloater('SHIELDED!', pk.x, pk.y - 22 * S, '#7dd3fc', 22);
           burst(pk.x, pk.y, '#7dd3fc', 12, 0.8, 'star');
           sfx.ui();
