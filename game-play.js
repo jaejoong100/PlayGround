@@ -570,34 +570,11 @@ function bindJoysticks() {
       joyEl.classList.remove('active');
       knob.style.transform = 'translate(-50%, -50%)';
     };
+    j.centerOf = centerOf;
+    j.setAxis = setAxis;
+    j.releaseFn = release;
     const canUse = () => (state === 'play' || state === 'title') && !paused;
 
-    joyEl.addEventListener('pointerdown', e => {
-      e.preventDefault();
-      e.stopImmediatePropagation();
-      ensureAudio();
-      if (!canUse() || j.pointerId !== null) return;
-      // float the joystick to the touch point, constrained to its screen half
-      const pad = joyEl.closest('.pad');
-      const padRect = pad.getBoundingClientRect();
-      const halfW = joyEl.offsetWidth / 2;
-      const halfH = joyEl.offsetHeight / 2;
-      const mid = window.innerWidth / 2;
-      let cx = e.clientX, cy = e.clientY;
-      if (j.pIdx === 0) cx = Math.max(halfW, Math.min(cx, mid - halfW));
-      else cx = Math.max(mid + halfW, Math.min(cx, window.innerWidth - halfW));
-      cy = Math.max(halfH, Math.min(cy, window.innerHeight - halfH));
-      joyEl.style.position = 'absolute';
-      joyEl.style.left = (cx - padRect.left - halfW) + 'px';
-      joyEl.style.top = (cy - padRect.top - halfH) + 'px';
-      joyEl.style.right = 'auto';
-      joyEl.style.bottom = 'auto';
-      j.pointerId = e.pointerId;
-      joyEl.classList.add('active');
-      try { joyEl.setPointerCapture(e.pointerId); } catch {}
-      const c = centerOf();
-      setAxis(e.clientX - c.x, e.clientY - c.y);
-    });
     joyEl.addEventListener('pointermove', e => {
       if (j.pointerId !== e.pointerId) return;
       e.preventDefault();
@@ -631,6 +608,43 @@ function bindJoysticks() {
     window.addEventListener('pointercancel', end);
     window.addEventListener('lostpointercapture', end);
   }
+
+  // Full-half touch zones: touching anywhere in a player's half activates
+  // and floats that player's joystick at the touch point.
+  if (!window.__bonkJoyZones) {
+    window.__bonkJoyZones = true;
+    window.addEventListener('pointerdown', e => {
+      if (!((state === 'play' || state === 'title') && !paused)) return;
+      const target = e.target;
+      if (target && target.closest && target.closest('button, .btn, .tab, input, a, .panel')) return;
+      const idx = e.clientX < window.innerWidth / 2 ? 0 : 1;
+      const j = joysticks[idx];
+      if (!j || j.pointerId !== null) return;
+      ensureAudio();
+      const joyEl = j.el;
+      const pad = joyEl.closest('.pad');
+      const padRect = pad.getBoundingClientRect();
+      const halfW = joyEl.offsetWidth / 2;
+      const halfH = joyEl.offsetHeight / 2;
+      const mid = window.innerWidth / 2;
+      let cx = e.clientX, cy = e.clientY;
+      if (idx === 0) cx = Math.max(halfW, Math.min(cx, mid - halfW));
+      else cx = Math.max(mid + halfW, Math.min(cx, window.innerWidth - halfW));
+      cy = Math.max(halfH, Math.min(cy, window.innerHeight - halfH));
+      joyEl.style.position = 'absolute';
+      joyEl.style.left = (cx - padRect.left - halfW) + 'px';
+      joyEl.style.top = (cy - padRect.top - halfH) + 'px';
+      joyEl.style.right = 'auto';
+      joyEl.style.bottom = 'auto';
+      j.pointerId = e.pointerId;
+      joyEl.classList.add('active');
+      try { joyEl.setPointerCapture(e.pointerId); } catch {}
+      const c = j.centerOf();
+      j.setAxis(e.clientX - c.x, e.clientY - c.y);
+      e.preventDefault();
+    }, { passive: false });
+  }
+  // expose canUse for zone handler
 
 function resetJoysticks() {
   touchAxes[0] = 0;
