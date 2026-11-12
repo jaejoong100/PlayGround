@@ -812,16 +812,10 @@ function drawPickups(t) {
     const pulse = 1 + Math.sin(t * 6 + pk.ph) * 0.06;
     ctx.scale(pulse, pulse);
     if (pk.type === 'chicken') {
-      // turkey leg
-      ctx.beginPath(); ctx.ellipse(0, -2 * S, 7 * S, 16 * S, 0, 0, TAU);
-      ctx.fillStyle = '#b86b3a'; ctx.fill();
-      ctx.lineWidth = 3 * S; ctx.strokeStyle = INK; ctx.stroke();
-      ctx.beginPath(); ctx.ellipse(0, 6 * S, 10 * S, 9 * S, 0, 0, TAU);
-      ctx.fillStyle = '#d9824a'; ctx.fill();
-      ctx.lineWidth = 3 * S; ctx.strokeStyle = INK; ctx.stroke();
-      ctx.beginPath(); ctx.ellipse(0, -15 * S, 4 * S, 6 * S, 0, 0, TAU);
-      ctx.fillStyle = '#f4e7d7'; ctx.fill();
-      ctx.lineWidth = 2.5 * S; ctx.strokeStyle = INK; ctx.stroke();
+      ctx.font = `${28 * S}px serif`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('🍗', 0, 0);
       ctx.restore();
     } else if (pk.type === 'shield') {
       ctx.font = `${28 * S}px serif`;
