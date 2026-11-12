@@ -387,12 +387,31 @@ function drawPlayer(p, t) {
   }
 
   if (p.rageT > 0) {
+    const flames = 8;
+    for (let i = 0; i < flames; i++) {
+      const a = (i / flames) * TAU + t * 3.2 + p.idx * 1.7;
+      const r = 40 * S + Math.sin(t * 9 + i * 1.3) * 7 * S;
+      const fx = p.x + Math.cos(a) * r;
+      const fy = p.y - 42 * S + Math.sin(a) * r * 0.55;
+      const h = (14 + Math.sin(t * 11 + i) * 4) * S;
+      ctx.beginPath();
+      ctx.moveTo(fx - 6 * S, fy + 4 * S);
+      ctx.quadraticCurveTo(fx - 8 * S, fy - h * 0.5, fx, fy - h);
+      ctx.quadraticCurveTo(fx + 8 * S, fy - h * 0.5, fx + 6 * S, fy + 4 * S);
+      ctx.closePath();
+      ctx.fillStyle = i % 2 === 0 ? '#ff6b35' : '#ffd23f';
+      ctx.globalAlpha = 0.85;
+      ctx.fill();
+      ctx.globalAlpha = 1;
+    }
+  }
+  if (p.shieldT > 0) {
     ctx.beginPath();
-    ctx.arc(p.x, p.y - 42 * S, 46 * S, 0, TAU);
-    ctx.fillStyle = `rgba(255,140,40,${0.16 + Math.sin(t * 10) * 0.05})`;
+    ctx.arc(p.x, p.y - 42 * S, 52 * S, 0, TAU);
+    ctx.fillStyle = `rgba(125,211,252,${0.18 + Math.sin(t * 8) * 0.05})`;
     ctx.fill();
     ctx.lineWidth = 3 * S;
-    ctx.strokeStyle = 'rgba(255,210,63,.8)';
+    ctx.strokeStyle = 'rgba(14,165,233,.85)';
     ctx.stroke();
   }
   ctx.save();
@@ -781,17 +800,32 @@ function drawPickups(t) {
     const pulse = 1 + Math.sin(t * 6 + pk.ph) * 0.06;
     ctx.scale(pulse, pulse);
     if (pk.type === 'chicken') {
-      // chicken booster
-      ctx.beginPath(); ctx.ellipse(0, 2 * S, 12 * S, 10 * S, 0, 0, TAU);
-      ctx.fillStyle = '#ffd23f'; ctx.fill();
+      // turkey leg
+      ctx.beginPath(); ctx.ellipse(0, -2 * S, 7 * S, 16 * S, 0, 0, TAU);
+      ctx.fillStyle = '#b86b3a'; ctx.fill();
       ctx.lineWidth = 3 * S; ctx.strokeStyle = INK; ctx.stroke();
-      ctx.beginPath(); ctx.arc(0, -10 * S, 7 * S, 0, TAU);
-      ctx.fillStyle = '#fff4d8'; ctx.fill();
+      ctx.beginPath(); ctx.ellipse(0, 6 * S, 10 * S, 9 * S, 0, 0, TAU);
+      ctx.fillStyle = '#d9824a'; ctx.fill();
+      ctx.lineWidth = 3 * S; ctx.strokeStyle = INK; ctx.stroke();
+      ctx.beginPath(); ctx.ellipse(0, -15 * S, 4 * S, 6 * S, 0, 0, TAU);
+      ctx.fillStyle = '#f4e7d7'; ctx.fill();
       ctx.lineWidth = 2.5 * S; ctx.strokeStyle = INK; ctx.stroke();
-      ctx.beginPath(); ctx.moveTo(6 * S, -10 * S); ctx.lineTo(13 * S, -8 * S); ctx.lineTo(6 * S, -6 * S);
-      ctx.fillStyle = '#ff8c42'; ctx.fill();
-      ctx.beginPath(); ctx.arc(2 * S, -11 * S, 1.6 * S, 0, TAU);
-      ctx.fillStyle = INK; ctx.fill();
+      ctx.restore();
+    } else if (pk.type === 'shield') {
+      ctx.beginPath();
+      ctx.moveTo(0, -15 * S);
+      ctx.lineTo(12 * S, -9 * S);
+      ctx.lineTo(12 * S, 4 * S);
+      ctx.quadraticCurveTo(12 * S, 13 * S, 0, 17 * S);
+      ctx.quadraticCurveTo(-12 * S, 13 * S, -12 * S, 4 * S);
+      ctx.lineTo(-12 * S, -9 * S);
+      ctx.closePath();
+      ctx.fillStyle = '#bfdbfe'; ctx.fill();
+      ctx.lineWidth = 3 * S; ctx.strokeStyle = INK; ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(0, -9 * S); ctx.lineTo(0, 11 * S);
+      ctx.moveTo(-7 * S, 1 * S); ctx.lineTo(7 * S, 1 * S);
+      ctx.lineWidth = 2.5 * S; ctx.strokeStyle = '#2563eb'; ctx.stroke();
       ctx.restore();
     } else {
       heartPath(ctx, 0, 0, 14 * S);
