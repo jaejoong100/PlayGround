@@ -577,14 +577,19 @@ function bindJoysticks() {
       e.stopImmediatePropagation();
       ensureAudio();
       if (!canUse() || j.pointerId !== null) return;
-      // float the joystick to the touch point
+      // float the joystick to the touch point, constrained to its screen half
       const pad = joyEl.closest('.pad');
       const padRect = pad.getBoundingClientRect();
       const halfW = joyEl.offsetWidth / 2;
       const halfH = joyEl.offsetHeight / 2;
+      const mid = window.innerWidth / 2;
+      let cx = e.clientX, cy = e.clientY;
+      if (j.pIdx === 0) cx = Math.max(halfW, Math.min(cx, mid - halfW));
+      else cx = Math.max(mid + halfW, Math.min(cx, window.innerWidth - halfW));
+      cy = Math.max(halfH, Math.min(cy, window.innerHeight - halfH));
       joyEl.style.position = 'absolute';
-      joyEl.style.left = (e.clientX - padRect.left - halfW) + 'px';
-      joyEl.style.top = (e.clientY - padRect.top - halfH) + 'px';
+      joyEl.style.left = (cx - padRect.left - halfW) + 'px';
+      joyEl.style.top = (cy - padRect.top - halfH) + 'px';
       joyEl.style.right = 'auto';
       joyEl.style.bottom = 'auto';
       j.pointerId = e.pointerId;
